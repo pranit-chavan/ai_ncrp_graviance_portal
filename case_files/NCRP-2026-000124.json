@@ -1,0 +1,130 @@
+{
+  "reference": "NCRP/2026/000124",
+  "generated_at": "2026-09-23T19:45:22",
+  "complainant": {
+    "title": "",
+    "name": "Withheld",
+    "gender": "not supplied",
+    "dob": "not supplied",
+    "age": 16,
+    "relative_name": "not supplied",
+    "relative_type": "Father",
+    "phone": "97XXXXXX08",
+    "email": "not supplied",
+    "address": "not supplied",
+    "city": "Pune",
+    "district": "not supplied",
+    "state": "Maharashtra",
+    "pincode": "not supplied",
+    "police_station": "not supplied",
+    "relationship_with_victim": "Self",
+    "id_type": "not supplied",
+    "id_upload_name": "not supplied"
+  },
+  "incident": {
+    "datetime": "not supplied",
+    "category": "not supplied",
+    "sub_category_reported": "not supplied",
+    "modus_operandi": "not supplied",
+    "location": [],
+    "delay_in_reporting": "No",
+    "delay_reason": "N/A"
+  },
+  "complaint": {
+    "raw_text": "not supplied",
+    "standardised_narrative": "The complainant was contacted on a social media platform by an unknown account. Private material was obtained during a video call without consent and its circulation was threatened unless payment was made.",
+    "narrative_source": "Module A"
+  },
+  "classification": {
+    "sub_category": "Cyber Bullying / Stalking / Sexting",
+    "confidence": 0.91,
+    "confidence_band": "HIGH",
+    "guidance": "Classification is reliable. Officer confirmation still required.",
+    "source": "Module B - machine generated",
+    "requires_confirmation": true
+  },
+  "extracted_entities": {
+    "platform": "Instagram",
+    "amount_demanded": "Rs. 20,000"
+  },
+  "legal_sections": {
+    "sub_category": "Cyber Bullying / Stalking / Sexting",
+    "it_act": [
+      {
+        "section": "66E",
+        "description": "Violation of privacy"
+      },
+      {
+        "section": "67",
+        "description": "Publishing or transmitting obscene material in electronic form"
+      },
+      {
+        "section": "67A",
+        "description": "Publishing or transmitting sexually explicit material"
+      }
+    ],
+    "bns": [
+      {
+        "section": "78",
+        "description": "Stalking",
+        "ipc_equivalent": "354D"
+      },
+      {
+        "section": "351",
+        "description": "Criminal intimidation",
+        "ipc_equivalent": "503/506"
+      }
+    ],
+    "other": [
+      {
+        "act": "POCSO Act 2012",
+        "section": "11",
+        "description": "Sexual harassment of a child"
+      },
+      {
+        "act": "POCSO Act 2012",
+        "section": "13",
+        "description": "Use of a child for pornographic purposes"
+      }
+    ],
+    "conditional_applied": [
+      {
+        "rule": "complainant_age < 18",
+        "status": "APPLIED",
+        "reason": "complainant_age = 16",
+        "note": "Applied from the structured complainant_age field only. Never inferred from narrative text."
+      }
+    ],
+    "notes": "Where money was demanded against threatened release of material, BNS 308 (extortion) is also attracted.",
+    "disclaimer": "This mapping is decision-support for an investigating officer. It is not legal advice and the final charge sheet is settled by the investigating officer and the prosecution."
+  },
+  "transactions": [],
+  "suspect_transactions": [],
+  "suspects": [],
+  "evidence": {
+    "attachments": [
+      "chat_screenshot.png"
+    ],
+    "count": 1,
+    "table": []
+  },
+  "intake_gaps_identified": [],
+  "reconciliation": {
+    "_status": "not available"
+  },
+  "sentiment": {},
+  "data_provenance": {
+    "narrative": "Module A (AI Standardised)",
+    "extracted_entities_source": "Module C (OCR + Regex)",
+    "classification_source": "Module B (LinearSVC Model)",
+    "legal_mapping_source": "Module D (Deterministic Statutory Lookup)",
+    "reconciliation_source": "Not Available"
+  },
+  "suggested_actions": [
+    "Issue a takedown request to the platform for the offending content or profile",
+    "Preserve the profile link, post URLs and screenshots before removal",
+    "Obtain subscriber details of the account from the platform"
+  ],
+  "status": "PENDING OFFICER REVIEW",
+  "_disclaimer": "This case file was assembled automatically from a citizen complaint. The classification and the legal provisions proposed are decision-support for the investigating officer and require confirmation before any action is taken on them."
+}

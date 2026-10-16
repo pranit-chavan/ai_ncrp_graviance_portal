@@ -1,0 +1,116 @@
+{
+  "reference": "NCRP/2026/000125",
+  "generated_at": "2026-09-23T19:45:22",
+  "complainant": {
+    "title": "",
+    "name": "A. Patil",
+    "gender": "not supplied",
+    "dob": "not supplied",
+    "age": "not supplied",
+    "relative_name": "not supplied",
+    "relative_type": "Father",
+    "phone": "99XXXXXX55",
+    "email": "not supplied",
+    "address": "not supplied",
+    "city": "Thane",
+    "district": "not supplied",
+    "state": "not supplied",
+    "pincode": "not supplied",
+    "police_station": "not supplied",
+    "relationship_with_victim": "Self",
+    "id_type": "not supplied",
+    "id_upload_name": "not supplied"
+  },
+  "incident": {
+    "datetime": "not supplied",
+    "category": "not supplied",
+    "sub_category_reported": "not supplied",
+    "modus_operandi": "not supplied",
+    "location": [],
+    "delay_in_reporting": "No",
+    "delay_reason": "N/A"
+  },
+  "complaint": {
+    "raw_text": "not supplied",
+    "standardised_narrative": "NOT AVAILABLE - Module A did not run",
+    "narrative_source": "unavailable"
+  },
+  "classification": {
+    "sub_category": "Cyber Bullying / Stalking / Sexting",
+    "confidence": 0.62,
+    "confidence_band": "LOW",
+    "guidance": "Manual classification recommended. Adjacent categories should be considered.",
+    "source": "Module B - machine generated",
+    "requires_confirmation": true
+  },
+  "extracted_entities": {
+    "_status": "NOT AVAILABLE - Module C did not run"
+  },
+  "legal_sections": {
+    "sub_category": "Cyber Bullying / Stalking / Sexting",
+    "it_act": [
+      {
+        "section": "66E",
+        "description": "Violation of privacy"
+      },
+      {
+        "section": "67",
+        "description": "Publishing or transmitting obscene material in electronic form"
+      },
+      {
+        "section": "67A",
+        "description": "Publishing or transmitting sexually explicit material"
+      }
+    ],
+    "bns": [
+      {
+        "section": "78",
+        "description": "Stalking",
+        "ipc_equivalent": "354D"
+      },
+      {
+        "section": "351",
+        "description": "Criminal intimidation",
+        "ipc_equivalent": "503/506"
+      }
+    ],
+    "other": [],
+    "conditional_applied": [
+      {
+        "rule": "complainant_age < 18",
+        "status": "NOT EVALUATED - complainant_age was not supplied",
+        "action": "Confirm the complainant's age; POCSO may apply."
+      }
+    ],
+    "notes": "Where money was demanded against threatened release of material, BNS 308 (extortion) is also attracted.",
+    "disclaimer": "This mapping is decision-support for an investigating officer. It is not legal advice and the final charge sheet is settled by the investigating officer and the prosecution."
+  },
+  "transactions": [],
+  "suspect_transactions": [],
+  "suspects": [],
+  "evidence": {
+    "attachments": [],
+    "count": 0,
+    "table": []
+  },
+  "intake_gaps_identified": [],
+  "reconciliation": {
+    "_status": "not available"
+  },
+  "sentiment": {},
+  "data_provenance": {
+    "narrative": "Citizen Raw Text",
+    "extracted_entities_source": "Not Available",
+    "classification_source": "Module B (LinearSVC Model)",
+    "legal_mapping_source": "Module D (Deterministic Statutory Lookup)",
+    "reconciliation_source": "Not Available"
+  },
+  "suggested_actions": [
+    "Confirm the complainant's age - POCSO may apply.",
+    "Issue a takedown request to the platform for the offending content or profile",
+    "Preserve the profile link, post URLs and screenshots before removal",
+    "Obtain subscriber details of the account from the platform"
+  ],
+  "status": "PENDING OFFICER REVIEW",
+  "_disclaimer": "This case file was assembled automatically from a citizen complaint. The classification and the legal provisions proposed are decision-support for the investigating officer and require confirmation before any action is taken on them."
+}

@@ -1,0 +1,472 @@
+{
+  "_meta": {
+    "description": "Deterministic legal mapping engine for National Cyber Crime Reporting Portal (NCRP) sub-categories to statutory penal provisions.",
+    "jurisdiction": "Republic of India",
+    "primary_penal_statute": "Bharatiya Nyaya Sanhita, 2023 (Act No. 45 of 2023)",
+    "primary_cyber_statute": "Information Technology Act, 2000 (Act No. 21 of 2000 as amended)",
+    "procedural_statute": "Bharatiya Nagarik Suraksha Sanhita, 2023 (Act No. 46 of 2023)",
+    "evidentiary_statute": "Bharatiya Sakshya Adhiniyam, 2023 (Act No. 47 of 2023)",
+    "enactment_effective_date": "2024-07-01",
+    "source_registry": "Ministry of Law and Justice, Government of India (India Code Information System: indiacode.nic.in)",
+    "bns_note": "Bharatiya Nyaya Sanhita 2023 replaced the Indian Penal Code (IPC 1860) with effect from 1 July 2024. Legacy IPC equivalents are retained for statutory cross-referencing and historical FIR compatibility.",
+    "evidentiary_note": "Section 63 of Bharatiya Sakshya Adhiniyam (BSA) 2023 governs admissibility of electronic records in court, superseding legacy Section 65B of Indian Evidence Act 1872.",
+    "disclaimer": "This mapping constitutes automated decision-support for investigating officers (IOs) and law enforcement authorities. It does not replace independent judicial or prosecutorial discretion.",
+    "last_reviewed": "2026-09-23",
+    "audit_status": "CERTIFIED_CURRENT"
+  },
+
+  "Cheating by Impersonation": {
+    "verified": true,
+    "statute_year": 2023,
+    "it_act": [
+      {"section": "66D", "description": "Cheating by personation by using computer resource (Imprisonment up to 3 years and fine up to Rs 1 lakh)"}
+    ],
+    "bns": [
+      {"section": "318(4)", "description": "Cheating and dishonestly inducing delivery of property (Imprisonment up to 7 years and fine)", "ipc_equivalent": "420"},
+      {"section": "319(2)", "description": "Cheating by personation (Imprisonment up to 5 years, or fine, or both)", "ipc_equivalent": "419"}
+    ],
+    "other": [],
+    "statutory_elements": [
+      "Deceptive representation of identity or authority using electronic communication",
+      "Dishonest inducement causing victim to deliver valuable property, money, or sensitive credentials",
+      "Intentional causation of wrongful gain to perpetrator or wrongful loss to victim"
+    ],
+    "notes": "Where the complaint discloses sustained confinement or intimidation via video call ('digital arrest'), BNS Section 308(2) (Extortion) and Section 127(2) (Wrongful confinement) must also be charged."
+  },
+
+  "Cyber Bullying / Stalking / Sexting": {
+    "verified": true,
+    "statute_year": 2023,
+    "it_act": [
+      {"section": "66E", "description": "Violation of privacy - intentionally capturing, publishing or transmitting image of private area without consent"},
+      {"section": "67", "description": "Publishing or transmitting obscene material in electronic form (First conviction up to 3 years, second conviction up to 5 years)"},
+      {"section": "67A", "description": "Publishing or transmitting material containing sexually explicit act in electronic form (First conviction up to 5 years)"}
+    ],
+    "bns": [
+      {"section": "78(1)", "description": "Stalking - monitoring the use by a woman of the internet, email or any other form of electronic communication (Imprisonment up to 3 years on first conviction)", "ipc_equivalent": "354D"},
+      {"section": "79", "description": "Word, gesture or act intended to insult the modesty of a woman (Imprisonment up to 3 years and fine)", "ipc_equivalent": "509"},
+      {"section": "351(2)", "description": "Criminal intimidation (Imprisonment up to 2 years, or fine, or both)", "ipc_equivalent": "503/506"}
+    ],
+    "other": [],
+    "conditional": [
+      {
+        "condition": "complainant_age < 18",
+        "add": [
+          {"act": "POCSO Act 2012", "section": "11", "description": "Sexual harassment of a child using electronic or digital media"},
+          {"act": "POCSO Act 2012", "section": "13", "description": "Use of a child for pornographic purposes"},
+          {"act": "POCSO Act 2012", "section": "15", "description": "Storage of child sexual abuse material (CSAM)"},
+          {"act": "Information Technology Act 2000", "section": "67B", "description": "Publishing or transmitting material depicting children in sexually explicit acts in electronic form"}
+        ],
+        "note": "Mandatory statutory enhancement triggered strictly from verified complainant_age field under Section 19 POCSO Act."
+      }
+    ],
+    "statutory_elements": [
+      "Repeated or persistent unwanted contact or monitoring via electronic platforms",
+      "Transmission of sexually explicit, abusive, or non-consensual private imagery",
+      "Intention to cause distress, fear of violence, or insult to modesty"
+    ],
+    "notes": "Where money or favors were demanded against threatened release of compromising material (sextortion), BNS Section 308(2) (Extortion - legacy IPC 384) is attracted."
+  },
+
+  "Email Phishing": {
+    "verified": true,
+    "statute_year": 2023,
+    "it_act": [
+      {"section": "66C", "description": "Identity theft - fraudulently or dishonestly making use of electronic signature, password or unique identification feature"},
+      {"section": "66D", "description": "Cheating by personation by using computer resource"}
+    ],
+    "bns": [
+      {"section": "318(4)", "description": "Cheating and dishonestly inducing delivery of property (Imprisonment up to 7 years)", "ipc_equivalent": "420"},
+      {"section": "336(3)", "description": "Forgery of electronic record for purpose of deception", "ipc_equivalent": "465"}
+    ],
+    "other": [],
+    "statutory_elements": [
+      "Creation or dispatch of deceptive electronic message mimicking legitimate financial/statutory institution",
+      "Harvesting of authentication credentials, OTPs, or financial secrets",
+      "Wrongful extraction of funds or unauthorized access to citizen account"
+    ],
+    "notes": "Where credentials were harvested without immediate monetary extraction, IT Act Section 66C remains the primary charging provision."
+  },
+
+  "Fake / Impersonating Profile": {
+    "verified": true,
+    "statute_year": 2023,
+    "it_act": [
+      {"section": "66C", "description": "Identity theft - fraudulent use of victim's electronic identity, name, photograph or unique identification feature"},
+      {"section": "66D", "description": "Cheating by personation by using computer resource"}
+    ],
+    "bns": [
+      {"section": "319(2)", "description": "Cheating by personation (Imprisonment up to 5 years)", "ipc_equivalent": "419"},
+      {"section": "356(2)", "description": "Defamation committed via electronic medium or social networking service", "ipc_equivalent": "499/500"}
+    ],
+    "other": [],
+    "statutory_elements": [
+      "Unauthorized establishment of digital profile utilizing another living or deceased person's likeness and identity",
+      "Deceptive representation to public, contacts, or commercial entities",
+      "Harm to reputation or fraudulent extraction of pecuniary benefit"
+    ],
+    "notes": "Where morphed or obscene photographs of the victim are uploaded on the fake profile, IT Act Section 67/67A and BNS Section 79 must be added."
+  },
+
+  "Impersonating Email (Business Email Compromise)": {
+    "verified": true,
+    "statute_year": 2023,
+    "it_act": [
+      {"section": "66C", "description": "Identity theft - unauthorized adoption of executive or vendor electronic communication identity"},
+      {"section": "66D", "description": "Cheating by personation by using computer resource"}
+    ],
+    "bns": [
+      {"section": "318(4)", "description": "Cheating and dishonestly inducing delivery of property (Imprisonment up to 7 years)", "ipc_equivalent": "420"},
+      {"section": "338", "description": "Forgery of electronic record for purpose of cheating (Imprisonment up to 7 years and fine)", "ipc_equivalent": "468"}
+    ],
+    "other": [],
+    "statutory_elements": [
+      "Intrusion into or deceptive spoofing of corporate domain or executive email account",
+      "Deceptive instruction to corporate accounts/finance department altering vendor beneficiary coordinates",
+      "Interception and diversion of high-value commercial transactions into illicit mule accounts"
+    ],
+    "notes": "Losses in BEC are typically substantial. Immediate inter-bank communication via I4C / 1930 portal is required to freeze beneficiary debit lines before withdrawal."
+  },
+
+  "Intimidating Email": {
+    "verified": true,
+    "statute_year": 2023,
+    "it_act": [
+      {"section": "66F", "description": "Cyber terrorism - where the communication threatens unity, integrity, security or sovereignty of India, or targets critical infrastructure"}
+    ],
+    "bns": [
+      {"section": "351(2)", "description": "Criminal intimidation via electronic record (Imprisonment up to 2 years, or fine, or both)", "ipc_equivalent": "503/506"},
+      {"section": "353(1)", "description": "Statements conducing to public mischief with intent to cause fear or alarm to the public", "ipc_equivalent": "505"}
+    ],
+    "other": [
+      {"act": "Unlawful Activities (Prevention) Act 1967", "description": "Invoked exclusively where a terrorist or unlawful association nexus is established during investigation"}
+    ],
+    "statutory_elements": [
+      "Transmission of electronic mail containing threat of injury to person, property, or reputation",
+      "Intent to cause alarm or compel recipient to take or omit an action contrary to law",
+      "Threat to public order or vital national infrastructure (if charged under 66F)"
+    ],
+    "notes": "Section 66F IT Act is exceptional. Common hoax bomb threats or individual harassment emails are primarily prosecuted under BNS Sections 351(2) and 353(1)."
+  },
+
+  "Online Job Fraud": {
+    "verified": true,
+    "statute_year": 2023,
+    "it_act": [
+      {"section": "66D", "description": "Cheating by personation by using computer resource"}
+    ],
+    "bns": [
+      {"section": "318(4)", "description": "Cheating and dishonestly inducing delivery of property (Imprisonment up to 7 years and fine)", "ipc_equivalent": "420"},
+      {"section": "338", "description": "Forgery of electronic record for purpose of cheating", "ipc_equivalent": "468"},
+      {"section": "340(2)", "description": "Using as genuine a forged electronic document or record (Imprisonment up to 7 years)", "ipc_equivalent": "471"}
+    ],
+    "other": [],
+    "statutory_elements": [
+      "Publication of fictitious employment or work-from-home vacancies on recruitment portals/Telegram",
+      "Fraudulent demand for upfront registration, security deposit, or document verification charges",
+      "Distribution of forged appointment orders or corporate seals"
+    ],
+    "notes": "Where job applicants' identity documents (PAN, Aadhaar) were collected and subsequently utilized to register mule accounts or SIM cards, charge IT Act Section 66C."
+  },
+
+  "Online Matrimonial Fraud": {
+    "verified": true,
+    "statute_year": 2023,
+    "it_act": [
+      {"section": "66D", "description": "Cheating by personation by using computer resource"}
+    ],
+    "bns": [
+      {"section": "318(4)", "description": "Cheating and dishonestly inducing delivery of property (Imprisonment up to 7 years)", "ipc_equivalent": "420"},
+      {"section": "319(2)", "description": "Cheating by personation (Imprisonment up to 5 years)", "ipc_equivalent": "419"}
+    ],
+    "other": [],
+    "statutory_elements": [
+      "Creation of fictitious profile on matrimonial platform portraying affluent foreign/NRI status",
+      "Emotional manipulation culminating in fictitious emergency (customs clearance fee, medical crisis)",
+      "Inducement of victim into transferring money into third-party beneficiary accounts"
+    ],
+    "notes": "Where the perpetrator enticed the victim into a fraudulent investment or cryptocurrency scheme under the guise of marriage, SEBI and PMLA provisions may be supplementary."
+  },
+
+  "Profile Hacking / Identity Theft": {
+    "verified": true,
+    "statute_year": 2023,
+    "it_act": [
+      {"section": "43", "description": "Penalty and compensation for damage to computer system and unauthorized access"},
+      {"section": "66", "description": "Computer-related offences - dishonest or fraudulent act referred to in section 43"},
+      {"section": "66C", "description": "Identity theft - fraudulently using password or unique identification feature"}
+    ],
+    "bns": [
+      {"section": "319(2)", "description": "Cheating by personation where hijacked profile is used to solicit funds", "ipc_equivalent": "419"}
+    ],
+    "other": [
+      {"act": "TRAI / DoT Subscriber Verification Guidelines", "description": "Applicable where account takeover was executed via illegal SIM swap"}
+    ],
+    "statutory_elements": [
+      "Bypassing security controls to gain unauthorized access to computer resource or social account",
+      "Appropriation and misuse of unique authentication keys, passwords, or recovery tokens",
+      "Depriving lawful user of access and exercising illegitimate dominion over digital identity"
+    ],
+    "notes": "Preserve IP access logs, session tokens, and telecom CDR records immediately before log retention thresholds expire."
+  },
+
+  "Provocative Speech for Unlawful Acts": {
+    "verified": true,
+    "statute_year": 2023,
+    "it_act": [
+      {"section": "66", "description": "Computer-related offences where a computer resource is deployed to commit an offence"},
+      {"section": "69A", "description": "Power to issue directions for blocking for public access of any information through any computer resource in interest of sovereignty, public order or security of State"}
+    ],
+    "bns": [
+      {"section": "196(1)", "description": "Promoting enmity between different groups on grounds of religion, race, place of birth, residence, language, etc. (Imprisonment up to 3 years)", "ipc_equivalent": "153A"},
+      {"section": "197(1)", "description": "Imputations, assertions prejudicial to national integration (Imprisonment up to 3 years)", "ipc_equivalent": "153B"},
+      {"section": "299", "description": "Deliberate and malicious acts intended to outrage religious feelings of any class (Imprisonment up to 3 years, or fine, or both)", "ipc_equivalent": "295A"},
+      {"section": "353(2)", "description": "Statements creating or promoting enmity, hatred or ill-will between classes in place of worship or via mass digital communication", "ipc_equivalent": "505"}
+    ],
+    "other": [],
+    "statutory_elements": [
+      "Dissemination of inflammatory, communally sensitive, or insurrectionary material across digital networks",
+      "Deliberate and malicious intent to cause public disorder, communal disharmony, or breach of peace",
+      "Deployment of mass digital communication channels to amplify provocative incitement"
+    ],
+    "notes": "Statutory Integrity Check: IT Act Section 66A was unconstitutionally struck down in Shreya Singhal v. Union of India (2015) 5 SCC 1 and must NEVER be cited. Prosecution is grounded strictly in BNS Sections 196, 197, 299, 353 and IT Act Section 69A blocking directives."
+  },
+
+  "AePS Fraud": {
+    "verified": true,
+    "statute_year": 2023,
+    "it_act": [
+      {"section": "66C", "description": "Identity theft - unauthorized access and use of biometric identity data"},
+      {"section": "66D", "description": "Cheating by personation by using computer resource"}
+    ],
+    "bns": [
+      {"section": "318(4)", "description": "Cheating and dishonestly inducing delivery of property (Imprisonment up to 7 years)", "ipc_equivalent": "420"},
+      {"section": "319(2)", "description": "Cheating by personation (Imprisonment up to 5 years)", "ipc_equivalent": "419"}
+    ],
+    "other": [
+      {"act": "Aadhaar (Targeted Delivery of Financial and Other Subsidies, Benefits and Services) Act 2016", "section": "29 / 38 / 40", "description": "Penalty for unauthorized access to Central Identities Data Repository and sharing of core biometric information"}
+    ],
+    "statutory_elements": [
+      "Illicit cloning or capture of citizen biometric identity data (silicone fingerprint, latent scan)",
+      "Authentication at Banking Correspondent (BC) Micro-ATM terminal without customer knowledge or presence",
+      "Siphoning of funds from Aadhaar-Enabled Payment System without OTP or physical debit card"
+    ],
+    "notes": "RBI circulars establish limited customer liability: where unauthorized electronic debit occurs without citizen negligence, the bank must reverse the debit within statutory timelines."
+  },
+
+  "Debit/Credit Card Fraud / SIM Swap Fraud": {
+    "verified": true,
+    "statute_year": 2023,
+    "it_act": [
+      {"section": "66C", "description": "Identity theft - unauthorized electronic signature, OTP, or CVV capture"},
+      {"section": "66D", "description": "Cheating by personation by using computer resource"}
+    ],
+    "bns": [
+      {"section": "318(4)", "description": "Cheating and dishonestly inducing delivery of property (Imprisonment up to 7 years)", "ipc_equivalent": "420"}
+    ],
+    "other": [
+      {"act": "RBI Master Directions on Limiting Liability of Customers in Unauthorised Electronic Banking Transactions", "description": "Zero liability applies where fraudulent transaction is reported within three working days"},
+      {"act": "TRAI / DoT Subscriber Verification Regulations", "description": "Mandatory physical and documentary verification prior to SIM issuance; telecom operator liability in fraudulent SIM swap"}
+    ],
+    "statutory_elements": [
+      "Compromise of card credentials via skimming, vishing, or phishing",
+      "Deceptive acquisition of replacement SIM card (SIM swap) to intercept 2-factor authentication codes",
+      "Unauthorized execution of debit transactions against cardholder's financial account"
+    ],
+    "notes": "In SIM-swap cases, obtain the exact timestamp of SIM deactivation from the telecom provider and cross-reference with the time of unauthorized bank debits."
+  },
+
+  "Demat / Depository Fraud": {
+    "verified": true,
+    "statute_year": 2023,
+    "it_act": [
+      {"section": "66D", "description": "Cheating by personation by using computer resource"}
+    ],
+    "bns": [
+      {"section": "316(2)", "description": "Criminal breach of trust (Imprisonment up to 5 years, or fine, or both)", "ipc_equivalent": "406"},
+      {"section": "318(4)", "description": "Cheating and dishonestly inducing delivery of property (Imprisonment up to 7 years)", "ipc_equivalent": "420"}
+    ],
+    "other": [
+      {"act": "Securities and Exchange Board of India (SEBI) Act 1992", "section": "12A / 24", "description": "Prohibition of manipulative and deceptive devices, fraudulent schemes, and unregistered investment advisory operations"}
+    ],
+    "statutory_elements": [
+      "Unauthorized liquidation or transfer of securities held in depository account (NSDL/CDSL)",
+      "Luring investors into counterfeit 'institutional trading accounts' or fraudulent stock recommendations on social media",
+      "Appropriation of investor capital through unregistered investment schemes"
+    ],
+    "notes": "Check registration of the entity on SEBI's official intermediary directory. Immediate intimation to NSDL/CDSL and depository participants is vital to trace share transfers."
+  },
+
+  "E-Wallet Related Fraud": {
+    "verified": true,
+    "statute_year": 2023,
+    "it_act": [
+      {"section": "66C", "description": "Identity theft - unauthorized access to wallet credentials"},
+      {"section": "66D", "description": "Cheating by personation by using computer resource"}
+    ],
+    "bns": [
+      {"section": "318(4)", "description": "Cheating and dishonestly inducing delivery of property (Imprisonment up to 7 years)", "ipc_equivalent": "420"}
+    ],
+    "other": [
+      {"act": "RBI Master Directions on Prepaid Payment Instruments (PPIs)", "description": "Customer protection guidelines, mandatory KYC verification, and transaction dispute redressal"}
+    ],
+    "statutory_elements": [
+      "Deceptive inducement to install screen-sharing software (AnyDesk, TeamViewer) or grant remote accessibility permissions",
+      "Unauthorized generation and scanning of wallet transfer QR codes",
+      "Rapid depletion and multi-hop transfer of digital wallet balances"
+    ],
+    "notes": "Preserve the name, download link, and installation timestamp of any remote access application installed on victim's device as primary digital evidence."
+  },
+
+  "Internet Banking Related Fraud": {
+    "verified": true,
+    "statute_year": 2023,
+    "it_act": [
+      {"section": "66C", "description": "Identity theft - unlawful extraction and use of customer login ID, transaction password, or OTP"},
+      {"section": "66D", "description": "Cheating by personation by using computer resource"}
+    ],
+    "bns": [
+      {"section": "318(4)", "description": "Cheating and dishonestly inducing delivery of property (Imprisonment up to 7 years)", "ipc_equivalent": "420"}
+    ],
+    "other": [
+      {"act": "Prevention of Money Laundering Act (PMLA) 2002", "section": "3 / 4", "description": "Applicable where stolen proceeds are systematically laundered through organized mule account syndicates"},
+      {"act": "RBI Cyber Security Framework in Banks", "description": "Mandatory suspicious transaction monitoring and inter-bank freeze protocols"}
+    ],
+    "statutory_elements": [
+      "Infiltration of victim's device via trojanized APK (electricity bill, bank KYC update) or cloned portal",
+      "Unauthorized addition of beneficiary accounts and execution of RTGS/NEFT/IMPS transfers",
+      "Layering of funds through secondary and tertiary mule accounts within minutes"
+    ],
+    "notes": "Extract and preserve the 12-digit UTR for every transaction. Immediate freeze requests must be dispatched to the destination banks via the I4C / 1930 system."
+  },
+
+  "UPI Related Frauds": {
+    "verified": true,
+    "statute_year": 2023,
+    "it_act": [
+      {"section": "66D", "description": "Cheating by personation by using computer resource"}
+    ],
+    "bns": [
+      {"section": "318(4)", "description": "Cheating and dishonestly inducing delivery of property (Imprisonment up to 7 years)", "ipc_equivalent": "420"}
+    ],
+    "other": [
+      {"act": "National Payments Corporation of India (NPCI) UPI Procedural Guidelines", "description": "Protocol for collect-request authentication, beneficiary tracing, and PSP settlement freeze"}
+    ],
+    "statutory_elements": [
+      "Deceptive generation of 'Collect Request' misrepresented to citizen as payment credit or refund",
+      "Inducement to enter UPI PIN under false pretext that PIN is required to receive money",
+      "Instantaneous electronic debit and routing to suspect Virtual Payment Address (VPA)"
+    ],
+    "notes": "UPI transfers settle instantly. Beneficiary VPAs and handles must be flagged on the NCRP portal within the 1930 Golden Hour window to intercept ATM cash-outs."
+  },
+
+  "Damage to Computer / Computer System": {
+    "verified": true,
+    "statute_year": 2023,
+    "it_act": [
+      {"section": "43", "description": "Penalty and compensation for damage to computer, computer system, virus injection, or data destruction"},
+      {"section": "66", "description": "Computer-related offences where the act under section 43 is committed dishonestly or fraudulently"}
+    ],
+    "bns": [
+      {"section": "324(1)", "description": "Mischief causing damage to property", "ipc_equivalent": "426"},
+      {"section": "324(4)", "description": "Mischief causing damage to the amount of twenty thousand rupees or more (Imprisonment up to 2 years, or fine, or both)", "ipc_equivalent": "427"}
+    ],
+    "other": [
+      {"act": "CERT-In Cyber Security Directions 2022", "description": "Mandatory cyber incident reporting within six hours of detection for ransomware, data destruction, and server compromise"}
+    ],
+    "statutory_elements": [
+      "Unlawful insertion or distribution of malware, ransomware, or logic bomb into target system",
+      "Degradation, disruption, or destruction of digital services or storage media",
+      "Pecuniary damage and disruption to organizational operations"
+    ],
+    "notes": "Where critical national infrastructure is affected, IT Act Section 66F (Cyber terrorism) is attracted. Confirm whether the mandatory 6-hour CERT-In filing has been completed."
+  },
+
+  "Email Hacking": {
+    "verified": true,
+    "statute_year": 2023,
+    "it_act": [
+      {"section": "43", "description": "Unauthorized access to computer resource and data extraction"},
+      {"section": "66", "description": "Computer-related offences"},
+      {"section": "66C", "description": "Identity theft - unauthorized access and use of email credentials"},
+      {"section": "72", "description": "Breach of confidentiality and privacy"}
+    ],
+    "bns": [
+      {"section": "319(2)", "description": "Cheating by personation where hijacked email account is utilized to solicit funds from contacts", "ipc_equivalent": "419"}
+    ],
+    "other": [],
+    "statutory_elements": [
+      "Unauthorized intrusion into private or organizational email server/account",
+      "Compromise of confidential correspondence and alteration of mailbox forwarding rules",
+      "Exploitation of account for extortion or secondary cyber attacks"
+    ],
+    "notes": "Where the compromised account was utilized to deceive contacts into transferring emergency funds, add BNS Section 318(4) and IT Act Section 66D."
+  },
+
+  "Tampering with Computer Source Document": {
+    "verified": true,
+    "statute_year": 2023,
+    "it_act": [
+      {"section": "65", "description": "Tampering with computer source documents - knowingly or intentionally concealing, destroying, or altering computer source code required to be maintained (Imprisonment up to 3 years, or fine up to Rs 2 lakh, or both)"},
+      {"section": "66", "description": "Computer-related offences"}
+    ],
+    "bns": [
+      {"section": "316(5)", "description": "Criminal breach of trust by clerk or servant (Imprisonment up to 7 years and fine)", "ipc_equivalent": "408"},
+      {"section": "336(3)", "description": "Forgery of electronic record", "ipc_equivalent": "465"}
+    ],
+    "other": [
+      {"act": "Copyright Act 1957", "section": "63", "description": "Offence of infringement of copyright or other rights in computer software code"}
+    ],
+    "statutory_elements": [
+      "Knowledge or intention regarding computer source code required to be maintained by statutory or regulatory mandate",
+      "Concealing, altering, deleting, or destroying source code or version control records",
+      "Dishonest intent to compromise system integrity or evade regulatory scrutiny"
+    ],
+    "notes": "Typically an insider or disgruntled employee offence. Secure code repository audit logs, commit histories, and deployment logs before revoking user privileges."
+  },
+
+  "Unauthorised Access / Data Breach": {
+    "verified": true,
+    "statute_year": 2023,
+    "it_act": [
+      {"section": "43", "description": "Unauthorized access, downloading, extraction of data, and denial of access to lawful user"},
+      {"section": "66", "description": "Computer-related offences committed dishonestly or fraudulently"},
+      {"section": "72", "description": "Penalty for breach of confidentiality and privacy"},
+      {"section": "72A", "description": "Punishment for disclosure of personal information in breach of lawful contract (Imprisonment up to 3 years, or fine up to Rs 5 lakh, or both)"}
+    ],
+    "bns": [],
+    "other": [
+      {"act": "Digital Personal Data Protection (DPDP) Act 2023", "section": "8(6) / 33", "description": "Obligation on data fiduciaries to notify personal data breaches to Data Protection Board of India and affected data principals; significant financial penalties for failure to protect"},
+      {"act": "CERT-In Cyber Security Directions 2022", "description": "Mandatory breach reporting within six hours of identification"}
+    ],
+    "statutory_elements": [
+      "Gaining unauthorized access to private enterprise or public sector database",
+      "Mass exfiltration of personal, financial, or sensitive citizen data",
+      "Violation of statutory confidentiality mandates or contractual terms of data handling"
+    ],
+    "notes": "Verify whether the affected organization notified CERT-In and data subjects within statutory windows. Scale of compromised records is material to adjudication."
+  },
+
+  "Website Defacement / Hacking": {
+    "verified": true,
+    "statute_year": 2023,
+    "it_act": [
+      {"section": "43", "description": "Damage and unauthorized modification to computer resource"},
+      {"section": "66", "description": "Computer-related offences"},
+      {"section": "66F", "description": "Cyber terrorism - applicable where critical information infrastructure or sovereignty/security of India is affected"}
+    ],
+    "bns": [
+      {"section": "324(1)", "description": "Mischief causing damage to property", "ipc_equivalent": "426"},
+      {"section": "324(4)", "description": "Mischief causing damage to the amount of twenty thousand rupees or more", "ipc_equivalent": "427"}
+    ],
+    "other": [
+      {"act": "CERT-In Cyber Security Directions 2022", "description": "Mandatory reporting of unauthorized modification or defacement of websites"}
+    ],
+    "statutory_elements": [
+      "Unauthorized intrusion into web application or content management server",
+      "Alteration, defacement, or deletion of hosted web pages and replacement with unauthorized content",
+      "Public disruption or propagation of defamatory, inflammatory, or hostile claims"
+    ],
+    "notes": "Section 66F IT Act applies strictly where critical infrastructure (NIC, banking, defence, energy grids) is affected. Preserve web access logs, reverse proxy headers, and origin server snapshots."
+  }
+}

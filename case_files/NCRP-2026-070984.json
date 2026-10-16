@@ -1,0 +1,157 @@
+{
+  "reference": "NCRP/2026/070984",
+  "generated_at": "2026-09-23T19:13:04",
+  "complainant": {
+    "name": "Pranit Chavan",
+    "age": 25,
+    "phone": "9325582770",
+    "email": "not supplied",
+    "city": "Nashik",
+    "state": "Maharashtra",
+    "relationship_with_victim": "Self",
+    "id_type": "Aadhaar Card"
+  },
+  "incident": {
+    "datetime": "2026-09-23 12:00",
+    "category": "Online and Social Media Related Crime",
+    "sub_category_reported": "Cyber Bullying / Stalking / Sexting",
+    "modus_operandi": "Harassment, stalking, or non-consensual dissemination of private media",
+    "location": []
+  },
+  "complaint": {
+    "raw_text": "For the past several days, I have been receiving repeated threatening messages from an unknown social media account. The person is using different accounts after I block them and is sending screenshots of my personal information along with threatening statements. I have preserved the messages, usernames and screenshots as evidence. I am concerned about my safety and request that the authorities identify the person responsible and take appropriate action.",
+    "standardised_narrative": "On 15 October 2026, the complainant began receiving repeated threatening messages from an unknown social media account. The sender has used different accounts after being blocked, and has attached screenshots of the complainant's personal information along with threatening statements. The complainant has preserved the messages, usernames, and screenshots as evidence. The complainant is concerned about personal safety and requests that authorities identify the person responsible and take appropriate action.",
+    "narrative_source": "Module A"
+  },
+  "classification": {
+    "sub_category": "Cyber Bullying / Stalking / Sexting",
+    "confidence": 0.7087704623130611,
+    "confidence_band": "MEDIUM",
+    "guidance": "Review the narrative before accepting the classification.",
+    "source": "Module B - machine generated",
+    "requires_confirmation": true
+  },
+  "extracted_entities": {
+    "_status": "NOT AVAILABLE - Module C did not run"
+  },
+  "legal_sections": {
+    "sub_category": "Cyber Bullying / Stalking / Sexting",
+    "it_act": [
+      {
+        "section": "66E",
+        "description": "Violation of privacy"
+      },
+      {
+        "section": "67",
+        "description": "Publishing or transmitting obscene material in electronic form"
+      },
+      {
+        "section": "67A",
+        "description": "Publishing or transmitting sexually explicit material"
+      }
+    ],
+    "bns": [
+      {
+        "section": "78",
+        "description": "Stalking",
+        "ipc_equivalent": "354D"
+      },
+      {
+        "section": "351",
+        "description": "Criminal intimidation",
+        "ipc_equivalent": "503/506"
+      }
+    ],
+    "other": [],
+    "conditional_applied": [
+      {
+        "rule": "complainant_age < 18",
+        "status": "not applicable",
+        "reason": "complainant_age = 25"
+      }
+    ],
+    "notes": "Where money was demanded against threatened release of material, BNS 308 (extortion) is also attracted.",
+    "disclaimer": "This mapping is decision-support for an investigating officer. It is not legal advice and the final charge sheet is settled by the investigating officer and the prosecution."
+  },
+  "transactions": [],
+  "suspect_transactions": [],
+  "suspects": [],
+  "evidence": {
+    "attachments": [],
+    "count": 0,
+    "table": []
+  },
+  "intake_gaps_identified": [
+    {
+      "field": "date",
+      "priority": "CRITICAL",
+      "hint": "On what date did this happen? (e.g. 12 August 2026)"
+    },
+    {
+      "field": "suspect_contact",
+      "priority": "HIGH",
+      "hint": "Do you have any contact detail for the person who did this? (phone number, email, social media profile)"
+    }
+  ],
+  "reconciliation": {
+    "agreements": [],
+    "conflicts": [],
+    "gaps": [
+      "amount",
+      "date",
+      "account_or_upi"
+    ],
+    "ocr_only": [],
+    "confidence_note": "text only — no screenshot evidence to cross-check",
+    "has_conflicts": false
+  },
+  "sentiment": {
+    "tone": "ANXIOUS_THREATENED",
+    "tone_label": "Anxious / Threatened (Extortion Risk)",
+    "tone_emoji": "⚠️",
+    "distress_score": 0.32,
+    "urgency_level": "HIGH_URGENCY",
+    "urgency_label": "High Urgency (Active Threat / Harassment)",
+    "urgency_score": 0.85,
+    "is_golden_hour": false,
+    "emotion_tags": [
+      "Extortion/Blackmail Anxiety"
+    ],
+    "reassurance": {
+      "title": "Important Safety Advice & Emotional Reassurance",
+      "message": "Please remember: You are the victim of a calculated crime, and you are not alone. Extortionists rely on panic, shame, and isolation to force quick payments. Paying will NOT stop them; it only invites further extortion demands.",
+      "immediate_steps": [
+        "**DO NOT transfer any money or succumb to extortion demands.**",
+        "Take screenshots of all chats, numbers, profile links, and payment handles for evidence.",
+        "Block the fraudster on all platforms once evidence is saved.",
+        "Report the profile directly to the social platform (Instagram/WhatsApp/Snapchat) to trigger account takedown."
+      ],
+      "helpline": "1930"
+    },
+    "comprehension": {
+      "summary": "Complainant reported an incident involving Cybercrime Incident via Electronic Channel on digital platforms. Context: \"For the past several days, I have been receiving repeated threatening messages from an unknown social media account. The person is using dif...\"",
+      "crime_vector": "Cybercrime Incident via Electronic Channel",
+      "financial_impact": "Not specified",
+      "key_actors": {
+        "disputed_amount": "Not specified",
+        "suspect_identifiers": "Not provided",
+        "platform_involved": "Online / Digital Channel",
+        "evidence_attached": false
+      }
+    }
+  },
+  "data_provenance": {
+    "narrative": "Module A (AI Standardised)",
+    "extracted_entities_source": "Not Available",
+    "classification_source": "Module B (LinearSVC Model)",
+    "legal_mapping_source": "Module D (Deterministic Statutory Lookup)",
+    "reconciliation_source": "Reconciliation Layer"
+  },
+  "suggested_actions": [
+    "Issue a takedown request to the platform for the offending content or profile",
+    "Preserve the profile link, post URLs and screenshots before removal",
+    "Obtain subscriber details of the account from the platform"
+  ],
+  "status": "PENDING OFFICER REVIEW",
+  "_disclaimer": "This case file was assembled automatically from a citizen complaint. The classification and the legal provisions proposed are decision-support for the investigating officer and require confirmation before any action is taken on them."
+}

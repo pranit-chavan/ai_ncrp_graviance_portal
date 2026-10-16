@@ -1,0 +1,130 @@
+{
+  "reference": "NCRP/2026/000123",
+  "generated_at": "2026-09-23T19:45:22",
+  "complainant": {
+    "title": "",
+    "name": "R. Sharma",
+    "gender": "not supplied",
+    "dob": "not supplied",
+    "age": 34,
+    "relative_name": "not supplied",
+    "relative_type": "Father",
+    "phone": "98XXXXXX21",
+    "email": "rsharma@example.com",
+    "address": "not supplied",
+    "city": "Nashik",
+    "district": "not supplied",
+    "state": "Maharashtra",
+    "pincode": "not supplied",
+    "police_station": "not supplied",
+    "relationship_with_victim": "Self",
+    "id_type": "not supplied",
+    "id_upload_name": "not supplied"
+  },
+  "incident": {
+    "datetime": "12 August 2026 10:30",
+    "category": "Online Financial Fraud",
+    "sub_category_reported": "AePS Fraud",
+    "modus_operandi": "Unauthorised AePS withdrawal using biometric spoofing",
+    "location": [
+      "Mobile App"
+    ],
+    "delay_in_reporting": "No",
+    "delay_reason": "N/A"
+  },
+  "complaint": {
+    "raw_text": "paise gaye account se, 40000, koi otp nahi aaya, card mere paas hi hai",
+    "standardised_narrative": "On 12 August 2026 the complainant found an unauthorised debit of Rs. 40,000 from the Aadhaar-linked savings account. The transactions were recorded as AePS withdrawals at a Business Correspondent outlet in another district. No one-time password was shared and the debit card remained in the complainant's possession throughout.",
+    "narrative_source": "Module A"
+  },
+  "classification": {
+    "sub_category": "AePS Fraud",
+    "confidence": 0.94,
+    "confidence_band": "HIGH",
+    "guidance": "Classification is reliable. Officer confirmation still required.",
+    "source": "Module B - machine generated",
+    "requires_confirmation": true
+  },
+  "extracted_entities": {
+    "amount": "Rs. 40,000",
+    "transaction_date": "12 August 2026",
+    "account_last4": "4417",
+    "outlet_district": "Jalgaon",
+    "transaction_type": "AePS withdrawal"
+  },
+  "legal_sections": {
+    "sub_category": "AePS Fraud",
+    "it_act": [
+      {
+        "section": "66C",
+        "description": "Identity theft"
+      },
+      {
+        "section": "66D",
+        "description": "Cheating by personation using a computer resource"
+      }
+    ],
+    "bns": [
+      {
+        "section": "318",
+        "description": "Cheating",
+        "ipc_equivalent": "420"
+      },
+      {
+        "section": "319",
+        "description": "Cheating by personation",
+        "ipc_equivalent": "419"
+      }
+    ],
+    "other": [
+      {
+        "act": "Aadhaar Act 2016",
+        "section": "29 / 38",
+        "description": "Unauthorised use of identity information and biometric data"
+      }
+    ],
+    "conditional_applied": [],
+    "notes": "The victim shares no OTP and retains the card. RBI limited-liability provisions apply: the customer is generally not liable where there is no negligence.",
+    "disclaimer": "This mapping is decision-support for an investigating officer. It is not legal advice and the final charge sheet is settled by the investigating officer and the prosecution."
+  },
+  "transactions": [
+    {
+      "bank": "SBI",
+      "account_no": "XXXX4417",
+      "transaction_id": "SBIN12345678AB",
+      "amount": "40000",
+      "transaction_date": "12 August 2026",
+      "reference_no": "REF001"
+    }
+  ],
+  "suspect_transactions": [],
+  "suspects": [],
+  "evidence": {
+    "attachments": [
+      "passbook_page.jpg",
+      "sms_alert.png"
+    ],
+    "count": 2,
+    "table": []
+  },
+  "intake_gaps_identified": [],
+  "reconciliation": {
+    "_status": "not available"
+  },
+  "sentiment": {},
+  "data_provenance": {
+    "narrative": "Module A (AI Standardised)",
+    "extracted_entities_source": "Module C (OCR + Regex)",
+    "classification_source": "Module B (LinearSVC Model)",
+    "legal_mapping_source": "Module D (Deterministic Statutory Lookup)",
+    "reconciliation_source": "Not Available"
+  },
+  "suggested_actions": [
+    "Report beneficiary account and UPI identifiers to the bank for immediate freezing",
+    "Raise the transaction on the NCRP/I4C portal within the golden hour",
+    "Obtain the bank statement and transaction references from the complainant",
+    "Issue notice to the beneficiary bank for KYC of the recipient account"
+  ],
+  "status": "PENDING OFFICER REVIEW",
+  "_disclaimer": "This case file was assembled automatically from a citizen complaint. The classification and the legal provisions proposed are decision-support for the investigating officer and require confirmation before any action is taken on them."
+}

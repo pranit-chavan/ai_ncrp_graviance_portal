@@ -1,0 +1,162 @@
+{
+  "reference": "NCRP/2026/074276",
+  "generated_at": "2026-09-23T20:07:56",
+  "complainant": {
+    "title": "Mr.",
+    "name": "Rajesh Kumar Sharma",
+    "gender": "Male",
+    "dob": "1988-06-15",
+    "age": "not supplied",
+    "relative_name": "Suresh Sharma",
+    "relative_type": "Father",
+    "phone": "9876543210",
+    "email": "rajesh.sharma@example.com",
+    "address": "Flat 402, Lotus Enclave, Link Road",
+    "city": "Mumbai",
+    "district": "Mumbai Suburban",
+    "state": "Maharashtra",
+    "pincode": "400053",
+    "police_station": "Cyber Crime Police Station Bandra Kurla Complex (BKC)",
+    "relationship_with_victim": "Self",
+    "id_type": "Aadhaar Card",
+    "id_upload_name": "aadhaar_rajesh.pdf"
+  },
+  "incident": {
+    "datetime": "2026-09-22 14:30",
+    "category": "Financial Fraud",
+    "sub_category_reported": "Email Phishing",
+    "modus_operandi": "Electricity bill disconnection threat via WhatsApp APK",
+    "location": [],
+    "delay_in_reporting": "No",
+    "delay_reason": "Reported within golden hour window"
+  },
+  "complaint": {
+    "raw_text": "I was contacted on WhatsApp by an unknown number (+91 98765 43210) pretending to be MSEDCL Electricity Dept. They sent an APK link and coerced me into transferring Rs 45,000 via UPI to avoid power disconnection. The transaction was debited from my SBI account to Paytm account of fraudster.",
+    "standardised_narrative": "On 12 August 2026, an unknown number (+91 98765 43210) contacted the complainant on WhatsApp, claiming to be from the MSEDCL Electricity Department. They sent an APK link and coerced the complainant into transferring Rs 45,000 via UPI to avoid a power disconnection. The transaction was debited from the complainant's SBI account to a Paytm account of the fraudster.",
+    "narrative_source": "Module A"
+  },
+  "classification": {
+    "sub_category": "Email Phishing",
+    "confidence": 0.5020512464070878,
+    "confidence_band": "LOW",
+    "guidance": "Manual classification recommended. Adjacent categories should be considered.",
+    "source": "Module B - machine generated",
+    "requires_confirmation": true
+  },
+  "extracted_entities": {
+    "_status": "NOT AVAILABLE - Module C did not run"
+  },
+  "legal_sections": {
+    "sub_category": "Email Phishing",
+    "it_act": [
+      {
+        "section": "66C",
+        "description": "Identity theft"
+      },
+      {
+        "section": "66D",
+        "description": "Cheating by personation using a computer resource"
+      }
+    ],
+    "bns": [
+      {
+        "section": "318",
+        "description": "Cheating",
+        "ipc_equivalent": "420"
+      }
+    ],
+    "other": [],
+    "conditional_applied": [],
+    "notes": "Where credentials were harvested but no money was lost, 66C alone may be appropriate.",
+    "disclaimer": "This mapping is decision-support for an investigating officer. It is not legal advice and the final charge sheet is settled by the investigating officer and the prosecution."
+  },
+  "transactions": [
+    {
+      "bank_name": "State Bank of India",
+      "account_number": "12345678901",
+      "amount": 45000.0,
+      "utr_number": "326712345678",
+      "date": "2026-09-22"
+    }
+  ],
+  "suspect_transactions": [
+    {
+      "bank_name": "Paytm Payments Bank",
+      "account_number": "9876543210@paytm",
+      "amount": 45000.0,
+      "reference_number": "TXN99887766"
+    }
+  ],
+  "suspects": [
+    {
+      "name": "Unknown (calling as MSEDCL Officer)",
+      "phone": "+91 98765 43210",
+      "account": "9876543210@paytm",
+      "platform": "WhatsApp / UPI"
+    }
+  ],
+  "evidence": {
+    "attachments": [],
+    "count": 0,
+    "table": []
+  },
+  "intake_gaps_identified": [],
+  "reconciliation": {
+    "agreements": [],
+    "conflicts": [],
+    "gaps": [
+      "date",
+      "account_or_upi"
+    ],
+    "ocr_only": [],
+    "confidence_note": "text only — no screenshot evidence to cross-check",
+    "has_conflicts": false
+  },
+  "sentiment": {
+    "tone": "FRUSTRATED_ANGRY",
+    "tone_label": "Frustrated / High Grievance",
+    "tone_emoji": "😠",
+    "distress_score": 0.15,
+    "urgency_level": "MODERATE_URGENCY",
+    "urgency_label": "Moderate Urgency (Financial Investigation)",
+    "urgency_score": 0.65,
+    "is_golden_hour": false,
+    "emotion_tags": [
+      "Betrayal & Grievance"
+    ],
+    "reassurance": {
+      "title": "Official NCRP Complaint Registration",
+      "message": "Your complaint is being analyzed and pre-filled into the National Cyber Crime Reporting Portal standard format. An investigating officer will review the legal sections and evidence.",
+      "immediate_steps": [
+        "Review auto-extracted fields in Step 2 to ensure 100% accuracy.",
+        "Attach payment receipts, SMS screenshots, or chat exports to strengthen evidentiary value."
+      ],
+      "helpline": "1930"
+    },
+    "comprehension": {
+      "summary": "Complainant reported unauthorized debit/fraudulent transfer of Rs. 45,000 via WhatsApp through Remote Access Trojan / Phishing Link Credential Theft. Context: \"I was contacted on WhatsApp by an unknown number (+91 98765 43210) pretending to be MSEDCL Electricity Dept. They sent an APK link and coerc...\"",
+      "crime_vector": "Remote Access Trojan / Phishing Link Credential Theft",
+      "financial_impact": "Rs. 45,000",
+      "key_actors": {
+        "disputed_amount": "Rs. 45,000",
+        "suspect_identifiers": "Not provided",
+        "platform_involved": "WhatsApp",
+        "evidence_attached": false
+      }
+    }
+  },
+  "data_provenance": {
+    "narrative": "Module A (AI Standardised)",
+    "extracted_entities_source": "Not Available",
+    "classification_source": "Module B (LinearSVC Model)",
+    "legal_mapping_source": "Module D (Deterministic Statutory Lookup)",
+    "reconciliation_source": "Reconciliation Layer"
+  },
+  "suggested_actions": [
+    "Advise the complainant to reset credentials and enable two-factor authentication",
+    "Obtain access logs and login records from the service provider",
+    "Preserve screenshots of the account activity before it is altered"
+  ],
+  "status": "PENDING OFFICER REVIEW",
+  "_disclaimer": "This case file was assembled automatically from a citizen complaint. The classification and the legal provisions proposed are decision-support for the investigating officer and require confirmation before any action is taken on them."
+}

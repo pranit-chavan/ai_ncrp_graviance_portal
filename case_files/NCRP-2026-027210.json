@@ -1,0 +1,60 @@
+{
+  "reference": "NCRP/2026/027210",
+  "generated_at": "2026-09-05T22:23:30",
+  "complainant": {
+    "name": "A. Patil",
+    "age": 22,
+    "phone": "97XXXXXX40",
+    "email": "not supplied",
+    "city": "Pune",
+    "state": "Maharashtra"
+  },
+  "complaint": {
+    "raw_text": "i applied for job on a portal then someone called saying hr and asked registration fee 5000 i paid then he asked 12000 more for training now number is off no job nothing",
+    "standardised_narrative": "The complainant applied for a job through a portal. Someone claiming to be from HR contacted them and requested a registration fee of 5000. The complainant paid this amount. Subsequently, the same person asked for an additional 12000 for training. The complainant has since been unable to contact this person and has not received any job.",
+    "narrative_source": "Module A"
+  },
+  "classification": {
+    "sub_category": "Online Job Fraud",
+    "confidence": 0.8880439028434948,
+    "confidence_band": "MEDIUM",
+    "guidance": "Review the narrative before accepting the classification.",
+    "source": "Module B - machine generated",
+    "requires_confirmation": true
+  },
+  "extracted_entities": {
+    "_status": "NOT AVAILABLE - Module C did not run"
+  },
+  "legal_sections": {
+    "sub_category": "Online Job Fraud",
+    "it_act": [
+      {
+        "section": "66D",
+        "description": "Cheating by personation using a computer resource"
+      }
+    ],
+    "bns": [
+      {
+        "section": "318",
+        "description": "Cheating",
+        "ipc_equivalent": "420"
+      }
+    ],
+    "other": [],
+    "conditional_applied": [],
+    "notes": "Where identity documents were also collected and misused, add IT Act 66C.",
+    "disclaimer": "This mapping is decision-support for an investigating officer. It is not legal advice and the final charge sheet is settled by the investigating officer and the prosecution."
+  },
+  "evidence": {
+    "attachments": [],
+    "count": 0
+  },
+  "suggested_actions": [
+    "Report beneficiary account and UPI identifiers to the bank for immediate freezing",
+    "Raise the transaction on the NCRP/I4C portal within the golden hour",
+    "Obtain the bank statement and transaction references from the complainant",
+    "Issue notice to the beneficiary bank for KYC of the recipient account"
+  ],
+  "status": "PENDING OFFICER REVIEW",
+  "_disclaimer": "This case file was assembled automatically from a citizen complaint. The classification and the legal provisions proposed are decision-support for the investigating officer and require confirmation before any action is taken on them."
+}

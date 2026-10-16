@@ -1,0 +1,75 @@
+{
+  "reference": "NCRP/2026/032000",
+  "generated_at": "2026-09-05T23:43:20",
+  "complainant": {
+    "name": "R. Sharma",
+    "age": 34,
+    "phone": "98XXXXXX21",
+    "email": "not supplied",
+    "city": "Nashik",
+    "state": "Maharashtra"
+  },
+  "complaint": {
+    "raw_text": "sir mere account se 40000 nikal gaye, maine koi otp nahi diya, card mere paas hi hai, bank wale bol rahe hai thumb impression use hua",
+    "standardised_narrative": "NOT AVAILABLE - Module A did not run",
+    "narrative_source": "unavailable - [\"numbers not in the input: ['2026']\", \"year not in the input: ['2026']\", \"mechanism not in the input: ['debit card']\"]"
+  },
+  "classification": {
+    "sub_category": "AePS Fraud",
+    "confidence": 0.6232184370908045,
+    "confidence_band": "LOW",
+    "guidance": "Manual classification recommended. Adjacent categories should be considered.",
+    "source": "Module B - machine generated",
+    "requires_confirmation": true
+  },
+  "extracted_entities": {
+    "_status": "NOT AVAILABLE - Module C did not run"
+  },
+  "legal_sections": {
+    "sub_category": "AePS Fraud",
+    "it_act": [
+      {
+        "section": "66C",
+        "description": "Identity theft"
+      },
+      {
+        "section": "66D",
+        "description": "Cheating by personation using a computer resource"
+      }
+    ],
+    "bns": [
+      {
+        "section": "318",
+        "description": "Cheating",
+        "ipc_equivalent": "420"
+      },
+      {
+        "section": "319",
+        "description": "Cheating by personation",
+        "ipc_equivalent": "419"
+      }
+    ],
+    "other": [
+      {
+        "act": "Aadhaar Act 2016",
+        "section": "29 / 38",
+        "description": "Unauthorised use of identity information and biometric data"
+      }
+    ],
+    "conditional_applied": [],
+    "notes": "The victim shares no OTP and retains the card. RBI limited-liability provisions apply: the customer is generally not liable where there is no negligence.",
+    "disclaimer": "This mapping is decision-support for an investigating officer. It is not legal advice and the final charge sheet is settled by the investigating officer and the prosecution."
+  },
+  "evidence": {
+    "attachments": [],
+    "count": 0
+  },
+  "suggested_actions": [
+    "Report beneficiary account and UPI identifiers to the bank for immediate freezing",
+    "Raise the transaction on the NCRP/I4C portal within the golden hour",
+    "Obtain the bank statement and transaction references from the complainant",
+    "Issue notice to the beneficiary bank for KYC of the recipient account"
+  ],
+  "status": "PENDING OFFICER REVIEW",
+  "_disclaimer": "This case file was assembled automatically from a citizen complaint. The classification and the legal provisions proposed are decision-support for the investigating officer and require confirmation before any action is taken on them."
+}

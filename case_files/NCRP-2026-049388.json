@@ -1,0 +1,80 @@
+{
+  "reference": "NCRP/2026/049388",
+  "generated_at": "2026-09-18T22:06:28",
+  "complainant": {
+    "name": "not supplied",
+    "age": "not supplied",
+    "phone": "not supplied",
+    "email": "not supplied",
+    "city": "not supplied",
+    "state": "not supplied",
+    "relationship_with_victim": "Self",
+    "id_type": "not supplied"
+  },
+  "incident": {
+    "datetime": "not supplied",
+    "category": "not supplied",
+    "sub_category_reported": "not supplied",
+    "modus_operandi": "not supplied",
+    "location": []
+  },
+  "complaint": {
+    "raw_text": "sir my 25000 rs debited without otp on gpay to scammer@okaxis utr 982143019283",
+    "standardised_narrative": "On an unspecified date, an unauthorised debit of Rs. 25,000 was noticed from the complainant's GPay account. No one-time password had been shared, and the GPay account remained in the complainant's possession. The transaction reference number was 982143019283, and the recipient was scammer@okaxis.",
+    "narrative_source": "Module A"
+  },
+  "classification": {
+    "sub_category": "Online Job Fraud",
+    "confidence": 0.5154615386314203,
+    "confidence_band": "LOW",
+    "guidance": "Manual classification recommended. Adjacent categories should be considered.",
+    "source": "Module B - machine generated",
+    "requires_confirmation": true
+  },
+  "extracted_entities": {
+    "_status": "NOT AVAILABLE - Module C did not run"
+  },
+  "legal_sections": {
+    "sub_category": "Online Job Fraud",
+    "it_act": [
+      {
+        "section": "66D",
+        "description": "Cheating by personation using a computer resource"
+      }
+    ],
+    "bns": [
+      {
+        "section": "318",
+        "description": "Cheating",
+        "ipc_equivalent": "420"
+      }
+    ],
+    "other": [],
+    "conditional_applied": [],
+    "notes": "Where identity documents were also collected and misused, add IT Act 66C.",
+    "disclaimer": "This mapping is decision-support for an investigating officer. It is not legal advice and the final charge sheet is settled by the investigating officer and the prosecution."
+  },
+  "transactions": [],
+  "suspect_transactions": [],
+  "suspects": [],
+  "evidence": {
+    "attachments": [],
+    "count": 0,
+    "table": []
+  },
+  "intake_gaps_identified": [],
+  "data_provenance": {
+    "narrative": "Module A (AI Standardised)",
+    "extracted_entities_source": "Not Available",
+    "classification_source": "Module B (LinearSVC Model)",
+    "legal_mapping_source": "Module D (Deterministic Statutory Lookup)"
+  },
+  "suggested_actions": [
+    "Report beneficiary account and UPI identifiers to the bank for immediate freezing",
+    "Raise the transaction on the NCRP/I4C portal within the golden hour",
+    "Obtain the bank statement and transaction references from the complainant",
+    "Issue notice to the beneficiary bank for KYC of the recipient account"
+  ],
+  "status": "PENDING OFFICER REVIEW",
+  "_disclaimer": "This case file was assembled automatically from a citizen complaint. The classification and the legal provisions proposed are decision-support for the investigating officer and require confirmation before any action is taken on them."
+}
