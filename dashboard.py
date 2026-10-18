@@ -876,154 +876,54 @@ def render_step1():
 
     section_header("1. Incident Narrative (Statement of Facts)")
     st.markdown(
-        "Enter your chronological statement of facts in **any Indian language, Hinglish, or English**. "
-        "State all relevant details: communications received, bank/wallet names, monetary loss, telephone numbers, "
-        "and digital handles involved."
+        "Enter your chronological statement of facts, or click the **microphone** icon to speak in any language (Hindi, Hinglish, Marathi, English, etc.)."
     )
-    text = st.text_area(
-        req("Statement of Incident"),
-        value=wiz.get("incident_text", ""), height=150,
-        placeholder="Provide a detailed chronological statement of the incident. Mention communication channels used (WhatsApp, SMS, Phone Call, Email), bank or wallet names, suspect identifiers (phone number, UPI ID, profile URL), monetary amounts debited, transaction references (UTR), and dates/times.",
-    )
-    wiz["incident_text"] = text
 
-    # ------------------------------------------------------------------
-    # MODULE G: Voice-to-Text — Audio Upload
-    # ------------------------------------------------------------------
-    with st.expander("🎙️ Live Voice Input & Speech-to-Text (Module G)", expanded=False):
-        if not _stt_available:
-            st.info(
-                "Voice-to-text is not currently available. To enable it, install OpenAI Whisper:\n\n"
-                "`pip install openai-whisper`\n\n"
-                "You may also need FFmpeg installed on your system."
-            )
-        else:
-            st.markdown(
-                "Speak or record your complaint in **any Indian language** "
-                "(Hindi, Hinglish, Marathi, Tamil, Telugu, Bengali, Gujarati, Kannada, Malayalam, Punjabi, Urdu, or English). "
-                "AI will transcribe your speech locally and populate your incident statement above."
-            )
+    # Inline Live Voice Input: clicking mic records, and stopping directly populates the text box
+    if _stt_available:
+        col_txt_lbl, col_mic_btn = st.columns([3.8, 1.2])
+        with col_txt_lbl:
+            st.markdown(f"**{req('Statement of Incident')}**")
+        with col_mic_btn:
+            live_mic = st.audio_input("Speak your complaint", key="live_voice_dictate", label_visibility="collapsed")
 
-            stt_set1, stt_set2, stt_set3 = st.columns([1.5, 1.5, 1])
-            with stt_set1:
-                langs = get_supported_languages()
-                lang_options = ["Auto-Detect"] + [f"{name} ({code})" for code, name in langs.items()]
-                lang_choice = st.selectbox("Language Hint", lang_options, index=0, key="stt_lang_select")
-            with stt_set2:
-                stt_model = st.selectbox(
-                    "Model Speed / Quality",
-                    ["Fast (base)", "Balanced (small)", "Best (medium)"],
-                    index=0, key="stt_model_select",
-                    help="Faster models use less memory. 'base' is recommended for responsive live speech."
-                )
-                model_map = {"Fast (base)": "base", "Balanced (small)": "small", "Best (medium)": "medium"}
-                chosen_model = model_map.get(stt_model, "base")
-            with stt_set3:
-                stt_action = st.radio(
-                    "Text Action",
-                    ["Append to text", "Replace text"],
-                    index=0, horizontal=False, key="stt_action_radio",
-                )
-
-            # Two input options: Live Microphone vs Audio File Upload
-            v_tab1, v_tab2 = st.tabs(["🎙️ Speak Live (Microphone)", "📁 Upload Audio File"])
-
-            audio_data_to_transcribe = None
-            audio_source_label = ""
-
-            with v_tab1:
-                st.markdown(
-                    "<div style='font-size:0.88em;color:#475569;margin-bottom:6px;'>"
-                    "<b>Click the microphone button below to record live</b>. Speak what happened clearly. Click again to stop."
-                    "</div>",
-                    unsafe_allow_html=True
-                )
-                live_mic = st.audio_input("Record live voice complaint", key="stt_live_mic")
-                if live_mic is not None:
-                    audio_data_to_transcribe = live_mic
-                    audio_source_label = "Live Voice Recording"
-
-            with v_tab2:
-                uploaded_audio = st.file_uploader(
-                    "Upload recorded audio file",
-                    type=["wav", "mp3", "m4a", "ogg", "flac", "webm", "aac", "mp4", "wma"],
-                    accept_multiple_files=False,
-                    key="stt_audio_upload",
-                )
-                if uploaded_audio is not None and audio_data_to_transcribe is None:
-                    audio_data_to_transcribe = uploaded_audio
-                    audio_source_label = uploaded_audio.name
-
-            # Transcribe Action
-            if audio_data_to_transcribe is not None:
-                st.markdown("<div style='margin-top:10px;'></div>", unsafe_allow_html=True)
-                btn_label = f"⚡ Transcribe {audio_source_label} with Whisper AI"
-                if st.button(btn_label, type="primary", key="stt_transcribe_btn", use_container_width=True):
-                    # Parse language selection
-                    lang_hint = None
-                    if lang_choice != "Auto-Detect":
-                        lang_hint = lang_choice.split("(")[-1].rstrip(")")
-
-                    filename = getattr(audio_data_to_transcribe, "name", "live_recording.wav")
-                    with st.spinner(f"Transcribing audio using Whisper ({chosen_model} model)... Please wait."):
-                        stt_result = transcribe_audio_bytes(
-                            audio_data_to_transcribe, filename=filename,
-                            language=lang_hint, model_name=chosen_model,
-                        )
-
-                    if stt_result["ok"]:
-                        transcribed = stt_result["text"]
-                        lang_name = stt_result["language_name"]
-                        lang_prob = stt_result["language_prob"]
-                        duration = stt_result["duration_seconds"]
-                        latency = stt_result["latency_seconds"]
-
-                        # Apply to incident text
-                        existing = wiz.get("incident_text", "").strip()
-                        if stt_action == "Append to text" and existing:
-                            wiz["incident_text"] = existing + "\n\n" + transcribed
-                        else:
-                            wiz["incident_text"] = transcribed
-
-                        # Store STT metadata for audit trail in case file
+        if live_mic is not None:
+            audio_hash = f"{getattr(live_mic, 'name', 'voice')}_{live_mic.size}"
+            if st.session_state.get("_last_transcribed_audio_id") != audio_hash:
+                with st.spinner("🎙️ Transcribing voice into complaint box..."):
+                    res = transcribe_audio_bytes(live_mic, filename="live_mic.wav", model_name="base")
+                    if res.get("ok") and res.get("text", "").strip():
+                        spoken = res["text"].strip()
+                        current_val = wiz.get("incident_text", "").strip()
+                        new_val = f"{current_val} {spoken}".strip() if current_val else spoken
+                        wiz["incident_text"] = new_val
+                        st.session_state["incident_text_box"] = new_val
+                        st.session_state["_last_wiz_text_seen"] = new_val
                         wiz["stt_metadata"] = {
                             "transcribed": True,
-                            "language": stt_result["language"],
-                            "language_name": lang_name,
-                            "language_confidence": lang_prob,
-                            "audio_duration_seconds": duration,
-                            "transcription_latency_seconds": latency,
-                            "model_used": stt_result["model_used"],
-                            "audio_filename": audio_source_label,
-                            "segment_count": len(stt_result["segments"]),
+                            "language": res.get("language", "unknown"),
+                            "language_name": res.get("language_name", "Unknown"),
+                            "language_confidence": res.get("language_prob", 0.0),
+                            "audio_duration_seconds": res.get("duration_seconds", 0.0),
+                            "transcription_latency_seconds": res.get("latency_seconds", 0.0),
+                            "model_used": "base",
                         }
-
-                        st.success(
-                            f"✅ Transcription complete! Extracted {len(transcribed)} characters.\n\n"
-                            f"**Language detected:** {lang_name} ({lang_prob:.0%}) | "
-                            f"**Audio duration:** {duration:.1f}s | **Latency:** {latency:.1f}s"
-                        )
+                        st.session_state["_last_transcribed_audio_id"] = audio_hash
                         st.rerun()
-                    else:
-                        st.error(f"Transcription failed: {stt_result['error']}")
 
-            # Show previous transcription metadata if available
-            stt_meta = wiz.get("stt_metadata")
-            if stt_meta and stt_meta.get("transcribed"):
-                st.markdown(
-                    f"""
-                    <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-left:4px solid #16a34a;
-                                padding:10px 14px;border-radius:4px;margin-top:8px;font-size:0.85em;">
-                      <span style="font-weight:700;color:#166534;">Voice transcription active</span> —
-                      {html.escape(stt_meta.get('language_name', 'Unknown'))} detected
-                      (confidence: {stt_meta.get('language_confidence', 0):.0%}),
-                      audio: {stt_meta.get('audio_filename', 'unknown')}
-                      ({stt_meta.get('audio_duration_seconds', 0):.1f}s),
-                      model: {html.escape(stt_meta.get('model_used', 'base'))}
-                    </div>
-                    """,
-                    unsafe_allow_html=True,
-                )
+    if st.session_state.get("_last_wiz_text_seen") != wiz.get("incident_text", ""):
+        st.session_state["incident_text_box"] = wiz.get("incident_text", "")
+        st.session_state["_last_wiz_text_seen"] = wiz.get("incident_text", "")
+
+    text = st.text_area(
+        req("Statement of Incident"),
+        height=160,
+        key="incident_text_box",
+        label_visibility="collapsed" if _stt_available else "visible",
+        placeholder="Provide a detailed chronological statement of the incident. Mention communication channels, bank names, suspect details, monetary amounts, or click the mic button above to speak...",
+    )
+    wiz["incident_text"] = text
+    st.session_state["_last_wiz_text_seen"] = text
 
     n = len(text.strip())
     if n > 0 and n < 50:
