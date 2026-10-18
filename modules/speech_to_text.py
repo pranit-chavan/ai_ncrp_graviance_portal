@@ -57,11 +57,53 @@ USAGE
 """
 
 import os
+import re
 import time
 import tempfile
 import logging
 
 logger = logging.getLogger(__name__)
+
+# Domain prompt conditioning Whisper language model priors for Indian cyber fraud complaints
+CYBER_CRIME_INITIAL_PROMPT = (
+    "National Cyber Crime Reporting Portal (NCRP) complaint in India. "
+    "Indian banks: HDFC Bank, State Bank of India, SBI, ICICI Bank, Axis Bank, PNB, Punjab National Bank, "
+    "Kotak Mahindra Bank, Canara Bank, Bank of Baroda, IndusInd Bank, Union Bank. "
+    "Payment and cyber terms: debited, credited, unauthorized transaction, OTP, One Time Password, "
+    "UPI, Unified Payments Interface, PIN, UTR, transaction reference, A/c, account ending, UID, Aadhaar, "
+    "PhonePe, Google Pay, GPay, Paytm, fraudulent, phishing, freeze transaction, recover funds."
+)
+
+
+def _post_process_cyber_transcription(text: str) -> str:
+    """Correct frequent acoustic misrecognitions for Indian banking terms."""
+    if not text:
+        return text
+
+    rules = [
+        # Common phonetic confusions in Indian English audio
+        (r"\bdeputated\b", "debited"),
+        (r"\bdeputed\b", "debited"),
+        (r"\bdepitate\b", "debited"),
+        (r"\b(my\s+)?agency\s+bank\b", "HDFC Bank"),
+        (r"\bfrom\s+my\s+agency\b", "from my HDFC"),
+        (r"\breceived\s+no\s+TP\b", "received no OTP"),
+        (r"\bno\s+TP\b", "no OTP"),
+        (r"\bwithout\s+TP\b", "without OTP"),
+        (r"\bany\s+TP\b", "any OTP"),
+        (r"\ban\s+TP\b", "an OTP"),
+        (r"\bmy\s+UPI\b", "via UPI"),
+        (r"\bU\.?\s*P\.?\s*I\.?\b", "UPI"),
+        (r"\bO\.?\s*T\.?\s*P\.?\b", "OTP"),
+        (r"\bU\.?\s*T\.?\s*R\.?\b", "UTR"),
+        (r"\bH\.?\s*D\.?\s*F\.?\s*C\.?\b", "HDFC"),
+        (r"\bS\.?\s*B\.?\s*I\.?\b", "SBI"),
+        (r"\bI\.?\s*C\.?\s*I\.?\s*C\.?\s*I\.?\b", "ICICI"),
+    ]
+    cleaned = text
+    for pattern, repl in rules:
+        cleaned = re.sub(pattern, repl, cleaned, flags=re.IGNORECASE)
+    return cleaned
 
 # ---------------------------------------------------------------------------
 # Language metadata for Indian languages supported by Whisper
@@ -157,7 +199,7 @@ def _validate_audio_file(file_path):
 # Public API
 # ---------------------------------------------------------------------------
 
-def transcribe_audio(audio_source, language=None, model_name="base", verbose=False):
+def transcribe_audio(audio_source, language=None, model_name="base", initial_prompt=None, verbose=False):
     """
     Transcribe an audio file to text using Whisper.
 
@@ -173,6 +215,9 @@ def transcribe_audio(audio_source, language=None, model_name="base", verbose=Fal
     model_name : str
         Whisper model size: 'tiny', 'base', 'small', 'medium', 'large'.
         Default 'base' balances accuracy and speed for CPU deployment.
+    initial_prompt : str, optional
+        Optional text prefix / domain hints for conditioning Whisper.
+        Defaults to CYBER_CRIME_INITIAL_PROMPT.
     verbose : bool
         If True, prints progress to stdout.
 
@@ -223,6 +268,7 @@ def transcribe_audio(audio_source, language=None, model_name="base", verbose=Fal
         options = {
             "fp16": False,  # CPU-safe: disable FP16 to avoid CUDA requirement
             "verbose": verbose,
+            "initial_prompt": initial_prompt or CYBER_CRIME_INITIAL_PROMPT,
         }
 
         if language:
@@ -238,7 +284,8 @@ def transcribe_audio(audio_source, language=None, model_name="base", verbose=Fal
         result = model.transcribe(audio_path, **options)
 
         elapsed = time.time() - t0
-        text = (result.get("text") or "").strip()
+        raw_text = (result.get("text") or "").strip()
+        text = _post_process_cyber_transcription(raw_text)
         detected_lang = result.get("language", "unknown")
         lang_name = SUPPORTED_LANGUAGES.get(detected_lang, detected_lang.capitalize())
 
@@ -248,7 +295,7 @@ def transcribe_audio(audio_source, language=None, model_name="base", verbose=Fal
             segments.append({
                 "start": round(seg["start"], 2),
                 "end": round(seg["end"], 2),
-                "text": seg["text"].strip(),
+                "text": _post_process_cyber_transcription(seg["text"].strip()),
             })
 
         # Estimate audio duration from last segment
