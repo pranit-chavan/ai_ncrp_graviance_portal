@@ -196,12 +196,8 @@ def tone_badge(tone, label=None):
 
 
 def band_badge(band, size="0.78em"):
-    band = band if band in BAND_COLOR else "NOT SUPPLIED"
-    color, bg, border = BAND_COLOR[band], BAND_BG[band], BAND_BORDER[band]
-    safe = html.escape(band)
-    return (f'<span style="background:{bg};color:{color};border:1px solid {border};padding:3px 9px;'
-            f'border-radius:4px;font-weight:700;font-size:{size};letter-spacing:0.04em;text-transform:uppercase;white-space:nowrap;">'
-            f'{safe} CONFIDENCE</span>')
+    return ""
+
 
 
 # ---- taxonomy (mirrors modules/legal_mapping.json) --------------------------
@@ -341,20 +337,11 @@ def confirmation_banner():
 
 
 def low_confidence_banner(band):
-    if band == "LOW":
-        st.error(
-            "**MANDATORY AUDIT REQUIRED (Low Statistical Confidence):** "
-            "The preliminary classification model returned low statistical certainty. "
-            "Investigating officers must independently examine the raw citizen statement and evidence attachments before confirming legal provisions."
-        )
-    elif band == "MEDIUM":
-        st.warning("**Advisory — Moderate Confidence:** Verify narrative specifics against the assigned sub-category before formal registration.")
-    elif band == "NOT SUPPLIED":
-        st.warning("No confidence score returned by the automated classifier. Manual evaluation required.")
+    pass
 
 
 def fmt_confidence(conf):
-    return f"{conf:.1%}" if isinstance(conf, (int, float)) else "not supplied"
+    return ""
 
 
 def pdf_path_for(case):
@@ -627,11 +614,8 @@ if nav_pages is not None:
         if current_route == "investigator":
             all_cases_preview, load_errors_preview = load_case_files()
             pending = sum(1 for c in all_cases_preview if g(c, "status", default="") == "PENDING OFFICER REVIEW")
-            low_count = sum(1 for c in all_cases_preview if band_of(c) == "LOW")
             st.metric("Total Cases on File", len(all_cases_preview))
             st.metric("Pending Officer Adjudication", pending)
-            if low_count:
-                st.markdown(f'<div style="background:#fee2e2;color:#991b1b;padding:6px 10px;border-radius:4px;font-size:0.82em;font-weight:700;margin-top:8px;">{low_count} Low-Confidence Case(s) Require Audit</div>', unsafe_allow_html=True)
             if load_errors_preview:
                 with st.expander(f"System Notice: {len(load_errors_preview)} unparsed file(s)"):
                     for name, err in load_errors_preview:
@@ -1147,20 +1131,13 @@ def render_step2():
     triage = wiz.get("triage", {})
 
     if wiz.get("ai_sub_category"):
-        try:
-            from modules.case_file import _confidence_band
-            ai_band, _ = _confidence_band(wiz.get("ai_confidence"))
-        except Exception:
-            ai_band = "NOT SUPPLIED"
-
         st.markdown(
             f"""<div style="background:#f8fafc;border:1px solid #cbd5e1;border-left:4px solid {GOV_BLUE};
                             padding:14px 18px;border-radius:4px;margin-bottom:16px;">
                   <div style="font-weight:800;color:{GOV_BLUE};font-size:0.98em;letter-spacing:0.02em;text-transform:uppercase;">
-                    Automated Preliminary Classification: {html.escape(wiz['ai_sub_category'])} &nbsp; {band_badge(ai_band)}
+                    Automated Preliminary Classification: {html.escape(wiz['ai_sub_category'])}
                   </div>
                   <div style="font-size:0.86em;color:#475569;margin-top:4px;">
-                    Model Confidence: <b>{fmt_confidence(wiz.get('ai_confidence'))}</b> &nbsp;|&nbsp; 
                     Extracted entities and receipt values have been auto-populated below. Verify and adjust any parameter.
                   </div>
                 </div>""",
@@ -1394,16 +1371,9 @@ def render_step3():
         st.caption(f"Platforms involved: {', '.join(wiz['incident_location'])}")
 
     if wiz.get("ai_sub_category"):
-        try:
-            from modules.case_file import _confidence_band
-            ai_band, _ = _confidence_band(wiz.get("ai_confidence"))
-        except Exception:
-            ai_band = "NOT SUPPLIED"
         confirmation_banner()
-        low_confidence_banner(ai_band)
         st.markdown(
-            f"Automated Preliminary Sub-Category: **{wiz['ai_sub_category']}** "
-            f"({fmt_confidence(wiz['ai_confidence'])}) &nbsp; {band_badge(ai_band)}",
+            f"Automated Preliminary Sub-Category: **{wiz['ai_sub_category']}**",
             unsafe_allow_html=True,
         )
 
@@ -1513,14 +1483,8 @@ def _render_submission_success(case):
         unsafe_allow_html=True,
     )
     st.write("")
-    confirmation_banner()
-    low_confidence_banner(band)
-
     cl = case.get("classification", {})
-    c1, c2, c3 = st.columns(3)
-    c1.metric("Assigned Offence Sub-Category", g(cl, "sub_category", default="UNCLASSIFIED"))
-    c2.metric("Intake Confidence Score", fmt_confidence(cl.get("confidence")))
-    c3.markdown(band_badge(band, size="1em"), unsafe_allow_html=True)
+    st.metric("Assigned Offence Sub-Category", g(cl, "sub_category", default="UNCLASSIFIED"))
 
     pdf_path = pdf_path_for(case)
     if pdf_path:
@@ -1577,43 +1541,32 @@ def page_cases():
         return
 
     sub_cats = sorted({g(c, "classification", "sub_category", default="UNCLASSIFIED") for c in cases})
-    bands_present = sorted({band_of(c) for c in cases}, key=lambda b: BAND_ORDER.index(b))
-
-    fc1, fc2 = st.columns(2)
-    with fc1:
-        pick_cats = st.multiselect("Filter by Sub-Category", sub_cats)
-    with fc2:
-        pick_bands = st.multiselect("Filter by Model Confidence Band", bands_present)
+    pick_cats = st.multiselect("Filter by Sub-Category", sub_cats)
 
     filtered = cases
     if pick_cats:
         filtered = [c for c in filtered if g(c, "classification", "sub_category", default="UNCLASSIFIED") in pick_cats]
-    if pick_bands:
-        filtered = [c for c in filtered if band_of(c) in pick_bands]
 
     st.caption(f"Displaying {len(filtered)} of {len(cases)} case file(s)")
 
-    header = st.columns([1.3, 2.0, 0.9, 1.1, 1.2, 1.0, 1.3, 0.8])
-    for col, label in zip(header, ["Reference", "Sub-Category", "Confidence", "Band", "Priority", "Jurisdiction", "State", "Action"]):
+    header = st.columns([1.5, 2.5, 1.3, 1.2, 1.2, 0.8])
+    for col, label in zip(header, ["Reference", "Sub-Category", "Priority", "Jurisdiction", "State", "Action"]):
         col.markdown(f"**{label}**")
     st.divider()
 
     filtered = sorted(filtered, key=lambda c: g(c, "generated_at", default=""), reverse=True)
     for case in filtered:
-        cols = st.columns([1.3, 2.0, 0.9, 1.1, 1.2, 1.0, 1.3, 0.8])
-        band = band_of(case)
+        cols = st.columns([1.5, 2.5, 1.3, 1.2, 1.2, 0.8])
         sent = case.get("sentiment") or {}
         urg_lvl = sent.get("urgency_level")
         is_gold = sent.get("is_golden_hour", False)
 
         cols[0].write(case.get("reference", "-"))
         cols[1].write(g(case, "classification", "sub_category", default="UNCLASSIFIED"))
-        cols[2].write(fmt_confidence(g(case, "classification", "confidence", default=None)))
-        cols[3].markdown(band_badge(band), unsafe_allow_html=True)
-        cols[4].markdown(urgency_badge(urg_lvl, is_gold), unsafe_allow_html=True)
-        cols[5].write(g(case, "complainant", "city", default="-"))
-        cols[6].write(g(case, "status", default="-"))
-        if cols[7].button("Inspect", key=f"open_{case.get('_path')}"):
+        cols[2].markdown(urgency_badge(urg_lvl, is_gold), unsafe_allow_html=True)
+        cols[3].write(g(case, "complainant", "city", default="-"))
+        cols[4].write(g(case, "status", default="-"))
+        if cols[5].button("Inspect", key=f"open_{case.get('_path')}"):
             st.session_state["selected_case_path"] = case["_path"]
             st.session_state["nav_page"] = "Case Detail"
             st.rerun()
@@ -1725,11 +1678,7 @@ def page_case_detail():
 
     with c2:
         section_header("Preliminary Classification (Module B)")
-        cl = case.get("classification") or {}
-        cc1, cc2 = st.columns(2)
-        cc1.metric("Offence Sub-Category", g(cl, "sub_category", default="UNCLASSIFIED"))
-        cc2.metric("Model Confidence", fmt_confidence(cl.get("confidence")))
-        st.markdown(band_badge(band, size="0.95em"), unsafe_allow_html=True)
+        st.metric("Offence Sub-Category", g(cl, "sub_category", default="UNCLASSIFIED"))
         if cl.get("guidance"):
             st.caption(cl["guidance"])
 
@@ -1875,13 +1824,11 @@ def page_statistics():
             st.info("No recorded case files for analytics compilation.")
         else:
             pending = sum(1 for c in cases if g(c, "status", default="") == "PENDING OFFICER REVIEW")
-            low = sum(1 for c in cases if band_of(c) == "LOW")
+            verified = sum(1 for c in cases if g(c, "status", default="") != "PENDING OFFICER REVIEW")
             m1, m2, m3 = st.columns(3)
             m1.metric("Total Recorded Cases", len(cases))
             m2.metric("Pending Officer Adjudication", pending)
-            m3.metric("Mandatory Review Backlog", low, help="Low statistical confidence cases requiring officer verification.")
-            if low:
-                st.error(f"{low} case(s) currently flagged for mandatory manual review.")
+            m3.metric("Processed / Verified Cases", verified)
 
             st.divider()
             left, right = st.columns([1.4, 1])
@@ -1898,17 +1845,16 @@ def page_statistics():
                 st.plotly_chart(fig, width="stretch", theme="streamlit")
 
             with right:
-                section_header("Statistical Confidence Band Distribution")
-                band_counts = pd.Series([band_of(c) for c in cases]).value_counts()
-                ordered = [b for b in BAND_ORDER if b in band_counts.index]
-                fig2 = go.Figure(go.Bar(x=ordered, y=[band_counts[b] for b in ordered],
-                                        marker_color=[BAND_COLOR[b] for b in ordered],
-                                        text=[band_counts[b] for b in ordered], textposition="outside",
+                section_header("Operational Urgency Triage")
+                urg_counts = pd.Series([g(c, "sentiment", "urgency_level", default="STANDARD") for c in cases]).value_counts()
+                fig2 = go.Figure(go.Bar(x=urg_counts.index, y=urg_counts.values,
+                                        marker_color="#1a3d7c",
+                                        text=urg_counts.values, textposition="outside",
                                         hovertemplate="%{x}: %{y} case(s)<extra></extra>"))
                 fig2.update_layout(height=320, margin=dict(l=10, r=10, t=20, b=10), xaxis_title=None, yaxis_title="Cases",
                                    yaxis=dict(gridcolor="#e2e8f0", zeroline=False))
                 st.plotly_chart(fig2, width="stretch", theme="streamlit")
-                st.caption("Distribution: High Confidence &bull; Medium Confidence &bull; Low Confidence")
+                st.caption("Distribution across priority tiers (Immediate, High, Standard)")
 
     with tab2:
         bench = load_benchmark_metrics()
