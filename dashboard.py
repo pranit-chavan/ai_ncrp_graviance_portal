@@ -890,7 +890,7 @@ def render_step1():
     # ------------------------------------------------------------------
     # MODULE G: Voice-to-Text — Audio Upload
     # ------------------------------------------------------------------
-    with st.expander("Voice Input — Upload Audio Recording (Module G)", expanded=False):
+    with st.expander("🎙️ Live Voice Input & Speech-to-Text (Module G)", expanded=False):
         if not _stt_available:
             st.info(
                 "Voice-to-text is not currently available. To enable it, install OpenAI Whisper:\n\n"
@@ -899,53 +899,75 @@ def render_step1():
             )
         else:
             st.markdown(
-                "Upload a voice recording of the complaint in **any Indian language** "
-                "(Hindi, Tamil, Telugu, Bengali, Marathi, Gujarati, Kannada, Malayalam, Punjabi, Urdu, or English). "
-                "The audio will be transcribed locally using AI and the text will be added to your incident statement above."
+                "Speak or record your complaint in **any Indian language** "
+                "(Hindi, Hinglish, Marathi, Tamil, Telugu, Bengali, Gujarati, Kannada, Malayalam, Punjabi, Urdu, or English). "
+                "AI will transcribe your speech locally and populate your incident statement above."
             )
-            st.caption("Permitted formats: WAV, MP3, M4A, OGG, FLAC, WebM, AAC (Maximum 100 MB)")
 
-            stt_col1, stt_col2 = st.columns([2, 1])
-            with stt_col1:
-                audio_file = st.file_uploader(
-                    "Upload voice recording",
+            stt_set1, stt_set2, stt_set3 = st.columns([1.5, 1.5, 1])
+            with stt_set1:
+                langs = get_supported_languages()
+                lang_options = ["Auto-Detect"] + [f"{name} ({code})" for code, name in langs.items()]
+                lang_choice = st.selectbox("Language Hint", lang_options, index=0, key="stt_lang_select")
+            with stt_set2:
+                stt_model = st.selectbox(
+                    "Model Speed / Quality",
+                    ["Fast (base)", "Balanced (small)", "Best (medium)"],
+                    index=0, key="stt_model_select",
+                    help="Faster models use less memory. 'base' is recommended for responsive live speech."
+                )
+                model_map = {"Fast (base)": "base", "Balanced (small)": "small", "Best (medium)": "medium"}
+                chosen_model = model_map.get(stt_model, "base")
+            with stt_set3:
+                stt_action = st.radio(
+                    "Text Action",
+                    ["Append to text", "Replace text"],
+                    index=0, horizontal=False, key="stt_action_radio",
+                )
+
+            # Two input options: Live Microphone vs Audio File Upload
+            v_tab1, v_tab2 = st.tabs(["🎙️ Speak Live (Microphone)", "📁 Upload Audio File"])
+
+            audio_data_to_transcribe = None
+            audio_source_label = ""
+
+            with v_tab1:
+                st.markdown(
+                    "<div style='font-size:0.88em;color:#475569;margin-bottom:6px;'>"
+                    "<b>Click the microphone button below to record live</b>. Speak what happened clearly. Click again to stop."
+                    "</div>",
+                    unsafe_allow_html=True
+                )
+                live_mic = st.audio_input("Record live voice complaint", key="stt_live_mic")
+                if live_mic is not None:
+                    audio_data_to_transcribe = live_mic
+                    audio_source_label = "Live Voice Recording"
+
+            with v_tab2:
+                uploaded_audio = st.file_uploader(
+                    "Upload recorded audio file",
                     type=["wav", "mp3", "m4a", "ogg", "flac", "webm", "aac", "mp4", "wma"],
                     accept_multiple_files=False,
                     key="stt_audio_upload",
-                    label_visibility="collapsed",
                 )
-            with stt_col2:
-                langs = get_supported_languages()
-                lang_options = ["Auto-Detect"] + [f"{name} ({code})" for code, name in langs.items()]
-                lang_choice = st.selectbox("Language", lang_options, index=0, key="stt_lang_select")
+                if uploaded_audio is not None and audio_data_to_transcribe is None:
+                    audio_data_to_transcribe = uploaded_audio
+                    audio_source_label = uploaded_audio.name
 
-            stt_model = st.radio(
-                "Transcription Quality",
-                ["Fast (base)", "Balanced (small)", "Best (medium)"],
-                index=0, horizontal=True, key="stt_model_radio",
-                help="Faster models use less memory but may be less accurate for mixed-language or noisy audio."
-            )
-            model_map = {"Fast (base)": "base", "Balanced (small)": "small", "Best (medium)": "medium"}
-            chosen_model = model_map.get(stt_model, "base")
-
-            stt_action = st.radio(
-                "After transcription",
-                ["Append to existing text", "Replace existing text"],
-                index=0, horizontal=True, key="stt_action_radio",
-            )
-
-            if st.button("Transcribe Audio", type="secondary", key="stt_transcribe_btn"):
-                if audio_file is None:
-                    st.warning("Please upload an audio file first.")
-                else:
+            # Transcribe Action
+            if audio_data_to_transcribe is not None:
+                st.markdown("<div style='margin-top:10px;'></div>", unsafe_allow_html=True)
+                btn_label = f"⚡ Transcribe {audio_source_label} with Whisper AI"
+                if st.button(btn_label, type="primary", key="stt_transcribe_btn", use_container_width=True):
                     # Parse language selection
                     lang_hint = None
                     if lang_choice != "Auto-Detect":
                         lang_hint = lang_choice.split("(")[-1].rstrip(")")
 
-                    with st.spinner(f"Transcribing audio using Whisper ({chosen_model} model)... This may take a moment."):
+                    filename = getattr(audio_data_to_transcribe, "name", "live_recording.wav")
+                    with st.spinner(f"Transcribing audio using Whisper ({chosen_model} model)... Please wait."):
                         stt_result = transcribe_audio_bytes(
-                            audio_file, filename=audio_file.name,
+                            audio_data_to_transcribe, filename=filename,
                             language=lang_hint, model_name=chosen_model,
                         )
 
@@ -958,7 +980,7 @@ def render_step1():
 
                         # Apply to incident text
                         existing = wiz.get("incident_text", "").strip()
-                        if stt_action == "Append to existing text" and existing:
+                        if stt_action == "Append to text" and existing:
                             wiz["incident_text"] = existing + "\n\n" + transcribed
                         else:
                             wiz["incident_text"] = transcribed
@@ -972,14 +994,14 @@ def render_step1():
                             "audio_duration_seconds": duration,
                             "transcription_latency_seconds": latency,
                             "model_used": stt_result["model_used"],
-                            "audio_filename": audio_file.name,
+                            "audio_filename": audio_source_label,
                             "segment_count": len(stt_result["segments"]),
                         }
 
                         st.success(
-                            f"Transcription complete — {len(transcribed)} characters extracted.\n\n"
-                            f"**Language detected:** {lang_name} (confidence: {lang_prob:.0%})  \n"
-                            f"**Audio duration:** {duration:.1f}s  |  **Processing time:** {latency:.1f}s"
+                            f"✅ Transcription complete! Extracted {len(transcribed)} characters.\n\n"
+                            f"**Language detected:** {lang_name} ({lang_prob:.0%}) | "
+                            f"**Audio duration:** {duration:.1f}s | **Latency:** {latency:.1f}s"
                         )
                         st.rerun()
                     else:

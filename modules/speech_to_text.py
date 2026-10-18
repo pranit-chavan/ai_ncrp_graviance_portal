@@ -304,6 +304,11 @@ def transcribe_audio_bytes(audio_bytes, filename="recording.wav", **kwargs):
     **kwargs
         Forwarded to transcribe_audio().
     """
+    if hasattr(audio_bytes, "seek"):
+        try:
+            audio_bytes.seek(0)
+        except Exception:
+            pass
     if hasattr(audio_bytes, "read"):
         audio_bytes = audio_bytes.read()
 
