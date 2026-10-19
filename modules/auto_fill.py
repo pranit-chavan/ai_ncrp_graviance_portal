@@ -248,7 +248,7 @@ def generate_autofill_payload(
             critical_needed.append("Suspect UPI ID or Beneficiary Bank Account")
         if "suspect_phone" in mo_critical and not extracted["suspect_phones"]:
             critical_needed.append("Suspect Caller / Sender Mobile Number")
-        if "apk_file_or_link" in mo_critical and not extracted["app_names"]:
+        if "apk_file_or_link" in mo_critical and not extracted["app_names"] and ("apk" in raw_text.lower() or "app" in raw_text.lower()):
             critical_needed.append("Name or link of APK / Remote Access Application")
 
     if complainant["name"] == "not supplied":

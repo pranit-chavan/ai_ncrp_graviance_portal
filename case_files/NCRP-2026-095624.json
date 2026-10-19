@@ -1,0 +1,212 @@
+{
+  "reference": "NCRP/2026/095624",
+  "generated_at": "2026-10-19T13:10:24",
+  "complainant": {
+    "title": "Shri/Smt",
+    "name": "Pranit Chavan",
+    "gender": "not supplied",
+    "dob": "not supplied",
+    "age": "not supplied",
+    "relative_name": "not supplied",
+    "relative_type": "Father",
+    "phone": "9123456789",
+    "email": "not supplied",
+    "address": "not supplied",
+    "city": "Pune",
+    "district": "not supplied",
+    "state": "Maharashtra",
+    "pincode": "not supplied",
+    "police_station": "not supplied",
+    "relationship_with_victim": "Self",
+    "id_type": "not supplied",
+    "id_upload_name": "not supplied"
+  },
+  "incident": {
+    "datetime": "17 Oct 2026 13:10",
+    "category": "Financial Fraud",
+    "sub_category_reported": "UPI Related Frauds",
+    "modus_operandi": "Fake Electricity / Utility Bill Disconnection Scam",
+    "location": [
+      "Paytm"
+    ],
+    "delay_in_reporting": "No",
+    "delay_reason": "N/A"
+  },
+  "complaint": {
+    "raw_text": "On 17 Oct 2026, ₹45,000 was fraudulently debited from my HDFC Bank account (A/c ending 1234) via UPI UTR: 326712345678 to msedcl.desk98@paytm. Scammer called from 9876543210 threatening electricity disconnection tonight.",
+    "standardised_narrative": "On 17 Oct 2026, ₹45,000 was fraudulently debited from my HDFC Bank account (A/c ending 1234) via UPI UTR: 326712345678 to msedcl.desk98@paytm. Scammer called from 9876543210 threatening electricity disconnection tonight.",
+    "narrative_source": "Module A"
+  },
+  "classification": {
+    "sub_category": "UPI Related Frauds",
+    "confidence": 0.583,
+    "confidence_band": "LOW",
+    "guidance": "Manual classification recommended. Adjacent categories should be considered.",
+    "source": "Module B - machine generated",
+    "requires_confirmation": true
+  },
+  "extracted_entities": {
+    "amount": 45000,
+    "amount_formatted": "₹45,000",
+    "bank_name": "HDFC",
+    "account_last4": "1234",
+    "utr": "326712345678",
+    "date": "17 Oct 2026",
+    "upi_id": "msedcl.desk98@paytm",
+    "suspect_phones": [
+      "9876543210"
+    ],
+    "victim_phones": [],
+    "platforms": [
+      "Paytm"
+    ],
+    "suspect_persona": null,
+    "app_names": [],
+    "all_phones": [
+      "9876543210"
+    ],
+    "extraction_confidence": 1.0
+  },
+  "legal_sections": {
+    "sub_category": "UPI Related Frauds",
+    "verified": true,
+    "statute_year": 2023,
+    "it_act": [
+      {
+        "section": "66D",
+        "description": "Cheating by personation by using computer resource"
+      }
+    ],
+    "bns": [
+      {
+        "section": "318(4)",
+        "description": "Cheating and dishonestly inducing delivery of property (Imprisonment up to 7 years)",
+        "ipc_equivalent": "420"
+      }
+    ],
+    "other": [
+      {
+        "act": "National Payments Corporation of India (NPCI) UPI Procedural Guidelines",
+        "description": "Protocol for collect-request authentication, beneficiary tracing, and PSP settlement freeze"
+      }
+    ],
+    "statutory_elements": [
+      "Deceptive generation of 'Collect Request' misrepresented to citizen as payment credit or refund",
+      "Inducement to enter UPI PIN under false pretext that PIN is required to receive money",
+      "Instantaneous electronic debit and routing to suspect Virtual Payment Address (VPA)"
+    ],
+    "conditional_applied": [],
+    "notes": "UPI transfers settle instantly. Beneficiary VPAs and handles must be flagged on the NCRP portal within the 1930 Golden Hour window to intercept ATM cash-outs.",
+    "procedural_notes": {
+      "fir_registration": "BNSS 2023 Section 173 mandates registration of FIR upon electronic communication disclosures.",
+      "electronic_evidence_admissibility": "BSA 2023 Section 63 certificate is mandatory for admitting electronic evidence in court (superseding legacy IEA 65B).",
+      "proceeds_lien": "Section 106/107 BNSS 2023 & SOP 1930 / I4C protocols empower immediate inter-bank lien marking."
+    },
+    "audit_framework": {
+      "jurisdiction": "Republic of India",
+      "primary_penal_statute": "Bharatiya Nyaya Sanhita, 2023 (Act No. 45 of 2023)",
+      "primary_cyber_statute": "Information Technology Act, 2000 (Act No. 21 of 2000 as amended)",
+      "enactment_effective_date": "2024-07-01",
+      "audit_status": "CERTIFIED_CURRENT",
+      "source_registry": "Ministry of Law and Justice, Government of India (India Code Information System: indiacode.nic.in)"
+    },
+    "disclaimer": "This mapping constitutes automated decision-support for investigating officers (IOs) and law enforcement authorities. It does not replace independent judicial or prosecutorial discretion."
+  },
+  "transactions": [
+    {
+      "bank": "HDFC",
+      "account_no": "A/c ending 1234",
+      "transaction_id": "326712345678",
+      "amount": 45000,
+      "transaction_date": "17 Oct 2026",
+      "payment_mechanism": "UPI"
+    }
+  ],
+  "suspect_transactions": [
+    {
+      "method": "UPI",
+      "bank": "PAYTM",
+      "account_no": "msedcl.desk98@paytm",
+      "transaction_id": "326712345678",
+      "amount": 45000,
+      "transaction_date": "17 Oct 2026"
+    }
+  ],
+  "suspects": [
+    {
+      "name": "Unknown Suspect Caller #1",
+      "id_type": "Mobile Phone Number",
+      "id_number": "9876543210",
+      "address": "Under Investigation via Telecom CDR"
+    },
+    {
+      "name": "Beneficiary VPA Holder",
+      "id_type": "UPI VPA Handle",
+      "id_number": "msedcl.desk98@paytm",
+      "address": "Lien Requested via PSP Bank"
+    }
+  ],
+  "evidence": {
+    "attachments": [],
+    "count": 0,
+    "table": []
+  },
+  "intake_gaps_identified": [],
+  "reconciliation": {
+    "agreements": [],
+    "conflicts": [],
+    "gaps": [],
+    "ocr_only": [],
+    "confidence_note": "text only — no screenshot evidence to cross-check",
+    "has_conflicts": false
+  },
+  "sentiment": {
+    "tone": "ANXIOUS_THREATENED",
+    "tone_label": "Anxious / Threatened (Extortion Risk)",
+    "tone_emoji": "⚠️",
+    "distress_score": 0.32,
+    "urgency_level": "EMERGENCY_GOLDEN_HOUR",
+    "urgency_label": "EMERGENCY (Golden Hour — <24h Fund Freeze Active)",
+    "urgency_score": 0.95,
+    "is_golden_hour": true,
+    "emotion_tags": [
+      "Extortion/Blackmail Anxiety"
+    ],
+    "reassurance": {
+      "title": "Immediate Action: Golden Hour Fund Freeze",
+      "message": "We understand how stressful this is, but taking immediate action gives the best chance of freezing your stolen funds. Under the Citizen Financial Cyber Fraud Reporting System (CFCFRMS), calling Helpline 1930 enables banks and payment aggregators to put an immediate lien on beneficiary accounts if reported promptly.",
+      "immediate_steps": [
+        "Call the National Cyber Crime Helpline **1930** immediately to report the transaction ID (UTR).",
+        "Contact your bank's 24/7 fraud helpline and request an urgent transaction block/chargeback.",
+        "Keep your UPI app, SMS alerts, and bank transaction reference ready."
+      ],
+      "helpline": "1930"
+    },
+    "comprehension": {
+      "summary": "Complainant reported unauthorized debit/fraudulent transfer of 45000 via Paytm through Cybercrime Incident via Electronic Channel. Context: \"On 17 Oct 2026, ₹45,000 was fraudulently debited from my HDFC Bank account (A/c ending 1234) via UPI UTR: 326712345678 to msedcl.desk98@payt...\"",
+      "crime_vector": "Cybercrime Incident via Electronic Channel",
+      "financial_impact": 45000,
+      "key_actors": {
+        "disputed_amount": 45000,
+        "suspect_identifiers": "msedcl.desk98@paytm",
+        "platform_involved": "Paytm",
+        "evidence_attached": true
+      }
+    }
+  },
+  "data_provenance": {
+    "narrative": "Module A (AI Standardised)",
+    "extracted_entities_source": "Module C (OCR + Regex)",
+    "classification_source": "Module B (LinearSVC Model)",
+    "legal_mapping_source": "Module D (Deterministic Statutory Lookup)",
+    "reconciliation_source": "Reconciliation Layer"
+  },
+  "suggested_actions": [
+    "Report beneficiary account and UPI identifiers to the bank for immediate freezing",
+    "Raise the transaction on the NCRP/I4C portal within the golden hour",
+    "Obtain the bank statement and transaction references from the complainant",
+    "Issue notice to the beneficiary bank for KYC of the recipient account"
+  ],
+  "status": "PENDING OFFICER REVIEW",
+  "_disclaimer": "This case file was assembled automatically from a citizen complaint. The classification and the legal provisions proposed are decision-support for the investigating officer and require confirmation before any action is taken on them."
+}

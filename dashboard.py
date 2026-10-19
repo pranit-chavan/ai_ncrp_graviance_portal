@@ -81,6 +81,17 @@ except ImportError:
     transcribe_audio_bytes = None
     get_supported_languages = None
 
+try:
+    from modules.mo_knowledge_base import match_mo, get_victim_guidance, list_all_mos
+    from modules.entity_extractor import extract_entities_v2
+    from modules.auto_fill import generate_autofill_payload
+    from modules.victim_guidance import generate_victim_guidance
+    from modules.pattern_engine import find_linked_cases, build_suspect_dossier
+    from modules.doc_generator import generate_investigation_document, list_available_templates
+    _v2_modules_available = True
+except Exception:
+    _v2_modules_available = False
+
 
 def inject_custom_css():
     st.markdown(
@@ -782,6 +793,30 @@ def _run_full_triage(wiz):
             )
             wiz["triage"] = triage_res
             wiz["sentiment"] = triage_res.get("sentiment") or wiz.get("sentiment")
+
+            # Enhanced with v2 Auto-Fill & MO-KB
+            if _v2_modules_available:
+                try:
+                    af_payload = generate_autofill_payload(
+                        wiz["incident_text"],
+                        ocr_entities=triage_res.get("entities", {})
+                    )
+                    wiz["autofill_payload"] = af_payload
+                    if af_payload.get("matched_mo"):
+                        wiz["mo_match"] = af_payload["matched_mo"]
+                        wiz["modus_operandi"] = af_payload["matched_mo"]["name"]
+                    
+                    if af_payload.get("transactions") and not wiz.get("transactions"):
+                        wiz["lost_money"] = "Yes"
+                        wiz["transactions"] = af_payload["transactions"]
+                    if af_payload.get("suspect_transactions") and not wiz.get("suspect_transactions"):
+                        wiz["has_suspect_txn"] = "Yes"
+                        wiz["suspect_transactions"] = af_payload["suspect_transactions"]
+                    if af_payload.get("suspects") and not wiz.get("suspects"):
+                        wiz["suspects"] = af_payload["suspects"]
+                except Exception:
+                    pass
+
             sub_cat = triage_res.get("sub_category")
             conf = triage_res.get("confidence", 0.0)
             if sub_cat and sub_cat != "UNCLASSIFIED":
@@ -957,7 +992,7 @@ def render_step1():
 
     st.divider()
 
-    col_act1, col_act2 = st.columns([1.2, 1])
+    col_act1, col_act2, col_act3 = st.columns([1.2, 1.3, 1.1])
     with col_act1:
         if st.button("Check Narrative Completeness & Identify Gaps", type="secondary", width="stretch"):
             if not text.strip() and not wiz["evidence"]:
@@ -968,9 +1003,19 @@ def render_step1():
                     sent_res = analyze_sentiment_and_urgency(text) if analyze_sentiment_and_urgency else {}
                     wiz["intake_analysis"] = {"gaps": gaps_res, "sentiment": sent_res}
                     wiz["sentiment"] = sent_res
+                    if _v2_modules_available:
+                        mo_res = match_mo(text)
+                        if mo_res:
+                            wiz["mo_match"] = mo_res
                     st.rerun()
     with col_act2:
-        if st.button("Proceed to Structured Review & Verification →", type="primary", width="stretch"):
+        if st.button("⚡ AI One-Shot Intake & Auto-Fill", type="primary", width="stretch"):
+            if not text.strip() and not wiz["evidence"]:
+                st.error("Please enter an incident narrative or speak into the mic first.")
+            else:
+                _run_full_triage(wiz)
+    with col_act3:
+        if st.button("Proceed to Review →", type="secondary", width="stretch"):
             if not text.strip() and not wiz["evidence"]:
                 st.error("Please enter an incident narrative or upload supporting documentation.")
             else:
@@ -991,6 +1036,34 @@ def render_step1():
         st.write("")
         st.markdown("---")
         section_header("Automated Intake Assessment & Completeness Audit")
+
+        if wiz.get("mo_match"):
+            mo = wiz["mo_match"]
+            st.markdown(
+                f"""<div style="background:#eef4fa;border:1px solid #93c5fd;border-left:5px solid {SEQ_BLUE};padding:14px 18px;border-radius:4px;margin-bottom:14px;">
+                      <div style="font-weight:800;color:{GOV_BLUE};font-size:0.95em;letter-spacing:0.02em;">
+                        IDENTIFIED MODUS OPERANDI: {mo['name'].upper()}
+                      </div>
+                      <div style="font-size:0.88em;color:#334155;margin-top:4px;">
+                        <b>Primary Statutory Mapping:</b> {mo['primary_ncrp_subcategory']} &bull; <b>Confidence:</b> {int(mo.get('match_score', 0.9)*100)}%
+                      </div>
+                      <div style="font-size:0.85em;color:#475569;margin-top:4px;">
+                        <b>Typical Attack Pattern:</b> {'; '.join(mo.get('attack_chain', [])[:2])}
+                      </div>
+                    </div>""",
+                unsafe_allow_html=True
+            )
+
+        if _v2_modules_available:
+            with st.expander("🛡️ Verified Bank Emergency Hotlines & Evidence Preservation Directives (BSA 2023)", expanded=False):
+                try:
+                    vg_res = generate_victim_guidance(
+                        mo_id=wiz.get("mo_match", {}).get("mo_id"),
+                        incident_date=date.today().isoformat()
+                    )
+                    st.markdown(vg_res["advisory_markdown"])
+                except Exception:
+                    pass
 
         if is_gold:
             st.markdown(
@@ -1805,6 +1878,138 @@ def page_case_detail():
                     st.rerun()
             except Exception as e:
                 st.error(f"Reclassification failure: {e}")
+
+    # =========================================================================
+    # MODULE L — Cross-Case Pattern & Criminal Syndicate Correlation
+    # =========================================================================
+    st.divider()
+    section_header("Cross-Case Pattern & Criminal Syndicate Correlation (Module L)")
+    if _v2_modules_available:
+        try:
+            links = find_linked_cases(case)
+            if links.get("total_cases_linked", 0) > 0:
+                st.markdown(
+                    f"""<div style="background:#fee2e2;border:1px solid #f87171;border-left:5px solid #dc2626;padding:16px 20px;border-radius:4px;margin-bottom:14px;">
+                          <div style="font-weight:800;color:#991b1b;font-size:1.05em;letter-spacing:0.02em;">
+                            ORGANIZED SCAM SYNDICATE DETECTED ({links['total_cases_linked']} LINKED COMPLAINTS)
+                          </div>
+                          <div style="font-size:0.92em;color:#374151;margin-top:6px;line-height:1.5;">
+                            This grievance shares confirmed suspect identifiers with <b>{links['total_cases_linked']}</b> other registered cybercrime cases across <b>{len(links.get('geographic_spread', []))}</b> cities ({', '.join(links.get('geographic_spread', [])[:4])}).
+                          </div>
+                          <div style="font-size:0.95em;color:#991b1b;font-weight:700;margin-top:8px;">
+                            Total Cumulative Loss Siphoned by Syndicate: Rs. {links['total_amount_defrauded']:,.2f}
+                          </div>
+                          <div style="font-size:0.85em;color:#475569;margin-top:4px;">
+                            Shared Identifiers: {', '.join(links.get('shared_identifiers', [])[:4])}
+                          </div>
+                        </div>""",
+                    unsafe_allow_html=True
+                )
+
+                # Show table of linked complaints
+                lk_rows = []
+                for lk in links.get("linked_cases", []):
+                    lk_rows.append({
+                        "Case Reference": lk["reference"],
+                        "Victim Name": lk.get("citizen_name", "-"),
+                        "City": lk.get("citizen_city", "-"),
+                        "Offence": lk.get("sub_category", "-"),
+                        "Amount Lost": f"Rs. {lk.get('amount', 0):,}",
+                        "Match Evidence": "; ".join(lk.get("match_reasons", [])),
+                        "Link Confidence": f"{int(lk.get('confidence_score', 0.8) * 100)}%"
+                    })
+                st.dataframe(pd.DataFrame(lk_rows), hide_index=True, width="stretch")
+
+                # Suspect Dossier Viewer
+                with st.expander("Compile & Inspect Criminal Syndicate Dossier", expanded=False):
+                    primary_suspect_id = None
+                    for sid in links.get("shared_identifiers", []):
+                        if "PHONE:" in sid or "UPI:" in sid:
+                            primary_suspect_id = sid.split(":", 1)[1].strip()
+                            break
+                    if primary_suspect_id:
+                        dos = build_suspect_dossier(primary_suspect_id)
+                        if dos.get("found"):
+                            dc1, dc2, dc3 = st.columns(3)
+                            dc1.metric("Total Victims Hit", dos.get("total_complaints", 1))
+                            dc2.metric("Total Defrauded", dos.get("total_amount_formatted", "Rs. 0"))
+                            dc3.metric("Syndicate Threat Level", dos.get("threat_level", "HIGH"))
+
+                            st.markdown(f"**Associated Phone Numbers:** `{', '.join(dos.get('associated_phones', [])) or 'None'}`")
+                            st.markdown(f"**Associated UPI Handles:** `{', '.join(dos.get('associated_upi_vpash', [])) or 'None'}`")
+                            st.markdown(f"**Victim Geographies:** {', '.join(dos.get('victim_geographies', []))}")
+                            st.info("Tactical Recommendation: Consolidate linked complaints under BNSS Section 173 and issue Look-Out Circular (LOC) / inter-state cyber cell coordination.")
+            else:
+                st.success("Cross-Case Correlation Audit: No repeat suspect phone, UPI handle, or account matches found in other registered complaints. (Isolated incident)")
+        except Exception as e:
+            st.caption(f"Pattern correlation note: {e}")
+    else:
+        st.caption("Cross-case correlation engine not loaded.")
+
+    # =========================================================================
+    # MODULE M — Statutory Investigation Document Generator
+    # =========================================================================
+    st.divider()
+    section_header("Investigator Action Center — Statutory Document Generator (Module M)")
+    st.caption("Generate official, procedural legal notices and charge-sheet requisitions under Bharatiya Nagarik Suraksha Sanhita 2023, IT Act 2000, and BSA 2023.")
+
+    if _v2_modules_available:
+        templates = list_available_templates()
+        t_opts = {t["doc_type"]: f"{t['doc_type']} — {t['title']}" for t in templates}
+
+        c_doc1, c_doc2 = st.columns([1.5, 1])
+        with c_doc1:
+            sel_doc_type = st.selectbox(
+                "Select Statutory Notice Template",
+                list(t_opts.keys()),
+                format_func=lambda k: t_opts[k],
+                key=f"doc_type_sel_{case.get('reference')}"
+            )
+        with c_doc2:
+            io_name_input = st.text_input("Investigating Officer Name", value="Inspector R. K. Patil", key=f"io_name_{case.get('reference')}")
+
+        c_doc3, c_doc4 = st.columns([1.5, 1])
+        with c_doc3:
+            io_desig_input = st.text_input("Officer Designation / Rank", value="Inspector of Police (Cyber Crime)", key=f"io_desig_{case.get('reference')}")
+        with c_doc4:
+            io_ps_input = st.text_input("Cyber Police Station Jurisdiction", value=g(case, "complainant", "police_station", default="Cyber Crime Police Station"), key=f"io_ps_{case.get('reference')}")
+
+        if st.button("Generate Official Statutory Document", type="primary", key=f"btn_gen_doc_{case.get('reference')}"):
+            try:
+                gen_res = generate_investigation_document(
+                    doc_type=sel_doc_type,
+                    case_data=case,
+                    io_name=io_name_input,
+                    io_designation=io_desig_input,
+                    police_station=io_ps_input
+                )
+                st.session_state["generated_doc_text"] = gen_res["document_text"]
+                st.session_state["generated_doc_title"] = gen_res["title"]
+                st.session_state["generated_doc_type"] = sel_doc_type
+            except Exception as e:
+                st.error(f"Document generation failed: {e}")
+
+        if st.session_state.get("generated_doc_text"):
+            st.markdown(f"#### {st.session_state.get('generated_doc_title', 'Statutory Document')}")
+            st.text_area(
+                "Official Document Preview",
+                st.session_state["generated_doc_text"],
+                height=320,
+                key=f"doc_preview_box_{case.get('reference')}"
+            )
+            c_d1, c_d2 = st.columns([1, 1])
+            with c_d1:
+                ref_slug = case.get("reference", "case").replace("/", "-")
+                st.download_button(
+                    "Download Notice (.txt)",
+                    data=st.session_state["generated_doc_text"],
+                    file_name=f"{st.session_state.get('generated_doc_type')}_{ref_slug}.txt",
+                    mime="text/plain",
+                    key=f"dl_doc_{case.get('reference')}"
+                )
+            with c_d2:
+                st.caption("Official copy formatted for dispatch to Bank Nodal Officers / Telecom Service Providers / Court.")
+
 
 
 # =============================================================================
