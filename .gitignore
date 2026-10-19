@@ -45,6 +45,8 @@ venv.bak/
 # Logs and runtime files
 *.log
 streamlit.log
+*.db
+*.sqlite3
 
 # OS generated files
 .DS_Store
