@@ -1,0 +1,760 @@
+{
+  "_meta": {
+    "version": "2.0.0",
+    "description": "Standardized Modus Operandi (MO) Knowledge Base for Indian Cyber Crime Investigation & Intake Guidance",
+    "authority": "NCRP / I4C Framework Alignment",
+    "last_updated": "2026-10-19",
+    "total_patterns": 14
+  },
+  "patterns": [
+    {
+      "mo_id": "MO-FIN-001",
+      "name": "Fake Electricity / Utility Bill Disconnection Scam",
+      "category": "Financial Fraud",
+      "primary_ncrp_subcategory": "UPI Related Frauds",
+      "secondary_ncrp_subcategories": ["Internet Banking Related Fraud", "Cheating by Impersonation"],
+      "aliases": [
+        "bijli bill fraud",
+        "electricity bill scam",
+        "power cut threat",
+        "light cut sms",
+        "meter disconnect notice",
+        "msedcl bill scam",
+        "bses fake message",
+        "uppcl bill threat"
+      ],
+      "keywords": [
+        "electricity bill", "bijli bill", "light bill", "power disconnect",
+        "power will be disconnected", "meter disconnect", "tonight 9:30", "tonight at",
+        "msedcl", "bses", "uppcl", "tneb", "bescom", "wbsedcl", "bill unpaid",
+        "pay immediately to avoid disconnection", "electricity officer", "bijli office"
+      ],
+      "attack_chain": [
+        "Victim receives SMS or WhatsApp claiming electricity/utility bill is overdue",
+        "Message warns electricity will be disconnected tonight by 9:30 PM",
+        "Victim is given an 'electricity officer' mobile number to contact immediately",
+        "Scammer instructs victim to pay nominal token fee (₹10 or ₹100) or install remote access APK",
+        "Scammer captures credentials or triggers unauthorized debit from victim's account"
+      ],
+      "typical_entities": ["amount", "upi_id", "suspect_phone", "bank_name", "utr", "apk_name", "date"],
+      "critical_for_investigation": ["utr", "beneficiary_upi_or_account", "suspect_phone", "apk_file_or_link"],
+      "golden_hour_applicable": true,
+      "typical_amount_range": [5000, 150000],
+      "common_platforms": ["SMS", "WhatsApp", "PhonePe", "Google Pay", "Paytm"],
+      "victim_guidance": {
+        "immediate_actions": [
+          "Call 1930 Cyber Helpline immediately to freeze fraudulent transaction",
+          "Contact your bank's fraud desk to block internet banking and debit cards",
+          "Do NOT uninstall any downloaded APK yet — it contains digital evidence",
+          "Disconnect your phone from the internet (turn on Airplane mode) if an APK was installed"
+        ],
+        "evidence_to_preserve": [
+          "Original SMS / WhatsApp message with sender number and timestamp",
+          "Bank debit alert SMS and UPI transaction reference (UTR) screenshot",
+          "Downloaded APK file or download link history in browser",
+          "Call logs showing incoming calls from the scammer"
+        ],
+        "helpline_contacts": ["1930", "Bank Fraud Desk", "Official State Electricity Helpline (e.g. 1912)"]
+      },
+      "investigation_hints": {
+        "preliminary_action": "Issue immediate Section 91 BNSS freeze request to beneficiary bank/UPI PSP using UTR",
+        "notices_required": ["Section 91 BNSS to Beneficiary Bank for Lien", "Section 91 BNSS to Telecom Provider for CDR of suspect mobile"],
+        "mule_pattern": "Rapid transfer from Layer 1 UPI to Layer 2 P2P mule accounts, then cash withdrawal at ATM within 45-90 minutes",
+        "statutory_provisions": ["BNS 318(4)", "BNS 319(2)", "IT Act 66D"]
+      }
+    },
+    {
+      "mo_id": "MO-FIN-002",
+      "name": "UPI QR Code & Collect Request Scam",
+      "category": "Financial Fraud",
+      "primary_ncrp_subcategory": "UPI Related Frauds",
+      "secondary_ncrp_subcategories": ["Cheating by Impersonation", "E-Wallet Related Fraud"],
+      "aliases": [
+        "olx qr code fraud",
+        "scan qr to receive money",
+        "upi pin collect scam",
+        "army officer olx scam",
+        "scan to accept money",
+        "reverse payment scam"
+      ],
+      "keywords": [
+        "scan qr", "qr code", "collect request", "scan to receive", "enter pin to receive",
+        "olx", "quikr", "marketplace", "army officer", "defence personnel",
+        "transfer advance", "token amount", "approve request", "upi pin"
+      ],
+      "attack_chain": [
+        "Victim posts item for sale on OLX/marketplace or responds to buyer",
+        "Scammer poses as interested buyer (often impersonating Army / CISF officer)",
+        "Scammer claims unable to pay directly and sends QR code or UPI Collect Request",
+        "Scammer misleads victim saying 'Scan this QR code and enter UPI PIN to receive money'",
+        "Victim enters PIN; instead of credit, amount is debited from victim's account"
+      ],
+      "typical_entities": ["amount", "upi_id", "suspect_phone", "bank_name", "utr", "marketplace_listing", "date"],
+      "critical_for_investigation": ["utr", "beneficiary_upi_or_account", "suspect_phone", "qr_code_image"],
+      "golden_hour_applicable": true,
+      "typical_amount_range": [2000, 75000],
+      "common_platforms": ["OLX", "WhatsApp", "PhonePe", "Google Pay", "Paytm", "BHIM"],
+      "victim_guidance": {
+        "immediate_actions": [
+          "Remember: UPI PIN is ONLY needed to SEND money, NEVER to receive money",
+          "Call 1930 immediately with your 12-digit UTR number",
+          "De-link or reset your UPI PIN from your banking/UPI application",
+          "Report suspect profile on OLX / marketplace platform"
+        ],
+        "evidence_to_preserve": [
+          "Screenshot of the QR code sent by scammer",
+          "Screenshot of UPI Collect request screen and transaction confirmation",
+          "Chat conversation on OLX / WhatsApp",
+          "Scammer's phone number and UPI VPA handle"
+        ],
+        "helpline_contacts": ["1930", "Bank Fraud Desk", "UPI PSP Helpline"]
+      },
+      "investigation_hints": {
+        "preliminary_action": "Identify VPA handle provider and issue urgent lien request via 1930 / I4C CFCFRMS",
+        "notices_required": ["Section 91 BNSS to UPI PSP (NPCI/Bank) for merchant/VPA details", "Section 91 BNSS to OLX/Platform for suspect IP & registration data"],
+        "mule_pattern": "Often uses merchant aggregators or fake QR codes linked to mule accounts in Bharatpe/Paytm merchant handles",
+        "statutory_provisions": ["BNS 318(4)", "BNS 319(2)", "IT Act 66D"]
+      }
+    },
+    {
+      "mo_id": "MO-FIN-003",
+      "name": "Part-Time Task & Online Job Scam",
+      "category": "Financial Fraud",
+      "primary_ncrp_subcategory": "Online Job Fraud",
+      "secondary_ncrp_subcategories": ["UPI Related Frauds", "Internet Banking Related Fraud"],
+      "aliases": [
+        "telegram task scam",
+        "youtube like job scam",
+        "hotel review task",
+        "work from home scam",
+        "google review job",
+        "part time earning scam",
+        "crypto task job"
+      ],
+      "keywords": [
+        "telegram task", "youtube like", "like and subscribe", "hotel rating", "google review",
+        "part time job", "work from home", "daily earning", "task 1", "task bonus",
+        "recharge wallet", "vip task", "prepaid task", "commission", "withdrawal frozen",
+        "deposit tax to withdraw", "telegram receptionist", "mentor", "crypto task"
+      ],
+      "attack_chain": [
+        "Victim receives unsolicited WhatsApp/Telegram offer for part-time online tasks",
+        "Initial tasks (like YouTube videos, write Google reviews) pay small genuine rewards (₹150 - ₹500) to build trust",
+        "Victim is added to a VIP Telegram group where fake members post huge profit screenshots",
+        "Victim is induced to execute 'Prepaid/Merchant Tasks' by transferring money to receive 30-50% commission",
+        "When victim attempts withdrawal, scammer claims system error and demands more deposits for 'taxes' or 'credit score'"
+      ],
+      "typical_entities": ["amount", "upi_id", "bank_account", "telegram_handle", "suspect_phone", "website_url", "utr", "date"],
+      "critical_for_investigation": ["utr_list", "beneficiary_accounts", "telegram_channel_or_handle", "fake_portal_url"],
+      "golden_hour_applicable": true,
+      "typical_amount_range": [25000, 2500000],
+      "common_platforms": ["Telegram", "WhatsApp", "UPI", "Net Banking", "Crypto Exchanges"],
+      "victim_guidance": {
+        "immediate_actions": [
+          "STOP transferring any further money — no 'tax' or 'unlock fee' will recover your funds",
+          "Call 1930 immediately with all UTR numbers from your transaction history",
+          "Do NOT leave the Telegram group yet — export chat history and capture screenshots first",
+          "Contact your bank to place debit lien on recent beneficiary accounts"
+        ],
+        "evidence_to_preserve": [
+          "Complete Telegram chat export with participant handles and group ID",
+          "All bank statements showing individual UTRs, dates, and beneficiary account numbers",
+          "Screenshots of the fake task portal showing fictitious balance and withdrawal errors",
+          "Payment slip receipts and WhatsApp initial message"
+        ],
+        "helpline_contacts": ["1930", "Bank Fraud Desk"]
+      },
+      "investigation_hints": {
+        "preliminary_action": "Correlate multiple UTRs against I4C database; task frauds almost always operate via organized multi-tier mule syndicates",
+        "notices_required": ["Section 91 BNSS to Beneficiary Banks (multiple layers)", "Notice to Telegram under IT Act Section 79 for channel and subscriber info", "Notice to Domain Registrar for fake task portal suspension"],
+        "mule_pattern": "Funds dispersed across 10-20 current accounts within 30 minutes, converted to USDT on P2P crypto exchanges",
+        "statutory_provisions": ["BNS 318(4)", "BNS 61(2) (Criminal Conspiracy)", "IT Act 66D"]
+      }
+    },
+    {
+      "mo_id": "MO-FIN-004",
+      "name": "Predatory Loan App & Blackmail / Morphed Photo Harassment",
+      "category": "Extortion & Harassment",
+      "primary_ncrp_subcategory": "Cyber Bullying / Stalking / Sexting",
+      "secondary_ncrp_subcategories": ["Cheating by Impersonation", "UPI Related Frauds"],
+      "aliases": [
+        "instant loan app scam",
+        "morphed photo blackmail",
+        "recovery agent harassment",
+        "7 days loan app",
+        "chinese loan app",
+        "contact list leak scam",
+        "torture loan app"
+      ],
+      "keywords": [
+        "loan app", "instant loan", "7 days loan", "recovery agent", "morphed photo",
+        "contacts call", "calling relatives", "whatsapp group blackmail", "nude photo",
+        "threaten to send contacts", "pan card aadhar card misused", "interest 100%",
+        "processing fee deducted", "abusive language", "suicide threat"
+      ],
+      "attack_chain": [
+        "Victim downloads an unverified instant loan app from Play Store or third-party APK link",
+        "App mandates permissions for Contacts, Gallery, SMS, and Location before disbursing small amount",
+        "Loan app disburses only 50-60% of amount after deducting huge 'processing fee' with 7-day tenure",
+        "Even upon repayment, app shows loan active or demands 3x-5x extortionate interest",
+        "Recovery agents harvest contacts and send morphed pornographic/shaming photos to victim's family and friends"
+      ],
+      "typical_entities": ["amount_extorted", "app_name", "suspect_phone_numbers", "upi_id", "apk_link", "victim_contacts_threatened"],
+      "critical_for_investigation": ["apk_package_name", "recovery_agent_phones", "extortion_upi_ids", "morphed_media_evidence"],
+      "golden_hour_applicable": true,
+      "typical_amount_range": [5000, 300000],
+      "common_platforms": ["WhatsApp", "SMS", "Third-party APKs", "Cloud Storage", "UPI"],
+      "victim_guidance": {
+        "immediate_actions": [
+          "Do NOT pay extortion money — paying once leads to repeated higher extortion demands",
+          "Revoke app permissions immediately: Settings -> Apps -> Permissions (disable Contacts/Storage)",
+          "Inform your family and close contacts that your phone was compromised by a rogue app",
+          "Call 1930 or local women/cyber helpline immediately",
+          "File complaint under BNS Section 78, 79, and 308"
+        ],
+        "evidence_to_preserve": [
+          "App name, developer name, APK package file or download URL",
+          "Screenshots and audio recordings of threatening calls and WhatsApp messages",
+          "UPI payment receipts showing receiver names and VPA addresses",
+          "Call records of all harassing recovery numbers"
+        ],
+        "helpline_contacts": ["1930", "112 Emergency", "1091 Women Helpline"]
+      },
+      "investigation_hints": {
+        "preliminary_action": "Flag app package to CERT-In / Google for takedown; immediately identify primary payment gateway / virtual accounts used for repayments",
+        "notices_required": ["Section 91 BNSS to Payment Aggregators (Razorpay/Cashfree/Paytm) for merchant KYC", "Section 91 BNSS to Telecom for CDR/tower location of caller numbers", "Emergency takedown request under IT Act 69A"],
+        "mule_pattern": "Extortion funds routed through aggregator virtual accounts (VAN) into corporate current accounts",
+        "statutory_provisions": ["BNS 308(2) (Extortion)", "BNS 79 (Insulting modesty of woman)", "BNS 351(2) (Criminal Intimidation)", "IT Act 66E", "IT Act 67"]
+      }
+    },
+    {
+      "mo_id": "MO-FIN-005",
+      "name": "Digital Arrest & Law Enforcement Impersonation Scam",
+      "category": "Extortion & Impersonation",
+      "primary_ncrp_subcategory": "Cheating by Impersonation",
+      "secondary_ncrp_subcategories": ["Intimidating Email", "Internet Banking Related Fraud", "UPI Related Frauds"],
+      "aliases": [
+        "digital arrest scam",
+        "cbi fake call",
+        "mumbai police skype scam",
+        "ed custom arrest",
+        "narcotics parcel scam",
+        "supreme court fake order",
+        "video call digital arrest"
+      ],
+      "keywords": [
+        "digital arrest", "cbi", "ed", "enforcement directorate", "mumbai police", "delhi police",
+        "customs", "parcel containing drugs", "passport seized", "skype video call",
+        "police uniform", "fake arrest warrant", "supreme court order", "rbi verification account",
+        "national security", "do not disconnect", "room isolation", "money laundering case"
+      ],
+      "attack_chain": [
+        "Victim receives IVR call claiming a FedEx/courier parcel with passport/MDMA drugs was intercepted",
+        "Call is transferred to fake police/CBI officer dressed in uniform over Skype or WhatsApp video call",
+        "Scammers show fake arrest warrants with official Government seals and national security warnings",
+        "Victim is subjected to 'Digital Arrest' — forced to remain on continuous video call and isolated in a room",
+        "Scammer instructs victim to transfer all bank balances to an 'RBI Verification Account' for financial audit"
+      ],
+      "typical_entities": ["amount", "suspect_phone", "skype_id", "fake_officer_name", "beneficiary_bank_account", "utr", "date"],
+      "critical_for_investigation": ["beneficiary_bank_accounts", "utr_numbers", "skype_or_video_call_id", "fake_warrant_documents"],
+      "golden_hour_applicable": true,
+      "typical_amount_range": [100000, 15000000],
+      "common_platforms": ["Skype", "WhatsApp Video", "VoIP IVR", "RTGS / NEFT", "Net Banking"],
+      "victim_guidance": {
+        "immediate_actions": [
+          "There is NO provision for 'Digital Arrest' under Indian Law (BNSS/BNS) — police never arrest via video call",
+          "Government agencies NEVER ask citizens to transfer money to 'verification accounts'",
+          "Disconnect the call immediately and call 1930 / 112",
+          "Inform your bank immediately to freeze the outbound RTGS/NEFT transfer"
+        ],
+        "evidence_to_preserve": [
+          "Skype ID, WhatsApp number, and call screenshots showing the fake police setup",
+          "Copies of all fake arrest warrants, official letters, or Supreme Court stamps received",
+          "Bank RTGS/NEFT debit counterfoils, UTR numbers, and beneficiary account details",
+          "Incoming call records and timestamps"
+        ],
+        "helpline_contacts": ["1930", "112 Emergency Police", "Local Cyber Police Station"]
+      },
+      "investigation_hints": {
+        "preliminary_action": "Extremely high value cases: immediately alert I4C nodal officers and destination bank nodal for RTGS recall",
+        "notices_required": ["Urgent Sec 91 BNSS to Beneficiary Bank for RTGS/NEFT branch tracing", "Notice to Skype/Microsoft for IP logs and device identifiers", "Look-Out Circular (LOC) advisory if international routing identified"],
+        "mule_pattern": "High-value funds routed via newly opened Shell Company Current Accounts, split into multiple RTGS legs within 60 minutes",
+        "statutory_provisions": ["BNS 318(4)", "BNS 319(2)", "BNS 308(2)", "BNS 127(2) (Wrongful Confinement)", "IT Act 66D"]
+      }
+    },
+    {
+      "mo_id": "MO-FIN-006",
+      "name": "Fake Stock Trading App & Crypto Investment Scam",
+      "category": "Financial Fraud",
+      "primary_ncrp_subcategory": "Demat / Depository Fraud",
+      "secondary_ncrp_subcategories": ["UPI Related Frauds", "Internet Banking Related Fraud", "Cheating by Impersonation"],
+      "aliases": [
+        "fake trading app",
+        "whatsapp stock tips scam",
+        "institutional trading scam",
+        "crypto investment fraud",
+        "foreign portfolio investor scam",
+        "ipo allotment scam",
+        "fake upper circuit tips"
+      ],
+      "keywords": [
+        "stock trading", "trading app", "institutional account", "fii trading", "crypto investment",
+        "whatsapp trading group", "vip investment", "ipo allotment", "upper circuit",
+        "guaranteed return", "300% profit", "sebi registered fake", "withdrawal tax",
+        "fake dashboard balance", "deposit more to release profit"
+      ],
+      "attack_chain": [
+        "Victim is added to an exclusive WhatsApp or Telegram group advertising high-return institutional stock tips",
+        "Scammers pose as reputed SEBI-registered fund managers or international wealth advisors",
+        "Victim is guided to download an unlisted trading app or trade via a customized web terminal",
+        "Dashboard displays fictitious 200%-500% profits on mock IPO or stock allocations",
+        "When victim requests fund withdrawal, account is locked and demands 20-30% 'SEBI verification tax' or 'capital gains fees'"
+      ],
+      "typical_entities": ["amount", "app_name", "website_url", "beneficiary_accounts", "telegram_group", "whatsapp_admin_phone", "utr"],
+      "critical_for_investigation": ["utr_list", "beneficiary_bank_accounts", "fake_app_url_or_apk", "admin_phone_numbers"],
+      "golden_hour_applicable": true,
+      "typical_amount_range": [100000, 20000000],
+      "common_platforms": ["WhatsApp Groups", "Telegram", "Fake APKs", "Web Portals", "RTGS/NEFT"],
+      "victim_guidance": {
+        "immediate_actions": [
+          "Do NOT pay any 'tax', 'margin money', or 'clearing fee' to withdraw — these are fake demands",
+          "Verify the broker on the official SEBI website (sebi.gov.in) — legitimate brokers never ask money in individual accounts",
+          "Call 1930 immediately with full list of transfers and UTR numbers",
+          "Download complete WhatsApp/Telegram chat history before administrators delete messages"
+        ],
+        "evidence_to_preserve": [
+          "Screenshots of trading dashboard showing fictitious balance and deposit ledger",
+          "All bank statements showing RTGS/NEFT/UPI transfers with UTRs",
+          "APK file of the fake app or URL of the trading web terminal",
+          "Admin phone numbers and chat export of the investment group"
+        ],
+        "helpline_contacts": ["1930", "SEBI Toll Free Helpline (1800 22 7575 / 1800 266 7575)"]
+      },
+      "investigation_hints": {
+        "preliminary_action": "Freeze destination accounts across primary recipient banks via I4C portal; flag rogue domain to CERT-In",
+        "notices_required": ["Section 91 BNSS to Beneficiary Banks for full KYC and debit freeze", "Notice to Web Host / Cloudflare / Domain Registrar for subscriber details", "Notice to WhatsApp/Telegram for group creator telemetry"],
+        "mule_pattern": "Funds deposited into diverse current accounts across multiple states, converted to USDT through OTC crypto desks",
+        "statutory_provisions": ["BNS 318(4)", "BNS 319(2)", "BNS 61(2)", "IT Act 66D"]
+      }
+    },
+    {
+      "mo_id": "MO-SOC-007",
+      "name": "Sextortion & WhatsApp Video Call Trap",
+      "category": "Extortion & Harassment",
+      "primary_ncrp_subcategory": "Cyber Bullying / Stalking / Sexting",
+      "secondary_ncrp_subcategories": ["Cheating by Impersonation", "UPI Related Frauds"],
+      "aliases": [
+        "whatsapp video call sextortion",
+        "nude call blackmail",
+        "video call honey trap",
+        "youtube viral threat scam",
+        "delhi crime branch sextortion",
+        "morphed video extortion"
+      ],
+      "keywords": [
+        "video call", "whatsapp video", "nude call", "screen recorded", "morphed video",
+        "youtube viral", "send to relatives", "contacts list", "crime branch officer call",
+        "sub inspector vikram rathore", "youtube manager call", "delete video fee",
+        "shame", "social media post", "facebook friends"
+      ],
+      "attack_chain": [
+        "Victim receives an unsolicited WhatsApp video call from unknown number showing an explicit female",
+        "Call lasts a few seconds during which victim's face is recorded alongside explicit footage",
+        "Minutes later, victim receives morphed video clips showing victim's face on obscene video",
+        "Scammer threatens to upload video to YouTube and send to victim's Facebook friends and relatives",
+        "Followed by call from fake 'Delhi Police / Crime Branch officer' or 'YouTube Manager' demanding fee to delete clip"
+      ],
+      "typical_entities": ["amount_extorted", "suspect_phone", "fake_officer_name", "upi_id", "youtube_complaint_threat", "date"],
+      "critical_for_investigation": ["suspect_phone_numbers", "extortion_upi_ids", "video_call_timestamps", "recorded_clip_metadata"],
+      "golden_hour_applicable": true,
+      "typical_amount_range": [5000, 150000],
+      "common_platforms": ["WhatsApp", "Facebook", "Instagram", "UPI", "YouTube"],
+      "victim_guidance": {
+        "immediate_actions": [
+          "Do NOT pay any money — paying never stops extortion, they will ask for more",
+          "Lock and privatize your Facebook, Instagram, and LinkedIn accounts immediately",
+          "Block the caller numbers on WhatsApp; do not engage in further conversation",
+          "Call 1930 or local cyber police station immediately",
+          "Take emotional support from family; cyber police deal with hundreds of identical cases daily"
+        ],
+        "evidence_to_preserve": [
+          "Screenshots of the extortion messages, threats, and demanded amounts",
+          "Phone numbers from which calls and messages originated",
+          "UPI ID where money was demanded or transferred",
+          "Call log showing incoming video call duration"
+        ],
+        "helpline_contacts": ["1930", "112 Emergency Police", "Mental Health Helpline (KIRAN: 1800-599-0019)"]
+      },
+      "investigation_hints": {
+        "preliminary_action": "Identify geo-location cluster (frequently Mewat / Bharatpur / Alwar region); freeze extortion recipient UPI VPAs",
+        "notices_required": ["Section 91 BNSS to UPI PSP for beneficiary details", "Section 91 BNSS to Telecom for CAF and CDR of extortionist SIMs (often pre-activated fake SIMs)"],
+        "mule_pattern": "Immediate transfer to local merchant QR codes or AePS cash-out points in border districts",
+        "statutory_provisions": ["BNS 308(2) (Extortion)", "BNS 351(2)", "BNS 79", "IT Act 66E", "IT Act 67", "IT Act 67A"]
+      }
+    },
+    {
+      "mo_id": "MO-FIN-008",
+      "name": "Fake KYC Expiry & Bank Account Block Threat Scam",
+      "category": "Financial Fraud",
+      "primary_ncrp_subcategory": "Debit/Credit Card Fraud / SIM Swap Fraud",
+      "secondary_ncrp_subcategories": ["Internet Banking Related Fraud", "Email Phishing", "UPI Related Frauds"],
+      "aliases": [
+        "sbi kyc update scam",
+        "hdfc account block sms",
+        "pan update scam",
+        "yono kyc phishing",
+        "apk kyc fraud",
+        "bank kyc expiry sms"
+      ],
+      "keywords": [
+        "kyc update", "account suspended", "account will be blocked", "pan card update",
+        "submit kyc", "yono", "sbi netbanking", "hdfc netbanking", "icici kyc",
+        "click link to update", "sbi_kyc.apk", "bank login page", "otp hijacked"
+      ],
+      "attack_chain": [
+        "Victim receives SMS claiming bank account or debit card will be blocked within 24 hours due to pending KYC/PAN",
+        "SMS contains short phishing link or link to download a malicious APK (e.g. 'SBI_KYC_Update.apk')",
+        "Victim enters Internet Banking username, password, date of birth, and OTP on the fake website/APK",
+        "Malicious APK intercepts all incoming SMS OTPs and forwards them to the scammer's server",
+        "Scammer adds new beneficiary or initiates instant IMPS/UPI transfers draining victim's account"
+      ],
+      "typical_entities": ["amount", "bank_name", "phishing_url", "suspect_phone", "utr", "apk_name", "date"],
+      "critical_for_investigation": ["utr", "beneficiary_bank_account", "phishing_url", "sms_sender_header", "apk_file"],
+      "golden_hour_applicable": true,
+      "typical_amount_range": [10000, 500000],
+      "common_platforms": ["SMS", "Mobile Web Browsers", "Malicious APKs", "Net Banking", "IMPS"],
+      "victim_guidance": {
+        "immediate_actions": [
+          "Banks NEVER send SMS links to update KYC or PAN — legitimate KYC is done in-branch or via official banking app",
+          "Call your bank's emergency helpline immediately to block netbanking and debit cards",
+          "Call 1930 with your transaction UTR numbers",
+          "Uninstall any downloaded KYC app and perform a factory reset if OTPs are still being intercepted"
+        ],
+        "evidence_to_preserve": [
+          "Original SMS with SMS header (e.g., 'VM-SBINB', 'AX-HDFCBK')",
+          "URL of the phishing website from browser history",
+          "Bank statement showing unauthorized debit and beneficiary account",
+          "Downloaded APK file if available"
+        ],
+        "helpline_contacts": ["1930", "Bank Fraud Helpline", "DoT Sanchar Saathi (sancharsaathi.gov.in)"]
+      },
+      "investigation_hints": {
+        "preliminary_action": "Report SMS header to Telecom Regulatory Authority of India (TRAI) and DoT Chakshu portal; freeze beneficiary bank accounts",
+        "notices_required": ["Section 91 BNSS to Beneficiary Bank for IMPS tracing", "Notice to Phishing Hosting Provider / Registrar for immediate domain takedown", "Notice to SMS Aggregator for sender header tracing"],
+        "mule_pattern": "Funds transferred via IMPS into mule savings accounts, subsequently withdrawn via AePS or POS terminals",
+        "statutory_provisions": ["BNS 318(4)", "BNS 338 (Forgery)", "BNS 340(2)", "IT Act 66C (Identity Theft)", "IT Act 66D"]
+      }
+    },
+    {
+      "mo_id": "MO-FIN-009",
+      "name": "Customs Parcel & Courier Clearance Fraud",
+      "category": "Extortion & Impersonation",
+      "primary_ncrp_subcategory": "Cheating by Impersonation",
+      "secondary_ncrp_subcategories": ["UPI Related Frauds", "Internet Banking Related Fraud"],
+      "aliases": [
+        "fedex parcel scam",
+        "customs duty fraud",
+        "foreign gift clearance scam",
+        "dhl package intercepted",
+        "airport customs clearance scam"
+      ],
+      "keywords": [
+        "customs", "customs officer", "fedex parcel", "dhl parcel", "foreign parcel",
+        "parcel held at airport", "customs clearance fee", "foreign currency inside",
+        "gift parcel", "gold parcel", "anti-money laundering certificate", "narcotics clearance"
+      ],
+      "attack_chain": [
+        "Victim is informed that an overseas parcel, courier, or gift is addressed to them and held at airport customs",
+        "Scammer posing as customs/FedEx official claims parcel contains illegal contraband, jewelry, or cash",
+        "Victim is told they face arrest unless they pay clearance charges, GST, or 'Anti-Terrorism Clearance Fee'",
+        "Victim transfers fees into specified bank accounts; scammer keeps inventing new clearance fees until victim runs out of money"
+      ],
+      "typical_entities": ["amount", "suspect_phone", "courier_tracking_no", "beneficiary_accounts", "utr", "date"],
+      "critical_for_investigation": ["utr_list", "beneficiary_bank_accounts", "suspect_phone_numbers", "fake_tracking_receipts"],
+      "golden_hour_applicable": true,
+      "typical_amount_range": [30000, 1500000],
+      "common_platforms": ["Phone Calls", "WhatsApp", "Email", "Net Banking", "UPI"],
+      "victim_guidance": {
+        "immediate_actions": [
+          "Indian Customs NEVER requests duty payment into individual personal bank accounts",
+          "Do NOT pay any additional clearance fees",
+          "Call 1930 immediately to register the transaction references",
+          "Verify any international tracking number directly on the official courier website (fedex.com, dhl.com)"
+        ],
+        "evidence_to_preserve": [
+          "Screenshots of emails/WhatsApp messages claiming customs detention",
+          "Copies of fake receipts, customs certificates, or invoices received",
+          "Bank payment slips showing beneficiary details and UTRs",
+          "Phone numbers and call history"
+        ],
+        "helpline_contacts": ["1930", "Central Board of Indirect Taxes and Customs (CBIC) Helpline"]
+      },
+      "investigation_hints": {
+        "preliminary_action": "Issue freeze mandate to recipient bank accounts via I4C CFCFRMS portal",
+        "notices_required": ["Section 91 BNSS to Beneficiary Bank for KYC and withdrawal trail", "Section 91 BNSS to Telecom Provider for CDR of caller numbers"],
+        "mule_pattern": "Funds moved through multiple intermediary accounts, often withdrawn in African/Southeast Asian syndicate nexus",
+        "statutory_provisions": ["BNS 318(4)", "BNS 319(2)", "IT Act 66D"]
+      }
+    },
+    {
+      "mo_id": "MO-FIN-010",
+      "name": "Remote Access & Screen Sharing Tech Support Scam",
+      "category": "Financial & Computer Intrusion",
+      "primary_ncrp_subcategory": "Damage to Computer / Computer System",
+      "secondary_ncrp_subcategories": ["Internet Banking Related Fraud", "UPI Related Frauds", "Unauthorised Access / Data Breach"],
+      "aliases": [
+        "anydesk scam",
+        "teamviewer support fraud",
+        "quicksupport bank scam",
+        "rustdesk screen share fraud",
+        "fake customer care scam",
+        "google search customer care fraud"
+      ],
+      "keywords": [
+        "anydesk", "teamviewer", "quicksupport", "rustdesk", "screen share", "9 digit code",
+        "customer care number", "toll free search", "refund issue", "order cancellation",
+        "screen black out", "grant permission", "enter password to verify", "remote access"
+      ],
+      "attack_chain": [
+        "Victim searches Google for customer care (Swiggy, Zomato, bank, courier) and dials a fraudulent number listed on SEO-poisoned search results",
+        "Scammer asks victim to install a screen-sharing tool (AnyDesk, TeamViewer, RustDesk) to 'resolve the refund'",
+        "Victim reads out the 9-digit remote access address and grants screen sharing permissions",
+        "Scammer instructs victim to open their banking or UPI app and enter login credentials",
+        "Scammer views credentials and OTP in real-time or blacks out victim's screen while initiating transfers"
+      ],
+      "typical_entities": ["amount", "remote_app_name", "remote_id_code", "suspect_phone", "bank_name", "utr", "date"],
+      "critical_for_investigation": ["utr", "beneficiary_bank_account", "suspect_phone", "remote_app_session_log"],
+      "golden_hour_applicable": true,
+      "typical_amount_range": [15000, 600000],
+      "common_platforms": ["AnyDesk", "TeamViewer", "Google Search Results", "Phone Calls", "UPI", "Net Banking"],
+      "victim_guidance": {
+        "immediate_actions": [
+          "Uninstall the remote access app (AnyDesk/TeamViewer/RustDesk) IMMEDIATELY",
+          "Put phone on Airplane mode to sever active sessions",
+          "Call 1930 immediately to freeze fraudulent transfers",
+          "Contact your bank to lock netbanking credentials and card services"
+        ],
+        "evidence_to_preserve": [
+          "The phone number dialed from Google search",
+          "App session logs or screenshot of the AnyDesk 9-digit code session",
+          "Bank debit alert SMS and transaction references (UTRs)",
+          "Google search term and history screenshot"
+        ],
+        "helpline_contacts": ["1930", "Bank Fraud Desk"]
+      },
+      "investigation_hints": {
+        "preliminary_action": "Emergency lien placement on beneficiary accounts; report fraudulent customer care phone numbers to DoT Chakshu portal",
+        "notices_required": ["Section 91 BNSS to Beneficiary Bank for transaction reversal", "Notice to AnyDesk / TeamViewer for connection session metadata and remote IP address", "Notice to Google for removing SEO-poisoned customer care numbers"],
+        "mule_pattern": "Immediate transfer to wallet/UPI and cash-out via POS agents within 30 minutes",
+        "statutory_provisions": ["BNS 318(4)", "IT Act 43 (Damage to computer system)", "IT Act 66", "IT Act 66C", "IT Act 66D"]
+      }
+    },
+    {
+      "mo_id": "MO-FIN-011",
+      "name": "AePS Biometric Clone & Micro-ATM Fraud",
+      "category": "Financial Fraud",
+      "primary_ncrp_subcategory": "AePS Fraud",
+      "secondary_ncrp_subcategories": ["Unauthorised Access / Data Breach", "Cheating by Impersonation"],
+      "aliases": [
+        "aeps biometric scam",
+        "fingerprint clone fraud",
+        "silicon thumb fraud",
+        "aadhaar enabled payment fraud",
+        "land registry biometric leak scam",
+        "csp kiosk fraud"
+      ],
+      "keywords": [
+        "aeps", "aadhaar enabled payment system", "fingerprint", "biometric", "micro atm",
+        "csp kiosk", "land registry", "sub registrar office", "silicon thumb", "gummy finger",
+        "money debited without otp", "no sms otp received", "customer service point"
+      ],
+      "attack_chain": [
+        "Scammers harvest biometric fingerprints and Aadhaar numbers from public land registry documents or compromised CSP databases",
+        "Cloned fingerprints are fabricated on silicon, rubber, or polymer sheets",
+        "Fraudsters visit remote banking correspondents (Customer Service Points / CSPs) or rogue Micro-ATMs",
+        "Using cloned biometric impressions and victim's Aadhaar number, unauthorized daily AePS withdrawals (₹10,000 limits) are executed without OTP"
+      ],
+      "typical_entities": ["amount", "bank_name", "aadhaar_masked", "csp_or_merchant_name", "terminal_id", "transaction_date"],
+      "critical_for_investigation": ["terminal_id", "bc_csp_merchant_id", "acquiring_bank", "transaction_rids_rrn"],
+      "golden_hour_applicable": true,
+      "typical_amount_range": [10000, 100000],
+      "common_platforms": ["AePS Micro-ATMs", "CSP Kiosks", "NPCI AePS Network"],
+      "victim_guidance": {
+        "immediate_actions": [
+          "LOCK your Aadhaar Biometrics immediately using mAadhaar App or UIDAI portal (resident.uidai.gov.in)",
+          "Call 1930 and report unauthorized AePS withdrawal",
+          "Visit your home bank branch and submit a written dispute for unauthorized AePS debit under NPCI guidelines",
+          "File an official police complaint to obtain compensation under RBI circular on unauthorized electronic banking transactions"
+        ],
+        "evidence_to_preserve": [
+          "Bank passbook / statement entry showing AePS transaction, CSP code, and RRN number",
+          "SMS alerts received from bank regarding cash withdrawal",
+          "Proof of Aadhaar biometric lock confirmation"
+        ],
+        "helpline_contacts": ["1930", "UIDAI 1947 Helpline", "Bank Nodal Grievance Desk"]
+      },
+      "investigation_hints": {
+        "preliminary_action": "Identify acquiring bank and Banking Correspondent (BC) network via NPCI to pinpoint the exact Micro-ATM terminal and CSP operator",
+        "notices_required": ["Section 91 BNSS to NPCI / Acquiring Bank for BC/CSP name, physical location, and terminal ID", "Physical inspection and CCTV footage seizure at CSP kiosk premises"],
+        "mule_pattern": "Local CSP agents colluding with fraudsters or compromised rural POS terminals",
+        "statutory_provisions": ["BNS 318(4)", "BNS 338 (Forgery)", "IT Act 66", "IT Act 66C", "Aadhaar Act 2016 Sections 38 & 40"]
+      }
+    },
+    {
+      "mo_id": "MO-SOC-012",
+      "name": "Social Media Account Hijack & Fake Profile Impersonation",
+      "category": "Social Media & Identity Fraud",
+      "primary_ncrp_subcategory": "Fake / Impersonating Profile",
+      "secondary_ncrp_subcategories": ["Profile Hacking / Identity Theft", "Cyber Bullying / Stalking / Sexting", "UPI Related Frauds"],
+      "aliases": [
+        "instagram fake account",
+        "facebook clone profile",
+        "hacked instagram account",
+        "asking money from friends",
+        "fake urgent medical emergency message",
+        "impersonating profile scam"
+      ],
+      "keywords": [
+        "instagram fake account", "facebook clone", "fake profile", "hacked account",
+        "asking money from friends", "emergency medical help needed", "send to upi",
+        "stole my photos", "impersonating me", "password reset link", "phishing story"
+      ],
+      "attack_chain": [
+        "Perpetrator either hacks victim's account via phishing or downloads photos to create a clone account with an identical username",
+        "Perpetrator messages all followers/friends claiming urgent financial emergency (e.g. 'Hospital admission, need ₹10,000 urgently')",
+        "Friends transfer funds to perpetrator's UPI address believing they are aiding the victim",
+        "Victim only discovers the incident when friends call inquiring about the emergency"
+      ],
+      "typical_entities": ["impersonated_name", "fake_profile_url", "suspect_upi_id", "suspect_phone", "platform_name", "date"],
+      "critical_for_investigation": ["fake_profile_url", "profile_creation_timestamp", "beneficiary_upi_id", "chat_screenshots"],
+      "golden_hour_applicable": true,
+      "typical_amount_range": [3000, 50000],
+      "common_platforms": ["Instagram", "Facebook", "Snapchat", "Telegram", "UPI"],
+      "victim_guidance": {
+        "immediate_actions": [
+          "Post a broadcast alert on other social media channels / WhatsApp status that your account is cloned/hacked",
+          "Report the profile directly within the app (Report -> Pretending to be someone I know)",
+          "If original account was hacked, use platform account recovery (instagram.com/hacked)",
+          "Advise friends who transferred money to immediately call 1930 with the UPI UTR"
+        ],
+        "evidence_to_preserve": [
+          "Exact URL / handle of the fake profile",
+          "Screenshots of chats where the impersonator requested money with UPI details",
+          "List of friends who transferred money and their transaction UTR numbers"
+        ],
+        "helpline_contacts": ["1930", "Platform Grievance Officer Portal"]
+      },
+      "investigation_hints": {
+        "preliminary_action": "Serve preservation notice to Meta / platform for IP logs, registration email, and mobile number",
+        "notices_required": ["Notice under IT Act 79(3)(b) / BNSS to Meta Platforms Inc for account removal and registration IPs", "Section 91 BNSS to UPI PSP for beneficiary account details"],
+        "mule_pattern": "Personal UPI accounts or mule wallets quickly cashed out via food delivery or merchant QR purchases",
+        "statutory_provisions": ["BNS 318(4)", "BNS 319(2)", "IT Act 66C", "IT Act 66D"]
+      }
+    },
+    {
+      "mo_id": "MO-FIN-013",
+      "name": "E-Commerce, Fake Shopping Store & Lucky Draw Lottery Scam",
+      "category": "Financial Fraud",
+      "primary_ncrp_subcategory": "E-Wallet Related Fraud",
+      "secondary_ncrp_subcategories": ["UPI Related Frauds", "Cheating by Impersonation"],
+      "aliases": [
+        "fake flipkart website",
+        "fake amazon sale scam",
+        "kbc lottery scam",
+        "car winner lucky draw fraud",
+        "fake brand discount store",
+        "product not delivered fraud"
+      ],
+      "keywords": [
+        "fake shopping site", "fake shopping", "flipkart", "amazon", "fake sale", "90% discount",
+        "kbc lottery", "won tata harrier", "lucky draw winner", "registration fee for prize",
+        "gst on prize", "order not delivered", "product not delivered", "product nahi aaya",
+        "fake courier site", "advance payment store", "prepaid order", "e-commerce fraud"
+      ],
+      "attack_chain": [
+        "Victim clicks sponsored ad on Instagram/Facebook offering luxury items (iPhones, branded shoes) at 80-90% discounts",
+        "Fake e-commerce website accepts prepaid UPI/Card payment, provides a fictitious tracking number, but never ships goods",
+        "Or: Victim receives letter/call claiming they won ₹25 Lakh in KBC lottery or a car in lucky draw",
+        "Victim is induced to pay successive 'processing fees', 'tax clearances', and 'delivery insurance' before realizing no prize exists"
+      ],
+      "typical_entities": ["amount", "fake_website_url", "suspect_phone", "beneficiary_upi_id", "order_id", "date"],
+      "critical_for_investigation": ["fake_website_url", "beneficiary_bank_or_upi", "utr", "payment_gateway_order_id"],
+      "golden_hour_applicable": true,
+      "typical_amount_range": [2000, 200000],
+      "common_platforms": ["Instagram Sponsored Ads", "Facebook Ads", "Fake Shopify/WooCommerce Sites", "WhatsApp", "UPI"],
+      "victim_guidance": {
+        "immediate_actions": [
+          "Discontinue all communications and do NOT pay any 'tax' or 'deposit fee' for gifts",
+          "Call 1930 with transaction UTR numbers",
+          "Contact your bank or card issuer to initiate a chargeback for 'merchandise not received'",
+          "Report the scam advertisement to the hosting platform"
+        ],
+        "evidence_to_preserve": [
+          "Website URL and receipt of purchase / order confirmation email",
+          "Ad screenshot and payment transaction reference (UTR)",
+          "Any letters or documents received regarding lottery winnings"
+        ],
+        "helpline_contacts": ["1930", "National Consumer Helpline (1915)", "Bank Dispute Desk"]
+      },
+      "investigation_hints": {
+        "preliminary_action": "Identify payment gateway (Razorpay/Cashfree/PayU) used on the fake store and order immediate account freeze",
+        "notices_required": ["Section 91 BNSS to Payment Gateway for merchant KYC, bank account, and settlement logs", "Takedown notice to Domain Registrar / Cloudflare for scam website"],
+        "mule_pattern": "Payment gateway settlements withdrawn into mule current accounts",
+        "statutory_provisions": ["BNS 318(4)", "BNS 319(2)", "IT Act 66D"]
+      }
+    },
+    {
+      "mo_id": "MO-SOC-014",
+      "name": "Online Matrimonial & Romance Scam",
+      "category": "Interpersonal & Financial Fraud",
+      "primary_ncrp_subcategory": "Online Matrimonial Fraud",
+      "secondary_ncrp_subcategories": ["Cheating by Impersonation", "UPI Related Frauds", "Internet Banking Related Fraud"],
+      "aliases": [
+        "shaadi.com fake profile",
+        "jeevansathi nri doctor scam",
+        "foreign fiance gift customs scam",
+        "romance scam",
+        "matrimonial honey trap",
+        "fake marriage proposal fraud"
+      ],
+      "keywords": [
+        "matrimonial", "shaadi.com", "jeevansathi", "bharatmatrimony", "nri groom",
+        "doctor in uk", "engineer in us", "coming to india to marry", "gift sent with jewelry",
+        "customs duty at delhi airport", "medical emergency before flight", "mother hospitalised",
+        "matrimonial fake profile"
+      ],
+      "attack_chain": [
+        "Scammer creates an attractive profile on Shaadi.com / Jeevansathi claiming to be an affluent NRI doctor/engineer",
+        "Scammer builds intense emotional intimacy with victim over several weeks via WhatsApp calls and messages",
+        "Scammer announces travel to India for marriage or states they sent an expensive parcel with jewelry and currency",
+        "Victim receives call from fake customs/immigration claiming fiance was detained or parcel requires heavy tax clearance",
+        "Emotionally committed victim transfers life savings across multiple accounts to 'clear' their prospective spouse"
+      ],
+      "typical_entities": ["amount", "suspect_profile_name", "matrimonial_id", "suspect_phone", "beneficiary_accounts", "utr", "date"],
+      "critical_for_investigation": ["matrimonial_profile_url", "suspect_phone_numbers", "utr_list", "beneficiary_accounts"],
+      "golden_hour_applicable": true,
+      "typical_amount_range": [100000, 5000000],
+      "common_platforms": ["Shaadi.com", "Jeevansathi", "BharatMatrimony", "WhatsApp", "RTGS/NEFT"],
+      "victim_guidance": {
+        "immediate_actions": [
+          "Never send money to someone you have only met online, regardless of their marriage promises",
+          "Stop all payments immediately; do not believe claims that the person is detained at customs",
+          "Call 1930 Cyber Helpline with all payment UTRs",
+          "Report the profile directly to the matrimonial website trust and safety team"
+        ],
+        "evidence_to_preserve": [
+          "Full chat export from WhatsApp and profile screenshots from matrimonial site",
+          "Bank statements showing all transfers with UTRs and account details",
+          "Photographs, flight tickets, or passport copies sent by the suspect"
+        ],
+        "helpline_contacts": ["1930", "Local Cyber Crime Police Station"]
+      },
+      "investigation_hints": {
+        "preliminary_action": "Lien beneficiary accounts via 1930 / CFCFRMS; serve preservation notice to matrimonial platform",
+        "notices_required": ["Section 91 BNSS to Matrimonial Platform for profile IP history, verified phone, and photo metadata", "Section 91 BNSS to Beneficiary Banks for full KYC and money trail"],
+        "mule_pattern": "Multi-state African and local syndicate network operating through layered mule savings accounts",
+        "statutory_provisions": ["BNS 318(4)", "BNS 319(2)", "IT Act 66D"]
+      }
+    }
+  ]
+}

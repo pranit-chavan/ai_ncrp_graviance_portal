@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CyberAssist — AI-Powered Cybercrime Complaint Assistant</title>
+  <meta name="description" content="CyberAssist: AI-Powered Cybercrime Complaint Assistant with voice conversation, manual form intake, draft review, and Scikit-Learn classification.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header class="app-navbar">
+    <div class="navbar-inner">
+      <div class="navbar-brand" id="brand-logo-btn">
+        <div class="brand-shield">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            <path d="M9 12l2 2 4-4"/>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span class="brand-title">CyberAssist</span>
+          <span class="brand-prototype-tag">Unofficial Prototype</span>
+        </div>
+      </div>
+
+      <!-- Quick Screen Navigator (for Mentor Presentation Demo) -->
+      <nav class="flow-stepper-nav" aria-label="Workflow Navigation">
+        <button type="button" class="stepper-tab-btn active" data-target="page-choose-mode" id="tab-btn-3">
+          <span class="tab-num">3</span> Choose Mode
+        </button>
+        <button type="button" class="stepper-tab-btn" data-target="page-voice" id="tab-btn-4">
+          <span class="tab-num">4</span> Voice Copilot
+        </button>
+        <button type="button" class="stepper-tab-btn" data-target="page-manual" id="tab-btn-5">
+          <span class="tab-num">5</span> Manual Form
+        </button>
+        <button type="button" class="stepper-tab-btn" data-target="page-review" id="tab-btn-6">
+          <span class="tab-num">6</span> Draft Review
+        </button>
+        <button type="button" class="stepper-tab-btn" data-target="page-result" id="tab-btn-7">
+          <span class="tab-num">7</span> Classification
+        </button>
+      </nav>
+
+      <div class="navbar-right">
+        <!-- Language Switcher Pills -->
+        <div class="lang-pill-group">
+          <button type="button" class="lang-pill" id="btn-lang-en" data-lang="en">English</button>
+          <button type="button" class="lang-pill active" id="btn-lang-hi" data-lang="hi">हिन्दी</button>
+          <button type="button" class="lang-pill" id="btn-lang-mr" data-lang="mr">मराठी</button>
+        </div>
+
+        <!-- Test Voice Button -->
+        <button type="button" class="btn-voice-test" id="btn-test-voice" title="Test Voice Output">
+          🔊 Test Voice
+        </button>
+
+        <!-- User Profile Avatar -->
+        <div class="user-avatar-badge" title="Logged in as Pranit Chavan">
+          <span>P</span>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- App Body Layout: Sidebar + Main Content -->
+  <div class="app-layout">
+    
+    <!-- Left Sidebar Menu -->
+    <aside class="app-sidebar">
+      <nav class="sidebar-menu">
+        <a href="#" class="sidebar-link" id="nav-dashboard">
+          <span class="link-icon">📊</span>
+          <span class="link-text">Dashboard</span>
+        </a>
+        <a href="#" class="sidebar-link active" id="nav-report">
+          <span class="link-icon">🛡️</span>
+          <span class="link-text">Report Cybercrime</span>
+        </a>
+        <a href="#" class="sidebar-link" id="nav-complaints">
+          <span class="link-icon">📁</span>
+          <span class="link-text">My Complaints</span>
+        </a>
+        <a href="#" class="sidebar-link" id="nav-withdraw">
+          <span class="link-icon">↩️</span>
+          <span class="link-text">Withdraw Complaint</span>
+        </a>
+        <a href="#" class="sidebar-link" id="nav-profile">
+          <span class="link-icon">👤</span>
+          <span class="link-text">Profile</span>
+        </a>
+        <a href="#" class="sidebar-link" id="nav-help">
+          <span class="link-icon">❓</span>
+          <span class="link-text">Help &amp; Guidelines</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="session-box">
+          <div class="session-lbl">Session Reference</div>
+          <div class="session-val" id="lbl-session-id">CYB-2026-LIVE</div>
+        </div>
+        <button type="button" class="btn-sidebar-logout" id="btn-reset-session">
+          <span>🚪</span> Reset Intake
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Workspace (Screen Switcher) -->
+    <main class="app-workspace">
+      
+      <!-- ================================================================= -->
+      <!-- SCREEN 3: REPORT CYBERCRIME (CHOOSE MODE)                        -->
+      <!-- ================================================================= -->
+      <section class="screen-view active" id="page-choose-mode">
+        <div class="screen-header">
+          <h1 class="screen-title">Report Cybercrime</h1>
+          <p class="screen-subtitle">Choose how you want to provide the details.</p>
+        </div>
+
+        <!-- 2 Big Choice Cards -->
+        <div class="mode-choice-grid">
+          
+          <!-- Card 1: Speak to AI Assistant -->
+          <div class="mode-card primary-mode-card" id="card-choose-voice">
+            <div class="mode-icon-circle blue-circle">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                <line x1="12" y1="19" x2="12" y2="23"/>
+                <line x1="8" y1="23" x2="16" y2="23"/>
+              </svg>
+            </div>
+            <h2 class="mode-card-title">Speak to AI Assistant</h2>
+            <p class="mode-card-desc">Have a natural conversation. Our AI will ask questions and fill the details.</p>
+            <button type="button" class="btn-primary-card" id="btn-start-voice">
+              Start Voice Conversation &rarr;
+            </button>
+          </div>
+
+          <!-- Card 2: Type Manually -->
+          <div class="mode-card outline-mode-card" id="card-choose-manual">
+            <div class="mode-icon-circle slate-circle">
+              <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="4" width="20" height="16" rx="2" ry="2"/>
+                <line x1="6" y1="8" x2="6.01" y2="8"/>
+                <line x1="10" y1="8" x2="10.01" y2="8"/>
+                <line x1="14" y1="8" x2="14.01" y2="8"/>
+                <line x1="18" y1="8" x2="18.01" y2="8"/>
+                <line x1="6" y1="12" x2="6.01" y2="12"/>
+                <line x1="10" y1="12" x2="10.01" y2="12"/>
+                <line x1="14" y1="12" x2="14.01" y2="12"/>
+                <line x1="18" y1="12" x2="18.01" y2="12"/>
+                <line x1="7" y1="16" x2="17" y2="16"/>
+              </svg>
+            </div>
+            <h2 class="mode-card-title">Type Manually</h2>
+            <p class="mode-card-desc">Fill the complaint form manually at your own pace.</p>
+            <button type="button" class="btn-outline-card" id="btn-start-manual">
+              Open Manual Form &rarr;
+            </button>
+          </div>
+
+        </div>
+
+        <!-- What Happens Next? Stepper Bar -->
+        <div class="next-steps-banner">
+          <div class="next-steps-title">What happens next?</div>
+          <div class="next-steps-stepper">
+            <div class="stepper-step">
+              <div class="step-num-badge">1</div>
+              <div class="step-text">Provide details<br><span class="step-sub">(Voice or Text)</span></div>
+            </div>
+            <div class="stepper-divider"></div>
+            <div class="stepper-step">
+              <div class="step-num-badge">2</div>
+              <div class="step-text">Review &amp; Edit<br><span class="step-sub">Complaint Draft</span></div>
+            </div>
+            <div class="stepper-divider"></div>
+            <div class="stepper-step">
+              <div class="step-num-badge">3</div>
+              <div class="step-text">Get Classification<br><span class="step-sub">(using ML model)</span></div>
+            </div>
+            <div class="stepper-divider"></div>
+            <div class="stepper-step">
+              <div class="step-num-badge">4</div>
+              <div class="step-text">Save &amp; Track<br><span class="step-sub">Your Complaint</span></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Prototype Disclaimer -->
+        <footer class="screen-disclaimer">
+          This is an educational and independent prototype. Not affiliated with the National Cyber Crime Reporting Portal (NCRP) or any government entity. It does not submit official complaints.
+        </footer>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- SCREEN 4: VOICE CONVERSATION PAGE                                -->
+      <!-- ================================================================= -->
+      <section class="screen-view" id="page-voice">
+        
+        <!-- Voice Header Bar -->
+        <div class="view-sub-header">
+          <div class="assistant-status-tag">
+            <span class="status-mic-icon">🎙️</span>
+            <span class="assistant-label">AI Assistant</span>
+            <span class="status-indicator-dot ready" id="status-dot"></span>
+            <span class="status-indicator-text" id="status-text">Ready</span>
+          </div>
+          <div class="view-header-actions">
+            <button type="button" class="btn-sub-link" id="btn-voice-to-manual">Switch to Manual Form</button>
+          </div>
+        </div>
+
+        <!-- Split Grid: Chat Stream (62%) + Information Collected (38%) -->
+        <div class="voice-workspace-grid">
+          
+          <!-- Left: Dialogue Chat Stream & Controls -->
+          <div class="voice-chat-card">
+            
+            <!-- Live Audio Subtitle Strip -->
+            <div class="voice-subtitles-bar" id="voice-subtitles-bar" style="display: none;">
+              <span class="pulsing-red-circle"></span>
+              <span class="subtitles-content" id="subtitles-content">Listening...</span>
+            </div>
+
+            <!-- Emergency Golden Hour Alert Banner -->
+            <div class="urgent-alert-banner" id="banner-urgency" style="display: none;">
+              <div class="urgent-banner-icon">🚨</div>
+              <div class="urgent-banner-text">
+                <strong id="banner-urgency-title">Active Financial Cyber Fraud Detected!</strong>
+                <p id="banner-urgency-body">Call <strong>1930</strong> immediately to freeze the beneficiary account! We are compiling your complaint draft in parallel.</p>
+              </div>
+            </div>
+
+            <!-- OCR Evidence Reconciliation Banner -->
+            <div class="reconcile-alert-banner" id="banner-reconcile" style="display: none;">
+              <div class="reconcile-banner-icon">⚠️</div>
+              <div class="reconcile-banner-content">
+                <div class="reconcile-title">Evidence Discrepancy Flagged (Module C)</div>
+                <div class="reconcile-text" id="reconcile-msg">Receipt indicates ₹50,000, while ₹5,000 was stated in dialogue.</div>
+                <div class="reconcile-btn-row">
+                  <button type="button" class="btn-reconcile-opt" id="btn-reconcile-ocr">Use Receipt (₹50,000)</button>
+                  <button type="button" class="btn-reconcile-opt secondary" id="btn-reconcile-spoken">Keep Spoken (₹5,000)</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Scrollable Message Bubble Area -->
+            <div class="chat-message-stream" id="chat-stream">
+              <!-- Rendered via JS -->
+            </div>
+
+            <!-- Voice Controls Dock -->
+            <div class="voice-action-dock">
+              <div class="dock-row-primary">
+                <select class="select-voice-lang" id="select-voice-lang">
+                  <option value="hi" selected>हिन्दी (hi-IN)</option>
+                  <option value="mr">मराठी (mr-IN)</option>
+                  <option value="en">English (en-IN)</option>
+                </select>
+
+                <!-- Big Blue Push-to-Talk Button -->
+                <button type="button" class="btn-mic-main" id="btn-mic-main">
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                    <line x1="12" y1="19" x2="12" y2="23"/>
+                    <line x1="8" y1="23" x2="16" y2="23"/>
+                  </svg>
+                  <span id="btn-mic-label">Tap to Speak</span>
+                </button>
+
+                <!-- Stop Button -->
+                <button type="button" class="btn-mic-stop" id="btn-mic-stop" title="Stop Recording">
+                  <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
+                    <rect x="5" y="5" width="14" height="14" rx="2"/>
+                  </svg>
+                  <span>Stop</span>
+                </button>
+              </div>
+
+              <!-- Text Fallback Row -->
+              <div class="dock-row-input">
+                <input type="text" id="input-voice-text" class="input-text-fallback" placeholder="Tap microphone to speak, or type here..." autocomplete="off">
+                <button type="button" id="btn-voice-send" class="btn-text-send">➤</button>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Right: Information Collected Checklist -->
+          <div class="info-collected-card">
+            <div class="info-card-header">
+              <div class="info-title-group">
+                <h3 class="info-card-title">Information Collected</h3>
+                <span class="info-counter-badge" id="info-counter-badge">0 / 8</span>
+              </div>
+              <button type="button" class="btn-reset-fields" id="btn-reset-checklist">Reset</button>
+            </div>
+
+            <!-- 8 Checklist Items -->
+            <div class="checklist-items-list">
+              <div class="check-item" id="item-incident-type">
+                <span class="check-icon">○</span>
+                <span class="check-label">Incident Type</span>
+                <span class="check-val" id="val-incident-type">—</span>
+              </div>
+              <div class="check-item" id="item-amount">
+                <span class="check-icon">○</span>
+                <span class="check-label">Amount</span>
+                <span class="check-val" id="val-amount">—</span>
+              </div>
+              <div class="check-item" id="item-datetime">
+                <span class="check-icon">○</span>
+                <span class="check-label">Date &amp; Time</span>
+                <span class="check-val" id="val-datetime">—</span>
+              </div>
+              <div class="check-item" id="item-platform">
+                <span class="check-icon">○</span>
+                <span class="check-label">Platform / Channel</span>
+                <span class="check-val" id="val-platform">—</span>
+              </div>
+              <div class="check-item" id="item-bank">
+                <span class="check-icon">○</span>
+                <span class="check-label">Bank / UPI / Wallet</span>
+                <span class="check-val" id="val-bank">—</span>
+              </div>
+              <div class="check-item" id="item-suspect">
+                <span class="check-icon">○</span>
+                <span class="check-label">Suspect Details</span>
+                <span class="check-val" id="val-suspect">—</span>
+              </div>
+              <div class="check-item" id="item-evidence">
+                <span class="check-icon">○</span>
+                <span class="check-label">Evidence</span>
+                <span class="check-val" id="val-evidence">—</span>
+              </div>
+              <div class="check-item" id="item-narrative">
+                <span class="check-icon">○</span>
+                <span class="check-label">Incident Description</span>
+                <span class="check-val" id="val-narrative">—</span>
+              </div>
+            </div>
+
+            <!-- Quick 1-Click Mentor Demo Scenarios -->
+            <div class="scenarios-panel">
+              <div class="scenarios-label">Quick Demo Scenarios (Mentor Presentation):</div>
+              <div class="scenarios-pills">
+                <button type="button" class="pill-scenario" data-text="नमस्ते, आज सुबह मुझे बिजली विभाग के नाम से फर्जी कॉल आया और मेरे पीएनबी खाते से 65000 रुपये कट गए।">
+                  ⚡ ₹65,000 PNB बिजली कॉल
+                </button>
+                <button type="button" class="pill-scenario" data-text="माझ्या बँक ऑफ महाराष्ट्र खात्यातून ५०००० रुपये गेले, कोणताही ओटीपी आला नाही.">
+                  🇮🇳 ₹50,000 बँक ऑफ महाराष्ट्र
+                </button>
+                <button type="button" class="pill-scenario" data-text="Telegram part-time job task fraud of Rs. 1,20,000 occurred today via UPI.">
+                  💼 Rs. 1,20,000 Telegram Job
+                </button>
+              </div>
+            </div>
+
+            <!-- Bottom Forward Button -->
+            <div class="info-card-footer">
+              <button type="button" class="btn-proceed-review" id="btn-proceed-from-voice">
+                Proceed to Review Draft &rarr;
+              </button>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- SCREEN 5: MANUAL FORM PAGE                                       -->
+      <!-- ================================================================= -->
+      <section class="screen-view" id="page-manual">
+        <div class="screen-header">
+          <div class="header-with-badge">
+            <span class="form-icon-circle">📝</span>
+            <div>
+              <h1 class="screen-title">Report Cybercrime (Manual Form)</h1>
+              <p class="screen-subtitle">Fill in the details of the incident.</p>
+            </div>
+          </div>
+        </div>
+
+        <form class="clean-form-card" id="form-manual-complaint">
+          
+          <!-- Row 1: Category, Sub-Category, Date/Time -->
+          <div class="form-row-3">
+            <div class="field-group">
+              <label class="field-label">Category of Complaint <span class="req">*</span></label>
+              <select class="field-select" id="man-category" required>
+                <option value="">-- Select Main Category --</option>
+                <option value="Online Financial Fraud" selected>Online Financial Fraud</option>
+                <option value="Online and Social Media Related Crime">Online and Social Media Related Crime</option>
+                <option value="Hacking / Damage to Computer">Hacking / Damage to Computer</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">Sub-Category of Complaint <span class="req">*</span></label>
+              <select class="field-select" id="man-subcategory" required>
+                <option value="">-- Select Sub-Category --</option>
+                <optgroup label="Online Financial Fraud (6 Sub-Categories)">
+                  <option value="UPI Related Frauds" selected>UPI Related Frauds</option>
+                  <option value="Internet Banking Related Fraud">Internet Banking Related Fraud</option>
+                  <option value="Debit/Credit Card Fraud / SIM Swap Fraud">Debit/Credit Card Fraud / SIM Swap Fraud</option>
+                  <option value="E-Wallet Related Fraud">E-Wallet Related Fraud</option>
+                  <option value="AePS Fraud">AePS Fraud</option>
+                  <option value="Demat / Depository Fraud">Demat / Depository Fraud</option>
+                </optgroup>
+                <optgroup label="Online and Social Media Related Crime (10 Sub-Categories)">
+                  <option value="Cheating by Impersonation">Cheating by Impersonation</option>
+                  <option value="Cyber Bullying / Stalking / Sexting">Cyber Bullying / Stalking / Sexting</option>
+                  <option value="Email Phishing">Email Phishing</option>
+                  <option value="Fake / Impersonating Profile">Fake / Impersonating Profile</option>
+                  <option value="Impersonating Email (Business Email Compromise)">Impersonating Email (Business Email Compromise)</option>
+                  <option value="Intimidating Email">Intimidating Email</option>
+                  <option value="Online Job Fraud">Online Job Fraud</option>
+                  <option value="Online Matrimonial Fraud">Online Matrimonial Fraud</option>
+                  <option value="Profile Hacking / Identity Theft">Profile Hacking / Identity Theft</option>
+                  <option value="Provocative Speech for Unlawful Acts">Provocative Speech for Unlawful Acts</option>
+                </optgroup>
+                <optgroup label="Hacking / Damage to Computer (5 Sub-Categories)">
+                  <option value="Damage to Computer / Computer System">Damage to Computer / Computer System</option>
+                  <option value="Email Hacking">Email Hacking</option>
+                  <option value="Tampering with Computer Source Document">Tampering with Computer Source Document</option>
+                  <option value="Unauthorised Access / Data Breach">Unauthorised Access / Data Breach</option>
+                  <option value="Website Defacement / Hacking">Website Defacement / Hacking</option>
+                </optgroup>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">Date &amp; Time of Incident <span class="req">*</span></label>
+              <input type="datetime-local" class="field-input" id="man-datetime" required>
+            </div>
+          </div>
+
+          <!-- Row 2: Amount, Bank, Transaction ID -->
+          <div class="form-row-3">
+            <div class="field-group">
+              <label class="field-label">Amount Lost (INR)</label>
+              <input type="number" class="field-input" id="man-amount" placeholder="e.g. 5000">
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">Bank / Wallet / Merchant</label>
+              <select class="field-select" id="man-bank">
+                <option value="">-- Select Bank / Wallet --</option>
+                <option value="State Bank of India">State Bank of India (SBI)</option>
+                <option value="Punjab National Bank">Punjab National Bank (PNB)</option>
+                <option value="Bank of Maharashtra">Bank of Maharashtra</option>
+                <option value="Bank of Baroda">Bank of Baroda</option>
+                <option value="HDFC Bank">HDFC Bank</option>
+                <option value="ICICI Bank">ICICI Bank</option>
+                <option value="Axis Bank">Axis Bank</option>
+                <option value="Kotak Mahindra Bank">Kotak Mahindra Bank</option>
+                <option value="Paytm Payments Bank">Paytm</option>
+                <option value="PhonePe">PhonePe</option>
+                <option value="Google Pay">Google Pay</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">Transaction ID / UTR</label>
+              <input type="text" class="field-input" id="man-utr" placeholder="12 digit number">
+            </div>
+          </div>
+
+          <!-- Row 3: Platform, Suspect Phone, Complainant Age -->
+          <div class="form-row-3">
+            <div class="field-group">
+              <label class="field-label">Platform / Channel <span class="req">*</span></label>
+              <select class="field-select" id="man-platform" required>
+                <option value="Phone Call">Phone Call</option>
+                <option value="WhatsApp">WhatsApp</option>
+                <option value="Telegram">Telegram</option>
+                <option value="Instagram">Instagram</option>
+                <option value="Facebook">Facebook</option>
+                <option value="SMS">SMS</option>
+                <option value="Email">Email</option>
+                <option value="Malicious Website / App">Malicious Website / App</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">Suspect Phone / UPI ID</label>
+              <input type="text" class="field-input" id="man-suspect" placeholder="+91 9876543210 or UPI ID">
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">Complainant Age <span class="field-hint">(POCSO triggers if &lt; 18)</span></label>
+              <input type="number" class="field-input" id="man-age" placeholder="e.g. 25" min="1" max="120" value="25">
+            </div>
+          </div>
+
+          <!-- Row 4: Law Enforcement Routing (State & District) & Evidence Upload -->
+          <div class="form-row-3">
+            <div class="field-group">
+              <label class="field-label">State / UT (Jurisdiction) <span class="req">*</span></label>
+              <select class="field-select" id="man-state" required>
+                <option value="Maharashtra" selected>Maharashtra</option>
+                <option value="Delhi">Delhi (NCT)</option>
+                <option value="Karnataka">Karnataka</option>
+                <option value="Telangana">Telangana</option>
+                <option value="Uttar Pradesh">Uttar Pradesh</option>
+                <option value="Tamil Nadu">Tamil Nadu</option>
+                <option value="West Bengal">West Bengal</option>
+                <option value="Gujarat">Gujarat</option>
+                <option value="Other">Other State / UT</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">District / City <span class="req">*</span></label>
+              <input type="text" class="field-input" id="man-district" placeholder="e.g. Mumbai Suburban, Pune, Noida" value="Mumbai Suburban" required>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label">Evidence Upload <span class="field-hint">(Triggers Module C OCR)</span></label>
+              <input type="file" class="field-input" id="man-evidence-file" accept="image/*">
+            </div>
+          </div>
+
+          <!-- Row 4: Describe What Happened -->
+          <div class="field-group">
+            <div class="label-with-counter">
+              <label class="field-label">Describe What Happened <span class="req">*</span></label>
+              <span class="char-counter" id="man-char-count">0 / 1000</span>
+            </div>
+            <textarea class="field-textarea" id="man-description" rows="4" maxlength="1000" placeholder="Please describe the sequence of events, how the fraud occurred, what information was shared, etc." required></textarea>
+          </div>
+
+          <!-- Row 5: Supporting Evidence & File Upload -->
+          <div class="form-row-2">
+            <div class="field-group">
+              <label class="field-label">Supporting Evidence / Notes (optional)</label>
+              <input type="text" class="field-input" id="man-evidence-notes" placeholder="Screenshots, messages, call recording etc.">
+            </div>
+            <div class="field-group">
+              <label class="field-label">Upload Files</label>
+              <div class="file-upload-box">
+                <input type="file" id="man-file-upload" class="file-input-hidden" accept="image/*,application/pdf">
+                <label for="man-file-upload" class="file-upload-label">
+                  <span class="upload-icon">📁</span>
+                  <span class="upload-btn-text">Upload Files</span>
+                  <span class="upload-hint">PDF, Images (Max 5MB each)</span>
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Form Actions -->
+          <div class="form-actions-bar">
+            <button type="button" class="btn-secondary-action" id="btn-manual-back">
+              &larr; Save as Draft
+            </button>
+            <button type="submit" class="btn-primary-action" id="btn-manual-submit">
+              Generate Draft with AI &rarr;
+            </button>
+          </div>
+
+        </form>
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- SCREEN 6: DRAFT REVIEW & EDIT                                    -->
+      <!-- ================================================================= -->
+      <section class="screen-view" id="page-review">
+        <div class="screen-header">
+          <div class="header-with-badge">
+            <span class="form-icon-circle blue-light-bg">📝</span>
+            <div>
+              <h1 class="screen-title">Review &amp; Edit Your Complaint Draft</h1>
+              <p class="screen-subtitle">Please check the details. You can edit any information before confirming.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2 Side-by-Side Review Cards -->
+        <div class="review-cards-grid">
+          
+          <!-- Left Card: Complaint Draft -->
+          <div class="review-box-card">
+            <div class="box-card-header">
+              <h2 class="box-card-title">Complaint Draft</h2>
+              <div class="box-header-actions">
+                <button type="button" class="btn-listen-small" id="btn-listen-review">
+                  🔊 Listen
+                </button>
+                <button type="button" class="btn-edit-toggle" id="btn-edit-narrative-toggle">
+                  ✏️ Edit
+                </button>
+              </div>
+            </div>
+
+            <div class="narrative-display-area" id="narrative-display-area">
+              <p class="narrative-paragraph" id="review-narrative-text">
+                On 21 October 2026, the complainant reported an unauthorized cyber fraud incident via digital channel. An amount of INR 5,000 was fraudulently debited from the bank account.
+              </p>
+              <textarea class="narrative-edit-textarea" id="review-narrative-edit" rows="6" style="display: none;"></textarea>
+            </div>
+          </div>
+
+          <!-- Right Card: Extracted Details -->
+          <div class="review-box-card">
+            <div class="box-card-header">
+              <h2 class="box-card-title">Extracted Details</h2>
+              <button type="button" class="btn-edit-toggle" id="btn-edit-details-toggle">
+                ✏️ Edit
+              </button>
+            </div>
+
+            <!-- Key-Value Structured Badges -->
+            <div class="extracted-details-table" id="extracted-details-table">
+              <div class="detail-row">
+                <span class="detail-key">Category</span>
+                <span class="detail-val" id="rev-category">Online Financial Fraud</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-key">Sub-Category</span>
+                <span class="detail-val" id="rev-subcategory">UPI Related Frauds</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-key">Date &amp; Time</span>
+                <span class="detail-val" id="rev-datetime">21-10-2026, 7:30 PM</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-key">Amount</span>
+                <span class="detail-val font-bold" id="rev-amount">₹ 5,000</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-key">Platform</span>
+                <span class="detail-val" id="rev-platform">Phone Call</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-key">Bank</span>
+                <span class="detail-val" id="rev-bank">SBI</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-key">Transaction ID</span>
+                <span class="detail-val font-mono" id="rev-utr">123456789012</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-key">Suspect Contact</span>
+                <span class="detail-val" id="rev-suspect">+91 9876543210</span>
+              </div>
+              <div class="detail-row">
+                <span class="detail-key">Complainant Age</span>
+                <span class="detail-val" id="rev-age">25 (Adult)</span>
+              </div>
+              <div class="detail-row highlight-row">
+                <span class="detail-key">Routed Police Station</span>
+                <span class="detail-val font-bold text-primary" id="rev-police-station">Cyber Crime Police Station BKC, Mumbai Police</span>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Verification Agreement Checkbox -->
+        <div class="verification-agreement-card">
+          <label class="agreement-checkbox-label">
+            <input type="checkbox" id="chk-review-verify" class="styled-checkbox">
+            <span>I have reviewed and confirm that the above information is correct to the best of my knowledge. This draft will be used to classify the complaint.</span>
+          </label>
+        </div>
+
+        <!-- Bottom Actions -->
+        <div class="review-actions-bar">
+          <button type="button" class="btn-secondary-action" id="btn-back-to-voice">
+            &larr; Edit Again
+          </button>
+          <button type="button" class="btn-primary-confirm" id="btn-confirm-and-classify" disabled>
+            Confirm &amp; Classify &rarr;
+          </button>
+        </div>
+
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- SCREEN 7: CLASSIFICATION RESULT                                  -->
+      <!-- ================================================================= -->
+      <section class="screen-view" id="page-result">
+        
+        <!-- Top Success Banner -->
+        <div class="result-success-banner">
+          <div class="success-icon-badge">✓</div>
+          <div>
+            <h1 class="result-banner-title">Complaint Draft Confirmed</h1>
+            <p class="result-banner-subtitle">Your complaint has been processed using our trained machine learning model.</p>
+          </div>
+        </div>
+
+        <!-- 2 Side-by-Side Result Cards -->
+        <div class="result-grid">
+          
+          <!-- Left Card: Prediction & Legal Sections -->
+          <div class="result-details-card">
+            
+            <div class="result-header-row">
+              <div>
+                <div class="result-lbl">Predicted Category</div>
+                <div class="category-badge-pill" id="res-category-badge">
+                  <span class="shield-tag">🛡️</span>
+                  <span id="res-predicted-category">Online Financial Fraud</span>
+                </div>
+                <div class="subcategory-text" id="res-subcategory-text">Sub-Category: UPI Related Frauds</div>
+              </div>
+
+              <!-- Confidence Score Radial / Box -->
+              <div class="confidence-box">
+                <div class="conf-lbl">Confidence Score</div>
+                <div class="conf-val-large" id="res-confidence-val">92%</div>
+                <div class="conf-bar-track">
+                  <div class="conf-bar-fill" id="res-confidence-bar" style="width: 92%;"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Decision Margin & Model Info -->
+            <div class="model-meta-row">
+              <span class="meta-item">LinearSVC Decision Margin: <strong id="res-margin-val">+1.842</strong></span>
+              <span class="meta-item">Runner-Up: <span id="res-runner-up">None</span></span>
+            </div>
+
+            <!-- Summary Box -->
+            <div class="result-summary-box">
+              <div class="summary-lbl">Summary</div>
+              <p class="summary-text" id="res-summary-text">
+                This appears to be a case of UPI-based financial fraud where the victim shared OTP during a fraudulent call leading to an unauthorised transaction.
+              </p>
+              <button type="button" class="btn-text-link" id="btn-view-full-draft">View Full Complaint Draft &rarr;</button>
+            </div>
+
+            <!-- Statutory Legal Sections -->
+            <!-- Statutory Penal Provisions -->
+            <div class="statutory-sections-box">
+              <div class="statutory-lbl">Applicable Penal Code Provisions (BNS 2023 &amp; IT Act):</div>
+              <div class="statute-tags-flex" id="res-statute-tags">
+                <span class="statute-tag">Section 318(4) BNS 2023 (Cheating)</span>
+                <span class="statute-tag">Section 66D IT Act 2000 (Impersonation)</span>
+              </div>
+            </div>
+
+            <!-- Law Enforcement Routing Card -->
+            <div class="routing-destination-box">
+              <div class="routing-box-header">
+                <span class="police-icon">🚓</span>
+                <span class="routing-title">Law Enforcement Jurisdiction &amp; Routing</span>
+              </div>
+              <div class="routing-details-body">
+                <div class="routing-dest-name" id="res-routing-station">Cyber Crime Police Station Bandra Kurla Complex (BKC), Mumbai Police</div>
+                <div class="routing-dest-addr" id="res-routing-address">BKC Police Station Bldg, Bandra Kurla Complex, Bandra (East), Mumbai - 400051</div>
+                <div class="routing-meta-tags">
+                  <span class="meta-pill" id="res-routing-officer">Officer: DCP Cyber Crime</span>
+                  <span class="meta-pill" id="res-routing-helpline">Helpline: 1930</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Right Card: What's Next? -->
+          <div class="result-next-card">
+            <h2 class="next-card-title">What's Next?</h2>
+            
+            <ul class="next-steps-list">
+              <li>
+                <span class="step-check">✓</span>
+                <span>Save this draft for your records.</span>
+              </li>
+              <li>
+                <span class="step-check">✓</span>
+                <span>You can submit it on the official NCRP portal if you wish.</span>
+              </li>
+              <li>
+                <span class="step-check">✓</span>
+                <span>Track it in 'My Complaints'.</span>
+              </li>
+              <li>
+                <span class="step-check">✓</span>
+                <span>Stay cautious and follow cyber safety guidelines.</span>
+              </li>
+            </ul>
+
+            <div class="result-action-buttons">
+              <button type="button" class="btn-download-pdf-clean" id="btn-download-pdf-result">
+                📄 Download Draft (PDF)
+              </button>
+              <button type="button" class="btn-save-continue" id="btn-save-continue">
+                Save and Continue &rarr;
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+      </section>
+
+      <!-- ================================================================= -->
+      <!-- MODULE F: LAW ENFORCEMENT & OFFICER DASHBOARD                     -->
+      <!-- ================================================================= -->
+      <section class="screen-view" id="page-dashboard">
+        <div class="dashboard-header-banner">
+          <div>
+            <div class="dash-badges-row">
+              <span class="badge-police-portal">🛡️ Official Police Portal</span>
+              <span class="badge-live-stream">● I4C / 1930 Live Queue</span>
+            </div>
+            <h1 class="dash-main-title">Cybercrime Case Management &amp; Dispatch</h1>
+            <p class="dash-main-sub">National Cyber Crime Reporting Portal (NCRP) Officer Adjudication Console</p>
+          </div>
+          <div class="dash-actions">
+            <button type="button" class="btn-refresh-cases" id="btn-refresh-cases">🔄 Refresh Queue</button>
+          </div>
+        </div>
+
+        <!-- 4 Metric Cards -->
+        <div class="dash-metrics-grid">
+          <div class="dash-metric-card">
+            <div class="metric-lbl">Total Registered Cases</div>
+            <div class="metric-num" id="stat-total-cases">28</div>
+            <div class="metric-sub">Across 21 NCRP Sub-Categories</div>
+          </div>
+          <div class="dash-metric-card metric-urgent">
+            <div class="metric-lbl">Golden Hour / Urgent Cases</div>
+            <div class="metric-num text-danger" id="stat-golden-hour">7</div>
+            <div class="metric-sub">&lt; 24h Bank Freeze Requisitions</div>
+          </div>
+          <div class="dash-metric-card">
+            <div class="metric-lbl">Total Disputed Loss (INR)</div>
+            <div class="metric-num text-primary" id="stat-total-loss">₹ 4,85,000</div>
+            <div class="metric-sub">Aggregated financial fraud value</div>
+          </div>
+          <div class="dash-metric-card">
+            <div class="metric-lbl">Pending Review</div>
+            <div class="metric-num text-warning" id="stat-pending-cases">12</div>
+            <div class="metric-sub">Awaiting Officer Adjudication</div>
+          </div>
+        </div>
+
+        <!-- Filter & Search Bar -->
+        <div class="dash-filter-bar">
+          <div class="search-input-wrapper">
+            <input type="text" id="dash-search-input" class="dash-search-input" placeholder="Search by Case Ref, Complainant, Bank, UTR...">
+          </div>
+          <select id="dash-category-filter" class="dash-select-filter">
+            <option value="">All Categories</option>
+            <option value="Online Financial Fraud">Online Financial Fraud</option>
+            <option value="Online and Social Media Related Crime">Online and Social Media Related Crime</option>
+            <option value="Hacking / Damage to Computer">Hacking / Damage to Computer</option>
+          </select>
+          <select id="dash-urgency-filter" class="dash-select-filter">
+            <option value="">All Priorities</option>
+            <option value="EMERGENCY_GOLDEN_HOUR">Golden Hour (&lt; 24h)</option>
+            <option value="HIGH">High Priority</option>
+            <option value="STANDARD">Standard Priority</option>
+          </select>
+        </div>
+
+        <!-- Cases Queue Table -->
+        <div class="dash-table-card">
+          <div class="dash-table-header">
+            <h3 class="table-card-title">Active Complaint Queue</h3>
+            <span class="table-counter-badge" id="dash-table-count">Showing 28 cases</span>
+          </div>
+          <div class="table-responsive">
+            <table class="dash-table" id="dash-cases-table">
+              <thead>
+                <tr>
+                  <th>Case Ref</th>
+                  <th>Incident Date</th>
+                  <th>Complainant</th>
+                  <th>Predicted Sub-Category</th>
+                  <th>Designated Police Station</th>
+                  <th>Loss (INR)</th>
+                  <th>Urgency</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="dash-cases-tbody">
+                <!-- Populated dynamically via JS -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </section>
+
+    </main>
+
+  </div>
+
+  <!-- Case Inspector Modal (Module F) -->
+  <div class="modal-overlay" id="modal-case-inspector" style="display: none;">
+    <div class="modal-dialog-large">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title" id="modal-case-ref">Case Record</h2>
+          <span class="modal-subtitle" id="modal-case-sub">Incident Dossier</span>
+        </div>
+        <button type="button" class="btn-modal-close" id="btn-close-modal">&times;</button>
+      </div>
+      <div class="modal-body" id="modal-case-body">
+        <!-- Rendered dynamically -->
+      </div>
+      <div class="modal-footer" id="modal-case-footer">
+        <!-- Action buttons like Download PDF, Issue Sec 91 BNSS Notice -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Element -->
+  <div class="toast-notification" id="toast-el" style="display: none;">
+    <span id="toast-text">Notification message</span>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

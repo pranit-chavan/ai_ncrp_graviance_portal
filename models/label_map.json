@@ -1,0 +1,23 @@
+{
+  "AePS Fraud": 0,
+  "Cheating by Impersonation": 1,
+  "Cyber Bullying / Stalking / Sexting": 2,
+  "Damage to Computer / Computer System": 3,
+  "Debit/Credit Card Fraud / SIM Swap Fraud": 4,
+  "Demat / Depository Fraud": 5,
+  "E-Wallet Related Fraud": 6,
+  "Email Hacking": 7,
+  "Email Phishing": 8,
+  "Fake / Impersonating Profile": 9,
+  "Impersonating Email (Business Email Compromise)": 10,
+  "Internet Banking Related Fraud": 11,
+  "Intimidating Email": 12,
+  "Online Job Fraud": 13,
+  "Online Matrimonial Fraud": 14,
+  "Profile Hacking / Identity Theft": 15,
+  "Provocative Speech for Unlawful Acts": 16,
+  "Tampering with Computer Source Document": 17,
+  "UPI Related Frauds": 18,
+  "Unauthorised Access / Data Breach": 19,
+  "Website Defacement / Hacking": 20
+}
