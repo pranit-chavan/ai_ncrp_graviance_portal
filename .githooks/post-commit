@@ -1,0 +1,11 @@
+#!/bin/sh
+
+branch=$(git symbolic-ref --quiet --short HEAD) || {
+    printf '%s\n' "Auto-push skipped because HEAD is detached." >&2
+    exit 0
+}
+
+if ! git push --set-upstream origin "HEAD:refs/heads/$branch"; then
+    printf '%s\n' "Auto-push failed. The commit remains local; run git push --set-upstream origin HEAD after fixing the cause." >&2
+    exit 1
+fi
