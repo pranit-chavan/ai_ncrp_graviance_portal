@@ -732,7 +732,7 @@ async def transcribe_endpoint(file: UploadFile = File(...), language: str = Form
         res = transcribe_audio_bytes(
             audio_bytes,
             filename=file.filename or "recording.webm",
-            lang_code=lang_code,
+            language=lang_code,
             model_name="tiny"
         )
         return JSONResponse({
