@@ -105,27 +105,24 @@ def inject_custom_css():
             color: #182b3b;
         }
         .stApp { background: #f3f6fa; }
-        .block-container { max-width: 1440px; padding: 1.5rem 2.25rem 3rem; }
+        .block-container { max-width: 1320px; padding: 1.25rem 1.5rem 2.5rem; }
         header[data-testid="stHeader"] { display: none !important; }
         h1 { color: #102c46 !important; font-weight: 750 !important; letter-spacing: -0.035em !important; }
         h2, h3 { color: #153853 !important; font-weight: 700 !important; letter-spacing: -0.02em !important; }
         p, label, [data-testid="stMarkdownContainer"] { line-height: 1.55; }
         div[data-testid="stVerticalBlockBorderWrapper"] {
-            background: #ffffff; border: 1px solid #dbe3ec; border-radius: 12px;
-            box-shadow: 0 4px 14px rgba(16, 44, 70, 0.035);
+            background: #ffffff; border: 1px solid #dbe3ec; border-radius: 10px;
         }
-        div[data-testid="stExpander"] {
-            border: 1px solid #dbe3ec; border-radius: 10px; background: #fff;
-        }
+        div[data-testid="stExpander"] { border: 1px solid #dbe3ec; border-radius: 8px; background: #fff; }
         
         div.stButton > button[kind="primary"] {
             background-color: #123451 !important;
             color: #ffffff !important;
             border: 1px solid #123451 !important;
-            border-radius: 7px !important;
+            border-radius: 6px !important;
             font-weight: 650 !important;
-            min-height: 46px !important;
-            padding: 10px 19px !important;
+            min-height: 42px !important;
+            padding: 8px 16px !important;
             transition: background-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
             box-shadow: 0 2px 4px rgba(10, 37, 64, 0.12) !important;
         }
@@ -179,9 +176,10 @@ def inject_custom_css():
             border-radius: 7px; padding: 4px 8px; font-weight: 600;
         }
         div[data-testid="stAlert"] { border-radius: 9px; }
-        div[data-testid="stMetric"] {
-            background: #fff; border: 1px solid #dbe3ec; border-radius: 10px;
-            padding: 14px 16px; box-shadow: 0 3px 10px rgba(16, 44, 70, 0.035);
+        div[data-testid="stMetric"] { background: #fff; border: 1px solid #dbe3ec; border-radius: 8px; padding: 12px 14px; }
+        @media (max-width: 768px) {
+            .block-container { padding: 1rem 1rem 2rem; }
+            h1 { font-size: 1.8rem !important; }
         }
         .portal-hero-title { font-size: 2.25em; }
         @media (max-width: 700px) {
@@ -468,8 +466,8 @@ def render_legal_sections(legal):
 def header_bar():
     st.markdown(
         f"""
-        <div class="portal-masthead" style="background:linear-gradient(105deg,{GOV_BLUE_DARK},{GOV_BLUE});margin:-1.5rem -2.25rem 1.4rem -2.25rem;padding:16px 34px;
-                    border-bottom:3px solid {GOV_ACCENT_ORANGE};box-shadow:0 5px 18px rgba(7,23,41,0.13);">
+        <div class="portal-masthead" style="background:linear-gradient(105deg,{GOV_BLUE_DARK},{GOV_BLUE});margin:-1.25rem -1.5rem 1.25rem -1.5rem;padding:14px 24px;
+                    border-bottom:2px solid {GOV_ACCENT_ORANGE};">
           <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
           <div style="display:flex;align-items:center;gap:14px;">
               <div style="background:#eaf1f8;color:{GOV_BLUE};font-weight:850;font-size:0.9em;
@@ -479,10 +477,10 @@ def header_bar():
               </div>
               <div>
                 <div style="color:#ffffff;font-size:1.12em;font-weight:800;letter-spacing:0.005em;line-height:1.25;">
-                  Cybercrime Intake &amp; Investigation Portal
+                  Cybercrime complaint workspace
                 </div>
-                <div style="color:#cbd5e1;font-size:0.78em;font-weight:600;letter-spacing:0.04em;text-transform:uppercase;">
-                  Independent AI-assisted MVP &bull; Not connected to NCRP or police systems
+                <div style="color:#cbd5e1;font-size:0.78em;font-weight:500;">
+                  Independent prototype · Not connected to police or NCRP systems
                 </div>
               </div>
             </div>
@@ -490,7 +488,7 @@ def header_bar():
               <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.22);
                           padding:7px 13px;border-radius:6px;color:#fff;font-size:0.77em;font-weight:700;
                           letter-spacing:0.025em;">
-                URGENT FINANCIAL FRAUD &nbsp; <span style="font-size:1.1em;color:#fde68a;">1930</span>
+                Need urgent help? &nbsp; <span style="font-size:1.1em;color:#fde68a;">Call 1930</span>
               </div>
             </div>
           </div>
@@ -608,8 +606,23 @@ PAGE_LABELS_CITIZEN = {
 PAGE_LABELS_INVESTIGATOR = {
     "Case Queue": "Case register",
     "Case Review": "Case review",
-    "Operations": "Operations & analytics",
+    "Operations": "Overview",
 }
+
+CASE_STATUS_LABELS = {
+    "RECEIVED - AWAITING REVIEW": "Waiting for review",
+    "IN REVIEW": "In review",
+    "AWAITING INFORMATION": "Waiting for more information",
+    "REFERRED FOR FOLLOW-UP": "Follow-up needed",
+    "REVIEW COMPLETE": "Review complete",
+    "CONFIRMED BY OFFICER": "Review complete",
+    "RECLASSIFIED BY OFFICER": "Category updated",
+}
+
+
+def display_case_status(status):
+    value = str(status or "").strip()
+    return CASE_STATUS_LABELS.get(value, value.replace("_", " ").title() or "Not set")
 
 header_bar()
 
@@ -640,8 +653,8 @@ if nav_pages is not None:
               <div style="font-weight:800;color:{GOV_BLUE};font-size:1.05em;letter-spacing:0.02em;">
                 Cybercrime Portal
               </div>
-              <div style="font-size:0.75em;color:#64748b;font-weight:600;text-transform:uppercase;letter-spacing:0.04em;margin-top:2px;">
-                {'Complainant workspace' if current_route == 'user' else 'Investigator workspace'}
+              <div style="font-size:0.78em;color:#64748b;font-weight:600;margin-top:2px;">
+                {'For people reporting an incident' if current_route == 'user' else 'For complaint review'}
               </div>
             </div>
             """,
@@ -701,42 +714,35 @@ if nav_pages is not None:
 def page_landing():
     st.markdown(
         f"""
-        <div class="portal-hero" style="background:linear-gradient(115deg, {GOV_BLUE_DARK} 0%, {GOV_BLUE_HEADER} 100%);
-                    padding:48px 42px;border-radius:12px;color:white;margin-bottom:24px;
-                    border-bottom:4px solid {GOV_ACCENT_ORANGE};box-shadow:0 12px 30px rgba(7,23,41,.15);">
-          <div style="font-size:.76em;font-weight:800;letter-spacing:.12em;text-transform:uppercase;color:#bfd2e4;">Independent AI-assisted MVP</div>
-          <div class="portal-hero-title" style="font-weight:800;letter-spacing:-.035em;margin-top:8px;">Cybercrime Intake &amp; Investigation Portal</div>
+        <div class="portal-hero" style="background:{GOV_BLUE};
+                    padding:30px 32px;border-radius:10px;color:white;margin-bottom:20px;
+                    border-bottom:3px solid {GOV_ACCENT_ORANGE};">
+          <div style="font-size:.78em;font-weight:700;color:#d5e2ee;">Independent prototype</div>
+          <div class="portal-hero-title" style="font-weight:750;letter-spacing:-.025em;margin-top:6px;">Complaint preparation and review</div>
           <div style="opacity:.92;margin-top:10px;font-size:1.02em;max-width:800px;line-height:1.6;">
-            One guided intake flow for complainants and a structured case workspace for investigators. Prepare, review, and organize — without implying an official police filing.
-          </div>
-          <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:22px;">
-            <span style="border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.08);padding:6px 11px;border-radius:5px;font-size:.82em;">Conversational intake</span>
-            <span style="border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.08);padding:6px 11px;border-radius:5px;font-size:.82em;">Evidence &amp; OCR review</span>
-            <span style="border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.08);padding:6px 11px;border-radius:5px;font-size:.82em;">Human-reviewed classification</span>
+            Prepare a complaint record or review records saved on this computer. This app does not send reports to police or NCRP.
           </div>
         </div>
         """,
         unsafe_allow_html=True,
     )
-    st.markdown("### Choose a workspace")
-    st.caption("Select the role for this session. The current MVP does not authenticate users or enforce role permissions.")
+    st.markdown("### What would you like to do?")
+    st.caption("Choose a task. This prototype does not use accounts or restrict access by role.")
     c1, c2 = st.columns(2, gap="large")
     with c1:
         with st.container(border=True):
-            st.markdown("#### Complainant workspace")
-            st.write("Describe the incident in your own words. The assistant can ask follow-up questions, help review evidence, and prepare a structured complaint record for human review.")
-            st.caption("Typical flow: Tell your story → clarify details → review evidence and category → save record.")
+            st.markdown("#### Report an incident")
+            st.write("Describe what happened, add any screenshots you have, and review the complaint record before saving it.")
         st.write("")
-        if st.button("Start complaint intake", use_container_width=True, type="primary"):
+        if st.button("Prepare a complaint", use_container_width=True, type="primary"):
             st.query_params["route"] = "user"
             st.session_state["nav_page"] = "Home"
             st.rerun()
 
     with c2:
         with st.container(border=True):
-            st.markdown("#### Investigator workspace")
-            st.write("Review completed intake records, check evidence and AI-assisted findings, manage case status, and record follow-up notes in the local case register.")
-            st.caption("Typical flow: Open case register → review evidence and classification → assign status and next action.")
+            st.markdown("#### Review complaint records")
+            st.write("Open saved records, check the information and evidence, and note the next review step.")
         st.write("")
         if st.button("Open case register", use_container_width=True, type="secondary"):
             st.query_params["route"] = "investigator"
@@ -749,7 +755,7 @@ def page_landing():
 # =============================================================================
 
 def page_home():
-    st.title("Complainant workspace")
+    st.title("Report an incident")
     st.markdown(
         f"""
         <div class="portal-hero" style="background:#fff;border:1px solid #dbe3ec;border-left:5px solid {GOV_ACCENT_ORANGE};
@@ -2225,7 +2231,7 @@ def page_check_status():
 
 def page_cases():
     st.title("Case register")
-    st.caption("Review incoming complaint records, triage signals, evidence gaps, and current case actions.")
+    st.caption("Open saved complaint records, check their details and evidence, and record the next review step.")
 
     with st.expander("Import an external case record", expanded=False):
         st.write("Use this for a structured JSON record created outside the intake flow. New completed intake records appear here automatically.")
@@ -2265,14 +2271,14 @@ def page_cases():
     metric_cols = st.columns(4)
     metric_cols[0].metric("Cases in register", len(cases))
     metric_cols[1].metric("Awaiting action", awaiting)
-    metric_cols[2].metric("Urgent review flags", urgent)
-    metric_cols[3].metric("Evidence conflicts", conflicts)
+    metric_cols[2].metric("Urgent cases to review", urgent)
+    metric_cols[3].metric("Evidence details to check", conflicts)
 
     if not cases:
-        st.info("No cases have been received yet. Completed complaint records will appear here after they are saved from the intake workflow.")
+        st.info("No complaint records yet. Saved records will appear here after intake is completed.")
         return
 
-    st.markdown("### Find a case")
+    st.markdown("### Find a complaint")
     filter_cols = st.columns([1.5, 1.2, 1.3])
     search = filter_cols[0].text_input("Search register", placeholder="Reference, category, or location")
     all_statuses = sorted({str(g(case, "status", default="RECEIVED - AWAITING REVIEW")) for case in cases})
@@ -2299,7 +2305,7 @@ def page_cases():
         not bool(g(case, "sentiment", "is_golden_hour", default=False)),
         str(case.get("_investigator_received_at", case.get("generated_at", ""))),
     ))
-    st.caption(f"Showing {len(filtered)} of {len(cases)} cases · AI triage flags are decision-support signals and require human review.")
+    st.caption(f"Showing {len(filtered)} of {len(cases)} records. Check suggested priorities and incident types before acting.")
     if not filtered:
         st.info("No cases match these filters.")
         return
@@ -2311,12 +2317,12 @@ def page_cases():
             main_cols = st.columns([1.2, 2.2, 1.2, 1.2, 1])
             main_cols[0].caption("CASE REFERENCE")
             main_cols[0].markdown(f"**{case.get('reference', 'No reference')}**")
-            main_cols[1].caption("AI-SUGGESTED INCIDENT TYPE")
+            main_cols[1].caption("SUGGESTED INCIDENT TYPE")
             main_cols[1].markdown(f"**{classification.get('sub_category', 'Not classified')}**")
-            main_cols[2].caption("TRIAGE SIGNAL")
+            main_cols[2].caption("REVIEW PRIORITY")
             main_cols[2].markdown(urgency_badge(sent.get("urgency_level"), sent.get("is_golden_hour", False)), unsafe_allow_html=True)
-            main_cols[3].caption("WORKFLOW STATUS")
-            main_cols[3].write(str(g(case, "status", default="RECEIVED - AWAITING REVIEW")))
+            main_cols[3].caption("STATUS")
+            main_cols[3].write(display_case_status(g(case, "status", default="RECEIVED - AWAITING REVIEW")))
             main_cols[4].caption("RECEIVED")
             main_cols[4].write(str(case.get("_investigator_received_at", case.get("generated_at", "Date not supplied")))[:10])
             detail_cols = st.columns([1, 2, 1, 1])
@@ -2333,7 +2339,7 @@ def page_cases():
 # =============================================================================
 
 def page_case_detail():
-    st.title("Case record review")
+    st.title("Review complaint")
     cases, errors = load_investigator_cases()
     if not cases:
         st.info("No case is available to review. New intake records will appear in the case register after saving.")
@@ -2345,7 +2351,7 @@ def page_case_detail():
     if current not in options:
         current = options[0] if options else None
 
-    picked = st.selectbox("Select Case File", options, index=options.index(current) if current in options else 0,
+    picked = st.selectbox("Choose a complaint record", options, index=options.index(current) if current in options else 0,
                           format_func=lambda p: by_path[p].get("reference", os.path.basename(p)))
     st.session_state["selected_case_path"] = picked
     case = by_path[picked]
@@ -2356,15 +2362,15 @@ def page_case_detail():
     status = str(case.get("status", "RECEIVED - AWAITING REVIEW"))
 
     st.subheader(f"{case.get('reference', 'Case record')}")
-    st.caption(f"Received: {case.get('_investigator_received_at', g(case, 'generated_at'))}  ·  Status: **{status}**  ·  Assigned to: **{case.get('assigned_to', 'Unassigned')}**")
+    st.caption(f"Received: {case.get('_investigator_received_at', g(case, 'generated_at'))}  ·  Status: **{display_case_status(status)}**  ·  Assigned to: **{case.get('assigned_to', 'Unassigned')}**")
 
     sent_summary = case.get("sentiment") if isinstance(case.get("sentiment"), dict) else {}
     urgency_summary = st.columns(4)
     urgency_summary[0].metric("Review priority", sent_summary.get("urgency_level", "Not assessed"))
     suggested_subcategory = cl.get("sub_category", "Not classified")
     urgency_summary[1].metric("Suggested main category", SUB_TO_MAIN_CATEGORY.get(suggested_subcategory, "Not classified"))
-    urgency_summary[2].metric("Classification confidence", fmt_confidence(cl.get("confidence")))
-    urgency_summary[3].metric("Evidence conflicts", len(g(case, "reconciliation", "conflicts", default=[])))
+    urgency_summary[2].metric("Suggested type match", fmt_confidence(cl.get("confidence")), help="A rough model estimate. Review the complaint and evidence before relying on it.")
+    urgency_summary[3].metric("Evidence details to check", len(g(case, "reconciliation", "conflicts", default=[])))
     st.caption(f"Suggested subcategory: **{suggested_subcategory}** · Source: {cl.get('source', 'Not recorded')} · Review before relying on this result.")
 
     with st.form(f"case_workflow_{os.path.basename(picked)}"):
@@ -2376,7 +2382,7 @@ def page_case_detail():
         ]
         if status not in status_options:
             status_options.insert(0, status)
-        next_status = action_cols[0].selectbox("Status", status_options, index=status_options.index(status))
+        next_status = action_cols[0].selectbox("Status", status_options, index=status_options.index(status), format_func=display_case_status)
         assignee = action_cols[1].text_input("Assigned investigator", value=str(case.get("assigned_to", "")))
         reviewer = action_cols[2].text_input("Reviewer initials", placeholder="Not authenticated")
         action_note = st.text_input("Next action or review note", placeholder="Record what was checked or what should happen next")
@@ -2501,12 +2507,12 @@ def page_case_detail():
                 st.caption(f"Could not open an imported evidence file: {exc}")
 
     with c2:
-        section_header("AI-assisted classification")
+        section_header("Suggested incident type")
         st.metric("Suggested incident type", g(cl, "sub_category", default="UNCLASSIFIED"))
         if cl.get("guidance"):
             st.caption(cl["guidance"])
 
-        section_header("Review priority signals")
+        section_header("Urgency and support")
         sent = case.get("sentiment") or {}
         if sent and isinstance(sent, dict) and sent.get("tone"):
             urg_lvl = sent.get("urgency_level")
@@ -2517,11 +2523,10 @@ def page_case_detail():
                 f"""<div style="background:#f8fafc;border:1px solid #cbd5e1;padding:12px 14px;border-radius:4px;margin-bottom:12px;">
                       <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:8px;">
                         <div><b>Priority:</b> {urg_badge_html}</div>
-                        <div><b>Tone Assessment:</b> {tone_badge_html}</div>
+                        <div><b>Message tone:</b> {tone_badge_html}</div>
                       </div>
                       <div style="font-size:0.86em;color:#475569;">
-                        <b>Distress Assessment:</b> {int(sent.get('distress_score', 0)*100)}% &nbsp;|&nbsp;
-                        <b>Vector:</b> {html.escape(str(sent.get('comprehension', {}).get('crime_vector', 'General')))}
+                        Suggested from the message wording. Check the original account and evidence.
                       </div>
                     </div>""",
                 unsafe_allow_html=True,
@@ -2529,18 +2534,18 @@ def page_case_detail():
             if is_gold:
                 st.warning("Possible recent financial loss. Contact 1930 and your bank promptly. This demo cannot block a payment or freeze an account.")
             elif sent.get("tone") == "ANXIOUS_THREATENED":
-                st.warning("Advisory: Active extortion / threat reported. Preserve platform logs prior to account deletion.")
+                st.warning("Possible threats were reported. Review the original messages and preserve evidence before changing the account.")
         else:
             st.caption("Urgency triage assessment not recorded for this file.")
 
-        section_header("Possible legal references")
+        section_header("Possible laws to review")
         legal = case.get("legal_sections") or {}
         if "_status" in legal:
             st.info(legal["_status"])
         else:
             render_legal_sections(legal)
 
-        section_header("Suggested review actions")
+        section_header("Possible next steps")
         actions = case.get("suggested_actions") or []
         if actions:
             for i, a in enumerate(actions, 1):
@@ -2665,7 +2670,7 @@ def page_case_detail():
     # MODULE L — Cross-Case Pattern & Criminal Syndicate Correlation
     # =========================================================================
     st.divider()
-    section_header("Cross-case links (review before relying on matches)")
+    section_header("Similar details in other records (check manually)")
     if _v2_modules_available:
         try:
             os.makedirs(INVESTIGATOR_INBOX_DIR, exist_ok=True)
@@ -2801,7 +2806,7 @@ def page_case_detail():
 # =============================================================================
 
 def page_statistics():
-    st.title("Operations & analytics")
+    st.title("Overview")
     st.caption("Operational counts are calculated only from records received into the local investigator inbox. They are not national statistics.")
     cases, errors = load_investigator_cases()
     if errors:

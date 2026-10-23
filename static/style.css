@@ -115,6 +115,9 @@ body {
 /* Quick Flow Tabs in Navbar */
 .flow-stepper-nav {
   display: flex;
+  flex-wrap: nowrap;
+  max-width: 100%;
+  overflow-x: auto;
   background: var(--bg-subtle);
   border-radius: 8px;
   padding: 3px;
@@ -132,6 +135,8 @@ body {
   border-radius: 6px;
   cursor: pointer;
   display: flex;
+  flex-shrink: 0;
+  white-space: nowrap;
   align-items: center;
   gap: 6px;
   transition: all 0.15s ease;
@@ -2058,6 +2063,10 @@ body {
 }
 
 /* Modal Dialog */
+.model-meta-row {
+  display: none;
+}
+
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -2140,7 +2149,25 @@ body {
 }
 
 /* Responsive */
+@media (min-width: 1025px) {
+  .dashboard-mode .flow-stepper-nav,
+  .dashboard-mode .navbar-right {
+    display: none;
+  }
+}
+
 @media (max-width: 1024px) {
+  .navbar-inner {
+    flex-wrap: wrap;
+    padding: 10px 16px;
+  }
+  .flow-stepper-nav {
+    order: 3;
+    width: 100%;
+  }
+  .navbar-right {
+    margin-left: auto;
+  }
   .app-sidebar {
     display: none;
   }

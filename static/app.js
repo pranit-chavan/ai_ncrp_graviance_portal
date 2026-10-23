@@ -269,6 +269,10 @@ document.addEventListener('DOMContentLoaded', () => {
 // Screen Router
 function showScreen(screenId) {
   state.currentScreen = screenId;
+  const isDashboard = screenId === 'page-dashboard';
+  document.body.classList.toggle('dashboard-mode', isDashboard);
+  navDashboard.classList.toggle('active', isDashboard);
+  navReport.classList.toggle('active', !isDashboard);
 
   // Toggle views
   screenViews.forEach(v => {
@@ -757,7 +761,7 @@ function syncToReviewDisplay() {
   if (revAge) {
     const ageVal = d.age || 25;
     if (ageVal < 18) {
-      revAge.innerHTML = `<span style="color:#dc2626; font-weight:700;">Minor (${ageVal} yrs) — POCSO Sec 19 Triggered</span>`;
+      revAge.innerHTML = `<span style="color:#dc2626; font-weight:700;">Under 18 (${ageVal} years)</span>`;
     } else {
       revAge.textContent = `${ageVal} yrs (Adult)`;
     }
@@ -878,7 +882,7 @@ function populateClassificationResult(data) {
     resRunnerUp.textContent = 'None';
   }
 
-  resSummaryText.textContent = `This incident has been officially categorized under "${mainCat}" as "${subCat}". It involves ${state.draft.bank || 'financial channels'} via ${state.draft.platform || 'digital interface'} with actionable statutory jurisdiction under Indian cyber law.`;
+  resSummaryText.textContent = `The app suggests "${subCat}" based on the details provided. Review the draft and evidence; this is not an official decision.`;
 
   // Render Statutory Tags (including POCSO conditional provisions)
   resStatuteTags.innerHTML = '';
@@ -906,10 +910,7 @@ function populateClassificationResult(data) {
     });
   }
   if (resStatuteTags.children.length === 0) {
-    resStatuteTags.innerHTML = `
-      <span class="statute-tag">Section 318(4) BNS 2023 (Cheating)</span>
-      <span class="statute-tag">Section 66D IT Act 2000 (Impersonation)</span>
-    `;
+    resStatuteTags.textContent = 'No legal references were returned. Ask a qualified professional to verify any that may apply.';
   }
 
   // Render Law Enforcement Routing Details
@@ -930,7 +931,7 @@ function populateClassificationResult(data) {
 // Download Court PDF FIR
 async function handleDownloadPdf() {
   const narrative = reviewNarrativeText.textContent.trim();
-  showToast("Generating official complaint PDF...");
+  showToast("Preparing complaint draft PDF...");
   try {
     const res = await fetch('/api/generate_pdf', {
       method: 'POST',
@@ -1269,6 +1270,20 @@ function escapeHtml(text) {
   return div.innerHTML;
 }
 
+function formatCaseStatus(status) {
+  const value = String(status || 'RECEIVED - AWAITING REVIEW');
+  const labels = {
+    'RECEIVED - AWAITING REVIEW': 'Waiting for review',
+    'IN REVIEW': 'In review',
+    'AWAITING INFORMATION': 'Waiting for information',
+    'REFERRED FOR FOLLOW-UP': 'Follow-up needed',
+    'REVIEW COMPLETE': 'Review complete',
+    'CONFIRMED BY OFFICER': 'Review complete',
+    'RECLASSIFIED BY OFFICER': 'Category updated'
+  };
+  return labels[value] || value.replace(/_/g, ' ').toLowerCase();
+}
+
 // ==========================================================================
 // 9. Module F: Law Enforcement / Officer Dashboard & Case Inspector
 // ==========================================================================
@@ -1297,11 +1312,11 @@ async function loadDashboardCases() {
     if (elPending) elPending.textContent = stats.pending_count !== undefined ? stats.pending_count : 0;
 
     applyDashboardFilters();
-    showToast("✓ Officer queue refreshed with latest case records.");
+    showToast("Saved complaint records refreshed.");
   } catch (err) {
     showToast("Error loading cases: " + err.message);
   } finally {
-    if (btn) btn.textContent = '🔄 Refresh Queue';
+    if (btn) btn.textContent = 'Refresh records';
   }
 }
 
@@ -1361,7 +1376,7 @@ function renderCasesTable(cases) {
     tbody.innerHTML = `
       <tr>
         <td colspan="9" style="text-align: center; padding: 2.5rem; color: #64748b;">
-          No matching case files found in queue.
+          No saved complaint records match this search.
         </td>
       </tr>
     `;
@@ -1371,10 +1386,10 @@ function renderCasesTable(cases) {
   tbody.innerHTML = cases.map(c => {
     const ref = c.reference || 'CYB-REF';
     const dateStr = (c.incident_datetime || c.generated_at || '—').slice(0, 16).replace('T', ' ');
-    const compName = c.complainant?.name || 'Citizen';
+    const compName = c.complainant?.name || 'Not provided';
     const compPhone = c.complainant?.phone ? `(${c.complainant.phone})` : '';
-    const subCat = c.classification?.sub_category || c.incident?.category || 'UPI Related Frauds';
-    const ps = c.complainant?.police_station || 'Cyber Crime Police Station';
+    const subCat = c.classification?.sub_category || c.incident?.category || 'Not classified';
+    const ps = c.complainant?.police_station || c.complainant?.city || 'Not provided';
     
     // Total loss calculation
     let lossVal = 0;
@@ -1385,13 +1400,15 @@ function renderCasesTable(cases) {
 
     // Urgency pill
     const isGolden = c.sentiment?.is_golden_hour || (c.sentiment?.urgency_level || '').includes('GOLDEN');
-    const urgLvl = c.sentiment?.urgency_level || (isGolden ? 'GOLDEN HOUR' : 'STANDARD');
+    const rawUrgency = c.sentiment?.urgency_level || 'STANDARD';
+    const urgLvl = isGolden ? 'Urgent' : rawUrgency.includes('HIGH') ? 'High' : 'Standard';
     const urgBadge = isGolden 
       ? `<span class="badge-golden-hour">🚨 ${escapeHtml(urgLvl)}</span>`
       : `<span class="badge-standard">${escapeHtml(urgLvl)}</span>`;
 
     // Status pill
-    const status = c.status || 'PENDING OFFICER REVIEW';
+    const status = c.status || 'RECEIVED - AWAITING REVIEW';
+    const displayStatus = formatCaseStatus(status);
     let statusStyle = 'background:#fef3c7; color:#92400e; border:1px solid #fde68a;';
     if (status.includes('CONFIRMED')) {
       statusStyle = 'background:#dcfce7; color:#166534; border:1px solid #bbf7d0;';
@@ -1421,12 +1438,12 @@ function renderCasesTable(cases) {
         <td>${urgBadge}</td>
         <td>
           <span style="display:inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.72rem; font-weight: 700; ${statusStyle}">
-            ${escapeHtml(status)}
+            ${escapeHtml(displayStatus)}
           </span>
         </td>
         <td style="white-space: nowrap;">
           <button type="button" class="btn-inspect-case" onclick="inspectCaseDetail('${escapeHtml(ref)}')">
-            🔍 Inspect
+            View details
           </button>
         </td>
       </tr>
@@ -1444,8 +1461,8 @@ async function inspectCaseDetail(caseRef) {
   if (!modal || !modalBody) return;
 
   modalRef.textContent = `Case Reference: ${caseRef}`;
-  modalSub.textContent = `Loading official police case file...`;
-  modalBody.innerHTML = `<div style="text-align:center; padding: 3rem; color: #64748b;">⏳ Fetching incident dossier, legal mapping, and evidence trail...</div>`;
+  modalSub.textContent = `Loading saved complaint record...`;
+  modalBody.innerHTML = `<div style="text-align:center; padding: 3rem; color: #64748b;">Loading record details and evidence...</div>`;
   modalFooter.innerHTML = '';
   modal.style.display = 'flex';
 
@@ -1489,63 +1506,60 @@ async function inspectCaseDetail(caseRef) {
       const other = (c.legal_sections.other || []).map(s => `<span class="statute-tag" style="background:#fee2e2; color:#991b1b; border-color:#fca5a5;">⚠️ ${s.act} Sec ${s.section}: ${s.description}</span>`).join(' ');
       legalHtml = bns + ' ' + it + ' ' + other;
     }
-    if (!legalHtml) {
-      legalHtml = '<span class="statute-tag">Section 318(4) BNS 2023</span> <span class="statute-tag">Section 66D IT Act 2000</span>';
-    }
+    if (!legalHtml) legalHtml = '<span style="color:#64748b;font-size:0.85rem;">No legal references recorded.</span>';
 
     modalBody.innerHTML = `
       <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
         <div style="display: flex; flex-direction: column; gap: 12px;">
           <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:8px; padding:14px;">
-            <h4 style="font-size:0.88rem; font-weight:700; color:#1e293b; margin-bottom:10px; border-bottom:1px solid #f1f5f9; padding-bottom:4px;">Complainant Details</h4>
-            <div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:0.82rem;"><span style="color:#64748b;">Full Name:</span><span style="font-weight:600;">${escapeHtml(c.complainant?.name || 'Citizen')}</span></div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:0.82rem;"><span style="color:#64748b;">Phone:</span><span style="font-weight:600;">${escapeHtml(c.complainant?.phone || 'Confidential')}</span></div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:0.82rem;"><span style="color:#64748b;">Age / POCSO:</span><span style="font-weight:600;">${c.complainant?.age ? `${c.complainant.age} yrs (${c.complainant.age < 18 ? '🚨 Minor - POCSO Triggered' : 'Adult'})` : 'Adult'}</span></div>
-            <div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:0.82rem;"><span style="color:#64748b;">Jurisdiction:</span><span style="font-weight:600; text-align:right; max-width:200px;">${escapeHtml(c.complainant?.police_station || 'Designated Cyber Cell')}</span></div>
-            <div style="display:flex; justify-content:space-between; font-size:0.82rem;"><span style="color:#64748b;">City / State:</span><span style="font-weight:600;">${escapeHtml(c.complainant?.city || '—')}, ${escapeHtml(c.complainant?.state || 'Maharashtra')}</span></div>
+            <h4 style="font-size:0.88rem; font-weight:700; color:#1e293b; margin-bottom:10px; border-bottom:1px solid #f1f5f9; padding-bottom:4px;">Person reporting</h4>
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:0.82rem;"><span style="color:#64748b;">Name:</span><span style="font-weight:600;">${escapeHtml(c.complainant?.name || 'Not provided')}</span></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:0.82rem;"><span style="color:#64748b;">Phone:</span><span style="font-weight:600;">${escapeHtml(c.complainant?.phone || 'Not provided')}</span></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:0.82rem;"><span style="color:#64748b;">Age:</span><span style="font-weight:600;">${c.complainant?.age ? `${c.complainant.age} years` : 'Not provided'}</span></div>
+            <div style="display:flex; justify-content:space-between; margin-bottom:4px; font-size:0.82rem;"><span style="color:#64748b;">Local contact:</span><span style="font-weight:600; text-align:right; max-width:200px;">${escapeHtml(c.complainant?.police_station || 'Not provided')}</span></div>
+            <div style="display:flex; justify-content:space-between; font-size:0.82rem;"><span style="color:#64748b;">City / State:</span><span style="font-weight:600;">${escapeHtml([c.complainant?.city, c.complainant?.state].filter(Boolean).join(', ') || 'Not provided')}</span></div>
           </div>
 
           <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:8px; padding:14px;">
-            <h4 style="font-size:0.88rem; font-weight:700; color:#1e293b; margin-bottom:10px; border-bottom:1px solid #f1f5f9; padding-bottom:4px;">Statutory Legal Mapping</h4>
+            <h4 style="font-size:0.88rem; font-weight:700; color:#1e293b; margin-bottom:10px; border-bottom:1px solid #f1f5f9; padding-bottom:4px;">Possible legal references (verify)</h4>
             <div class="statute-tags-flex" style="margin-top: 4px;">
               ${legalHtml}
             </div>
             <div style="margin-top: 8px; font-size: 0.78rem; color: #475569;">
-              Cognizable: <strong>${c.legal_sections?.cognizable !== false ? 'YES' : 'NO'}</strong> | 
-              Bailable: <strong>${c.legal_sections?.bailable ? 'YES' : 'NON-BAILABLE'}</strong>
+              These possible references need professional review.
             </div>
           </div>
 
           <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:8px; padding:14px;">
-            <h4 style="font-size:0.88rem; font-weight:700; color:#1e293b; margin-bottom:10px; border-bottom:1px solid #f1f5f9; padding-bottom:4px;">Financial Transaction Details</h4>
+            <h4 style="font-size:0.88rem; font-weight:700; color:#1e293b; margin-bottom:10px; border-bottom:1px solid #f1f5f9; padding-bottom:4px;">Money lost or transferred</h4>
             ${txnsHtml}
           </div>
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 12px;">
           <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:8px; padding:14px;">
-            <h4 style="font-size:0.88rem; font-weight:700; color:#1e293b; margin-bottom:10px; border-bottom:1px solid #f1f5f9; padding-bottom:4px;">Verified Standardized Narrative</h4>
+            <h4 style="font-size:0.88rem; font-weight:700; color:#1e293b; margin-bottom:10px; border-bottom:1px solid #f1f5f9; padding-bottom:4px;">Complaint summary</h4>
             <div style="background:#f8fafc; border:1px solid #e2e8f0; border-radius:6px; padding:10px; font-size:0.82rem; line-height:1.5; color:#334155; max-height:140px; overflow-y:auto;">
               ${escapeHtml(c.narrative || c.raw_complaint || 'No formal narrative recorded.')}
             </div>
           </div>
 
           <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:8px; padding:14px;">
-            <h4 style="font-size:0.88rem; font-weight:700; color:#1e293b; margin-bottom:10px; border-bottom:1px solid #f1f5f9; padding-bottom:4px;">Suspect / Syndicate Trace</h4>
+            <h4 style="font-size:0.88rem; font-weight:700; color:#1e293b; margin-bottom:10px; border-bottom:1px solid #f1f5f9; padding-bottom:4px;">Person or account mentioned</h4>
             ${suspectsHtml}
           </div>
 
           <div style="background:#ffffff; border:1px solid #e2e8f0; border-radius:8px; padding:14px;">
-            <h4 style="font-size:0.88rem; font-weight:700; color:#1e293b; margin-bottom:10px; border-bottom:1px solid #f1f5f9; padding-bottom:4px;">Investigation &amp; Adjudication Actions</h4>
+            <h4 style="font-size:0.88rem; font-weight:700; color:#1e293b; margin-bottom:10px; border-bottom:1px solid #f1f5f9; padding-bottom:4px;">Review actions</h4>
             <div style="display: flex; gap: 6px; flex-wrap: wrap;">
               <button type="button" class="btn-table-action" style="background:#22c55e; color:#fff; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;" onclick="adjudicateCase('${escapeHtml(c.reference)}', 'CONFIRM')">
-                ✓ Confirm Offence
+                ✓ Confirm suggested type
               </button>
               <button type="button" class="btn-table-action" style="background:#3b82f6; color:#fff; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;" onclick="generateStatutoryNotice('${escapeHtml(c.reference)}', 'BANK_FREEZE_NOTICE')">
-                🏦 Sec 91 BNSS Bank Freeze
+                🏦 Draft bank request
               </button>
               <button type="button" class="btn-table-action" style="background:#6366f1; color:#fff; border:none; padding:6px 12px; border-radius:6px; cursor:pointer;" onclick="generateStatutoryNotice('${escapeHtml(c.reference)}', 'TELECOM_CDR_NOTICE')">
-                📱 Sec 91 BNSS CDR Order
+                📱 Draft phone-record request
               </button>
             </div>
           </div>
@@ -1555,10 +1569,10 @@ async function inspectCaseDetail(caseRef) {
 
     modalFooter.innerHTML = `
       <div style="display: flex; justify-content: space-between; width: 100%; align-items: center;">
-        <span style="font-size: 0.85rem; color: #64748b;">Status: <strong>${escapeHtml(c.status || 'PENDING')}</strong></span>
+        <span style="font-size: 0.85rem; color: #64748b;">Status: <strong>${escapeHtml(formatCaseStatus(c.status))}</strong></span>
         <div style="display: flex; gap: 10px;">
           <a href="${pdfUrl}" target="_blank" class="btn-download-pdf-clean" style="text-decoration:none; padding: 6px 14px; font-size:0.82rem; font-weight:600; display:inline-flex; align-items:center; gap:6px;">
-            📄 Download Official FIR PDF
+            📄 Download complaint draft
           </a>
           <button type="button" class="btn-inspect-case" onclick="document.getElementById('modal-case-inspector').style.display='none'">
             Close
@@ -1583,17 +1597,17 @@ async function adjudicateCase(caseRef, action) {
         officer_note: "Verified by Investigating Officer via Module F Console."
       })
     });
-    if (!res.ok) throw new Error("Adjudication failed");
-    showToast(`✓ Case ${caseRef} confirmed under statutory sections.`);
+    if (!res.ok) throw new Error("Could not save the review");
+    showToast(`Review saved for ${caseRef}.`);
     inspectCaseDetail(caseRef);
     loadDashboardCases();
   } catch (err) {
-    showToast("Adjudication error: " + err.message);
+    showToast("Could not save review: " + err.message);
   }
 }
 
 async function generateStatutoryNotice(caseRef, docType) {
-  showToast(`Generating statutory notice under Section 91 BNSS 2023...`);
+  showToast("Preparing document draft...");
   try {
     const res = await fetch('/api/cases/generate_statutory_doc', {
       method: 'POST',
@@ -1618,7 +1632,7 @@ async function generateStatutoryNotice(caseRef, docType) {
     a.click();
     a.remove();
     window.URL.revokeObjectURL(url);
-    showToast(`✓ Statutory Notice generated & downloaded.`);
+    showToast("Document draft downloaded.");
   } catch (err) {
     showToast("Notice generation error: " + err.message);
   }

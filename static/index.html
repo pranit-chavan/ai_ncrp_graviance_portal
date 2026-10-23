@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CyberAssist — AI-Powered Cybercrime Complaint Assistant</title>
-  <meta name="description" content="CyberAssist: AI-Powered Cybercrime Complaint Assistant with voice conversation, manual form intake, draft review, and Scikit-Learn classification.">
+  <title>CyberAssist — Complaint preparation prototype</title>
+  <meta name="description" content="An independent prototype for preparing and reviewing cybercrime complaint drafts.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -31,19 +31,19 @@
       <!-- Quick Screen Navigator (for Mentor Presentation Demo) -->
       <nav class="flow-stepper-nav" aria-label="Workflow Navigation">
         <button type="button" class="stepper-tab-btn active" data-target="page-choose-mode" id="tab-btn-3">
-          <span class="tab-num">3</span> Choose Mode
+          <span class="tab-num">1</span> Start
         </button>
         <button type="button" class="stepper-tab-btn" data-target="page-voice" id="tab-btn-4">
-          <span class="tab-num">4</span> Voice Copilot
+          <span class="tab-num">2</span> Speak or type
         </button>
         <button type="button" class="stepper-tab-btn" data-target="page-manual" id="tab-btn-5">
-          <span class="tab-num">5</span> Manual Form
+          <span class="tab-num">3</span> Add details
         </button>
         <button type="button" class="stepper-tab-btn" data-target="page-review" id="tab-btn-6">
-          <span class="tab-num">6</span> Draft Review
+          <span class="tab-num">4</span> Check draft
         </button>
         <button type="button" class="stepper-tab-btn" data-target="page-result" id="tab-btn-7">
-          <span class="tab-num">7</span> Classification
+          <span class="tab-num">5</span> Suggested type
         </button>
       </nav>
 
@@ -60,10 +60,6 @@
           🔊 Test Voice
         </button>
 
-        <!-- User Profile Avatar -->
-        <div class="user-avatar-badge" title="Logged in as Pranit Chavan">
-          <span>P</span>
-        </div>
       </div>
     </div>
   </header>
@@ -76,27 +72,11 @@
       <nav class="sidebar-menu">
         <a href="#" class="sidebar-link" id="nav-dashboard">
           <span class="link-icon">📊</span>
-          <span class="link-text">Dashboard</span>
+          <span class="link-text">Case review</span>
         </a>
         <a href="#" class="sidebar-link active" id="nav-report">
           <span class="link-icon">🛡️</span>
-          <span class="link-text">Report Cybercrime</span>
-        </a>
-        <a href="#" class="sidebar-link" id="nav-complaints">
-          <span class="link-icon">📁</span>
-          <span class="link-text">My Complaints</span>
-        </a>
-        <a href="#" class="sidebar-link" id="nav-withdraw">
-          <span class="link-icon">↩️</span>
-          <span class="link-text">Withdraw Complaint</span>
-        </a>
-        <a href="#" class="sidebar-link" id="nav-profile">
-          <span class="link-icon">👤</span>
-          <span class="link-text">Profile</span>
-        </a>
-        <a href="#" class="sidebar-link" id="nav-help">
-          <span class="link-icon">❓</span>
-          <span class="link-text">Help &amp; Guidelines</span>
+          <span class="link-text">Prepare a complaint</span>
         </a>
       </nav>
 
@@ -119,8 +99,8 @@
       <!-- ================================================================= -->
       <section class="screen-view active" id="page-choose-mode">
         <div class="screen-header">
-          <h1 class="screen-title">Report Cybercrime</h1>
-          <p class="screen-subtitle">Choose how you want to provide the details.</p>
+          <h1 class="screen-title">Prepare a complaint</h1>
+          <p class="screen-subtitle">Choose whether to speak or fill in the details yourself.</p>
         </div>
 
         <!-- 2 Big Choice Cards -->
@@ -136,10 +116,10 @@
                 <line x1="8" y1="23" x2="16" y2="23"/>
               </svg>
             </div>
-            <h2 class="mode-card-title">Speak to AI Assistant</h2>
-            <p class="mode-card-desc">Have a natural conversation. Our AI will ask questions and fill the details.</p>
+            <h2 class="mode-card-title">Speak with the assistant</h2>
+            <p class="mode-card-desc">Tell us what happened. The assistant may ask a few follow-up questions.</p>
             <button type="button" class="btn-primary-card" id="btn-start-voice">
-              Start Voice Conversation &rarr;
+              Start speaking &rarr;
             </button>
           </div>
 
@@ -159,10 +139,10 @@
                 <line x1="7" y1="16" x2="17" y2="16"/>
               </svg>
             </div>
-            <h2 class="mode-card-title">Type Manually</h2>
+            <h2 class="mode-card-title">Fill in the details</h2>
             <p class="mode-card-desc">Fill the complaint form manually at your own pace.</p>
             <button type="button" class="btn-outline-card" id="btn-start-manual">
-              Open Manual Form &rarr;
+              Fill in details &rarr;
             </button>
           </div>
 
@@ -184,12 +164,12 @@
             <div class="stepper-divider"></div>
             <div class="stepper-step">
               <div class="step-num-badge">3</div>
-              <div class="step-text">Get Classification<br><span class="step-sub">(using ML model)</span></div>
+              <div class="step-text">See suggested type<br><span class="step-sub">Review before saving</span></div>
             </div>
             <div class="stepper-divider"></div>
             <div class="stepper-step">
               <div class="step-num-badge">4</div>
-              <div class="step-text">Save &amp; Track<br><span class="step-sub">Your Complaint</span></div>
+              <div class="step-text">Save a copy<br><span class="step-sub">Keep the reference number</span></div>
             </div>
           </div>
         </div>
@@ -234,8 +214,8 @@
             <div class="urgent-alert-banner" id="banner-urgency" style="display: none;">
               <div class="urgent-banner-icon">🚨</div>
               <div class="urgent-banner-text">
-                <strong id="banner-urgency-title">Active Financial Cyber Fraud Detected!</strong>
-                <p id="banner-urgency-body">Call <strong>1930</strong> immediately to freeze the beneficiary account! We are compiling your complaint draft in parallel.</p>
+                <strong id="banner-urgency-title">Possible recent financial loss</strong>
+                <p id="banner-urgency-body">Call <strong>1930</strong> promptly and contact your bank using its official app or phone number. This prototype cannot stop a payment.</p>
               </div>
             </div>
 
@@ -243,7 +223,7 @@
             <div class="reconcile-alert-banner" id="banner-reconcile" style="display: none;">
               <div class="reconcile-banner-icon">⚠️</div>
               <div class="reconcile-banner-content">
-                <div class="reconcile-title">Evidence Discrepancy Flagged (Module C)</div>
+                <div class="reconcile-title">The screenshot and your description may differ</div>
                 <div class="reconcile-text" id="reconcile-msg">Receipt indicates ₹50,000, while ₹5,000 was stated in dialogue.</div>
                 <div class="reconcile-btn-row">
                   <button type="button" class="btn-reconcile-opt" id="btn-reconcile-ocr">Use Receipt (₹50,000)</button>
@@ -386,7 +366,7 @@
           <div class="header-with-badge">
             <span class="form-icon-circle">📝</span>
             <div>
-              <h1 class="screen-title">Report Cybercrime (Manual Form)</h1>
+              <h1 class="screen-title">Add complaint details</h1>
               <p class="screen-subtitle">Fill in the details of the incident.</p>
             </div>
           </div>
@@ -499,7 +479,7 @@
             </div>
 
             <div class="field-group">
-              <label class="field-label">Complainant Age <span class="field-hint">(POCSO triggers if &lt; 18)</span></label>
+              <label class="field-label">Age of person affected <span class="field-hint">(optional)</span></label>
               <input type="number" class="field-input" id="man-age" placeholder="e.g. 25" min="1" max="120" value="25">
             </div>
           </div>
@@ -527,7 +507,7 @@
             </div>
 
             <div class="field-group">
-              <label class="field-label">Evidence Upload <span class="field-hint">(Triggers Module C OCR)</span></label>
+              <label class="field-label">Add screenshots or documents <span class="field-hint">(optional)</span></label>
               <input type="file" class="field-input" id="man-evidence-file" accept="image/*">
             </div>
           </div>
@@ -698,8 +678,8 @@
         <div class="result-success-banner">
           <div class="success-icon-badge">✓</div>
           <div>
-            <h1 class="result-banner-title">Complaint Draft Confirmed</h1>
-            <p class="result-banner-subtitle">Your complaint has been processed using our trained machine learning model.</p>
+            <h1 class="result-banner-title">Your draft is ready to review</h1>
+            <p class="result-banner-subtitle">Check the details and suggested incident type before saving or downloading it.</p>
           </div>
         </div>
 
@@ -711,7 +691,7 @@
             
             <div class="result-header-row">
               <div>
-                <div class="result-lbl">Predicted Category</div>
+                <div class="result-lbl">Suggested incident type</div>
                 <div class="category-badge-pill" id="res-category-badge">
                   <span class="shield-tag">🛡️</span>
                   <span id="res-predicted-category">Online Financial Fraud</span>
@@ -721,7 +701,7 @@
 
               <!-- Confidence Score Radial / Box -->
               <div class="confidence-box">
-                <div class="conf-lbl">Confidence Score</div>
+                <div class="conf-lbl">Suggested match (estimate)</div>
                 <div class="conf-val-large" id="res-confidence-val">92%</div>
                 <div class="conf-bar-track">
                   <div class="conf-bar-fill" id="res-confidence-bar" style="width: 92%;"></div>
@@ -729,9 +709,9 @@
               </div>
             </div>
 
-            <!-- Decision Margin & Model Info -->
+            <!-- Model details retained for the script, hidden from the user-facing result. -->
             <div class="model-meta-row">
-              <span class="meta-item">LinearSVC Decision Margin: <strong id="res-margin-val">+1.842</strong></span>
+              <span class="meta-item">Model details: <strong id="res-margin-val">—</strong></span>
               <span class="meta-item">Runner-Up: <span id="res-runner-up">None</span></span>
             </div>
 
@@ -747,10 +727,9 @@
             <!-- Statutory Legal Sections -->
             <!-- Statutory Penal Provisions -->
             <div class="statutory-sections-box">
-              <div class="statutory-lbl">Applicable Penal Code Provisions (BNS 2023 &amp; IT Act):</div>
+              <div class="statutory-lbl">Possible legal references (please verify):</div>
               <div class="statute-tags-flex" id="res-statute-tags">
-                <span class="statute-tag">Section 318(4) BNS 2023 (Cheating)</span>
-                <span class="statute-tag">Section 66D IT Act 2000 (Impersonation)</span>
+                No legal references returned yet.
               </div>
             </div>
 
@@ -758,13 +737,13 @@
             <div class="routing-destination-box">
               <div class="routing-box-header">
                 <span class="police-icon">🚓</span>
-                <span class="routing-title">Law Enforcement Jurisdiction &amp; Routing</span>
+                <span class="routing-title">Local contact information (if available)</span>
               </div>
               <div class="routing-details-body">
-                <div class="routing-dest-name" id="res-routing-station">Cyber Crime Police Station Bandra Kurla Complex (BKC), Mumbai Police</div>
-                <div class="routing-dest-addr" id="res-routing-address">BKC Police Station Bldg, Bandra Kurla Complex, Bandra (East), Mumbai - 400051</div>
+                <div class="routing-dest-name" id="res-routing-station">No local contact information available.</div>
+                <div class="routing-dest-addr" id="res-routing-address"></div>
                 <div class="routing-meta-tags">
-                  <span class="meta-pill" id="res-routing-officer">Officer: DCP Cyber Crime</span>
+                  <span class="meta-pill" id="res-routing-officer">Contact: not provided</span>
                   <span class="meta-pill" id="res-routing-helpline">Helpline: 1930</span>
                 </div>
               </div>
@@ -783,11 +762,11 @@
               </li>
               <li>
                 <span class="step-check">✓</span>
-                <span>You can submit it on the official NCRP portal if you wish.</span>
+                <span>To report officially, use the official NCRP website separately. This app does not submit reports.</span>
               </li>
               <li>
                 <span class="step-check">✓</span>
-                <span>Track it in 'My Complaints'.</span>
+                <span>Keep the reference number to find this saved record later.</span>
               </li>
               <li>
                 <span class="step-check">✓</span>
@@ -816,45 +795,45 @@
         <div class="dashboard-header-banner">
           <div>
             <div class="dash-badges-row">
-              <span class="badge-police-portal">🛡️ Official Police Portal</span>
-              <span class="badge-live-stream">● I4C / 1930 Live Queue</span>
+              <span class="badge-police-portal">Independent prototype</span>
+              <span class="badge-live-stream">Local records only</span>
             </div>
-            <h1 class="dash-main-title">Cybercrime Case Management &amp; Dispatch</h1>
-            <p class="dash-main-sub">National Cyber Crime Reporting Portal (NCRP) Officer Adjudication Console</p>
+            <h1 class="dash-main-title">Review complaint records</h1>
+            <p class="dash-main-sub">Records saved in this prototype. This is not connected to police or NCRP systems.</p>
           </div>
           <div class="dash-actions">
-            <button type="button" class="btn-refresh-cases" id="btn-refresh-cases">🔄 Refresh Queue</button>
+            <button type="button" class="btn-refresh-cases" id="btn-refresh-cases">Refresh records</button>
           </div>
         </div>
 
         <!-- 4 Metric Cards -->
         <div class="dash-metrics-grid">
           <div class="dash-metric-card">
-            <div class="metric-lbl">Total Registered Cases</div>
-            <div class="metric-num" id="stat-total-cases">28</div>
-            <div class="metric-sub">Across 21 NCRP Sub-Categories</div>
+            <div class="metric-lbl">Saved records</div>
+            <div class="metric-num" id="stat-total-cases">0</div>
+            <div class="metric-sub">On this computer</div>
           </div>
           <div class="dash-metric-card metric-urgent">
-            <div class="metric-lbl">Golden Hour / Urgent Cases</div>
-            <div class="metric-num text-danger" id="stat-golden-hour">7</div>
-            <div class="metric-sub">&lt; 24h Bank Freeze Requisitions</div>
+            <div class="metric-lbl">Urgent cases to review</div>
+            <div class="metric-num text-danger" id="stat-golden-hour">0</div>
+            <div class="metric-sub">Suggested by the app</div>
           </div>
           <div class="dash-metric-card">
-            <div class="metric-lbl">Total Disputed Loss (INR)</div>
-            <div class="metric-num text-primary" id="stat-total-loss">₹ 4,85,000</div>
-            <div class="metric-sub">Aggregated financial fraud value</div>
+            <div class="metric-lbl">Possible reported loss</div>
+            <div class="metric-num text-primary" id="stat-total-loss">₹ 0</div>
+            <div class="metric-sub">From saved records</div>
           </div>
           <div class="dash-metric-card">
-            <div class="metric-lbl">Pending Review</div>
-            <div class="metric-num text-warning" id="stat-pending-cases">12</div>
-            <div class="metric-sub">Awaiting Officer Adjudication</div>
+            <div class="metric-lbl">Needs review</div>
+            <div class="metric-num text-warning" id="stat-pending-cases">0</div>
+            <div class="metric-sub">Based on saved status</div>
           </div>
         </div>
 
         <!-- Filter & Search Bar -->
         <div class="dash-filter-bar">
           <div class="search-input-wrapper">
-            <input type="text" id="dash-search-input" class="dash-search-input" placeholder="Search by Case Ref, Complainant, Bank, UTR...">
+            <input type="text" id="dash-search-input" class="dash-search-input" placeholder="Search reference, person, or incident type">
           </div>
           <select id="dash-category-filter" class="dash-select-filter">
             <option value="">All Categories</option>
@@ -864,7 +843,7 @@
           </select>
           <select id="dash-urgency-filter" class="dash-select-filter">
             <option value="">All Priorities</option>
-            <option value="EMERGENCY_GOLDEN_HOUR">Golden Hour (&lt; 24h)</option>
+            <option value="EMERGENCY_GOLDEN_HOUR">Urgent (recent financial loss)</option>
             <option value="HIGH">High Priority</option>
             <option value="STANDARD">Standard Priority</option>
           </select>
@@ -873,22 +852,22 @@
         <!-- Cases Queue Table -->
         <div class="dash-table-card">
           <div class="dash-table-header">
-            <h3 class="table-card-title">Active Complaint Queue</h3>
-            <span class="table-counter-badge" id="dash-table-count">Showing 28 cases</span>
+            <h3 class="table-card-title">Saved complaints</h3>
+            <span class="table-counter-badge" id="dash-table-count">Showing 0 records</span>
           </div>
           <div class="table-responsive">
             <table class="dash-table" id="dash-cases-table">
               <thead>
                 <tr>
-                  <th>Case Ref</th>
-                  <th>Incident Date</th>
-                  <th>Complainant</th>
-                  <th>Predicted Sub-Category</th>
-                  <th>Designated Police Station</th>
-                  <th>Loss (INR)</th>
-                  <th>Urgency</th>
+                  <th>Reference</th>
+                  <th>Date</th>
+                  <th>Person reporting</th>
+                  <th>Suggested incident type</th>
+                  <th>Local area</th>
+                  <th>Possible reported loss</th>
+                  <th>Review priority</th>
                   <th>Status</th>
-                  <th>Action</th>
+                  <th>View</th>
                 </tr>
               </thead>
               <tbody id="dash-cases-tbody">
