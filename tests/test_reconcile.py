@@ -32,8 +32,8 @@ class TestReconciliationCore(unittest.TestCase):
         self.assertIn("Details confirmed from attached evidence", res["merged_text"])
         self.assertIn("high", res["confidence_note"].lower())
 
-    def test_amount_conflict_ocr_wins(self):
-        """When typed text says 40000 but OCR screenshot proves 42,000."""
+    def test_amount_conflict_requires_confirmation(self):
+        """When typed text and OCR disagree, preserve both and ask for confirmation."""
         typed = "paise gaye account se around 40000"
         ocr = {
             "amount": "Rs. 42,000",
@@ -47,7 +47,7 @@ class TestReconciliationCore(unittest.TestCase):
         self.assertEqual(conflict["field"], "amount")
         self.assertEqual(conflict["ocr_value"], "Rs. 42,000")
         self.assertIn("40000", conflict["typed_mentions"])
-        self.assertIn("OCR value used", conflict["resolution"])
+        self.assertIn("must confirm", conflict["resolution"])
         self.assertIn("disagree", res["confidence_note"].lower())
 
     def test_devanagari_numerals_normalization(self):

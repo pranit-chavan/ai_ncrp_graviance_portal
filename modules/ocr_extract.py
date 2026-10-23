@@ -73,8 +73,9 @@ PATTERNS = {
     },
     "transaction_ref": {
         # UTR / RRN / txn id - 12 to 22 digits, or an alphanumeric reference
-        "re": re.compile(r"\b(?:UTR|RRN|Txn|Transaction|Ref(?:erence)?)[\s:.#]*"
-                         r"([A-Z0-9]{8,25})\b", re.I),
+        "re": re.compile(r"\b(?:UTR|RRN|Txn|Transaction|Ref(?:erence)?)"
+                         r"(?:\s+(?:ID|No\.?|Number|Ref(?:erence)?))?[\s:.#-]*"
+                         r"([A-Z0-9][A-Z0-9-]{7,24})\b", re.I),
         "label": "Transaction reference",
     },
     "phone": {
@@ -112,7 +113,7 @@ PATTERNS = {
 # Platform names worth recording. Presence of these in a screenshot is a strong
 # signal for the classifier and useful context for the officer.
 PLATFORMS = [
-    "PhonePe", "Google Pay", "GPay", "Paytm", "BHIM", "Amazon Pay", "Mobikwik",
+    "PhonePe", "Google Pay", "GPay", "Paytm", "BHIM", "UPI", "Amazon Pay", "Mobikwik",
     "WhatsApp", "Telegram", "Instagram", "Facebook", "Snapchat",
     "SBI", "HDFC", "ICICI", "Axis", "Kotak", "PNB", "Bank of Baroda", "Canara",
     "Naukri", "LinkedIn", "Shine", "Indeed",

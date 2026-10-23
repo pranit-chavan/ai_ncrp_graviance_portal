@@ -13,6 +13,7 @@ Verifies that all 7 new modules function cohesively:
 
 import os
 import sys
+import tempfile
 import unittest
 from datetime import date
 
@@ -84,9 +85,10 @@ class TestNCRPv2System(unittest.TestCase):
         session = AgentSession(user_profile=self.user_profile)
         res = session.process_input(self.sample_speech)
         self.assertEqual(res["status"], "READY_FOR_SUBMISSION")
-        case = session.submit_complaint(output_dir="case_files")
-        self.assertTrue(case["reference"].startswith("NCRP/"))
-        self.assertTrue(os.path.exists(case["json_path"]))
+        with tempfile.TemporaryDirectory() as output_dir:
+            case = session.submit_complaint(output_dir=output_dir)
+            self.assertTrue(case["reference"].startswith("CASE/"))
+            self.assertTrue(os.path.exists(case["json_path"]))
 
     def test_06_pattern_engine(self):
         test_db = "test_system_index.db"

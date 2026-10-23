@@ -548,7 +548,11 @@ def select_next_question(
                 "utr"
             )
 
-    if not docket.get("date_time_of_incident") and "incident_time" not in unknown_fields and retry_counts.get("incident_time", 0) < 2:
+    should_ask_incident_time = is_financial or bool(docket.get("suspect_details"))
+    if (should_ask_incident_time
+            and not docket.get("date_time_of_incident")
+            and "incident_time" not in unknown_fields
+            and retry_counts.get("incident_time", 0) < 2):
         if retry_counts.get("incident_time", 0):
             question = "I didn’t catch the date or time. When did the incident happen? An approximate date and time is fine."
         elif is_financial:

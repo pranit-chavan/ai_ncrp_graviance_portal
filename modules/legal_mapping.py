@@ -133,6 +133,16 @@ def map_sections(sub_category, complainant_age=None):
             f"Known categories: {len(CATEGORIES)}. Check the classifier label matches exactly."
         )
 
+    # Case files use a plain-language sentinel for missing form values. Treat
+    # that and other non-numeric values as unknown rather than crashing while
+    # evaluating age-dependent safeguards.
+    try:
+        normalized_age = int(str(complainant_age).strip()) if complainant_age is not None else None
+        if normalized_age is not None and not 0 <= normalized_age <= 120:
+            normalized_age = None
+    except (TypeError, ValueError):
+        normalized_age = None
+
     entry = _MAP[sub_category]
 
     result = {
@@ -167,32 +177,32 @@ def map_sections(sub_category, complainant_age=None):
         applies = False
 
         if cond == "complainant_age < 18":
-            if complainant_age is None:
+            if normalized_age is None:
                 result["conditional_applied"].append({
                     "rule": cond,
                     "status": "NOT EVALUATED - complainant_age was not supplied",
                     "action": "Confirm the complainant's age; mandatory child protection provisions (POCSO / IT Act 67B) apply if minor.",
                 })
                 continue
-            applies = int(complainant_age) < 18
+            applies = normalized_age < 18
 
         if applies:
             result["other"].extend(rule["add"])
             result["conditional_applied"].append({
                 "rule": cond,
                 "status": "APPLIED",
-                "reason": f"complainant_age = {complainant_age}",
+                "reason": f"complainant_age = {normalized_age}",
                 "note": rule.get("note", ""),
             })
         else:
             result["conditional_applied"].append({
                 "rule": cond,
                 "status": "not applicable",
-                "reason": f"complainant_age = {complainant_age}",
+                "reason": f"complainant_age = {normalized_age}",
             })
 
     # Universal child complainant protection safeguard (Section 19 POCSO Act 2012)
-    if complainant_age is not None and int(complainant_age) < 18:
+    if normalized_age is not None and normalized_age < 18:
         if not any("POCSO" in s.get("act", "") for s in result["other"]):
             result["other"].append({
                 "act": "POCSO Act 2012",
@@ -202,7 +212,7 @@ def map_sections(sub_category, complainant_age=None):
             result["conditional_applied"].append({
                 "rule": "complainant_age < 18",
                 "status": "APPLIED",
-                "reason": f"complainant_age = {complainant_age}",
+                "reason": f"complainant_age = {normalized_age}",
                 "note": "Section 19 POCSO Act mandatory reporting protocol triggered for minor victim."
             })
 

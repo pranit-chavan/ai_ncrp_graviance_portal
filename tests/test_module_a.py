@@ -460,17 +460,17 @@ class TestConversationalIntakeUnknownAnswers(unittest.TestCase):
     def test_gemini_reply_is_used_when_it_passes_guards(self):
         with patch(
             "modules.conversational_agent.gemini_generate_content",
-            return_value='{"reply": "Hello. Could you describe what happened?"}',
+            return_value='{"reply": "I can help with that."}',
         ):
             result = conduct_counselor_turn(
                 "hello hello", [], current_docket={}, language="en"
             )
 
         self.assertTrue(result["llm_used"])
-        self.assertEqual(
-            result["spoken_response"],
-            "Hello. Could you describe what happened?",
-        )
+        self.assertTrue(result["spoken_response"].endswith(
+            "Could you please describe what cyber incident happened or what problem you are facing?"
+        ))
+        self.assertEqual(result["spoken_response"].count("?"), 1)
 
     def test_impersonation_requesting_money_does_not_assume_victim_loss(self):
         complaint = (

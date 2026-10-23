@@ -93,6 +93,11 @@ class TestLegalMappingAudit(unittest.TestCase):
         res = map_sections("Cyber Bullying / Stalking / Sexting", complainant_age=None)
         self.assertTrue(res["conditional_applied"][0]["status"].startswith("NOT EVALUATED"))
 
+    def test_pocso_conditional_unknown_age_sentinel(self):
+        """Plain-language missing-age sentinels should be handled as unknown."""
+        res = map_sections("Cyber Bullying / Stalking / Sexting", complainant_age="not supplied")
+        self.assertTrue(res["conditional_applied"][0]["status"].startswith("NOT EVALUATED"))
+
     def test_unknown_category_raises(self):
         """Verify UnknownCategory exception is raised for invalid category name."""
         with self.assertRaises(UnknownCategory):

@@ -282,7 +282,7 @@ def _run_self_test() -> bool:
 
     # Test Submission
     case = session.submit_complaint()
-    assert case["reference"].startswith("NCRP/")
+    assert case["reference"].startswith("CASE/")
     assert os.path.exists(case["json_path"])
     print(f"  [PASS] Final Submission: Case file created at '{case['json_path']}'.")
     return True
