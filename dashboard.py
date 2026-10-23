@@ -37,6 +37,7 @@ import streamlit as st
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from modules import investigator_store
+from modules.ocr_extract import format_entity_reading
 
 CASE_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "case_files")
 INVESTIGATOR_INBOX_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "investigator_inbox")
@@ -1492,8 +1493,11 @@ def render_step1():
                 if entities:
                     st.markdown("**Details the app found**")
                     st.dataframe(
-                        pd.DataFrame([{"Field": key.replace("_", " ").title(), "OCR reading": value}
-                                      for key, value in entities.items()]),
+                        pd.DataFrame([
+                            {"Field": key.replace("_", " ").title(),
+                             "OCR reading": format_entity_reading(value)}
+                            for key, value in entities.items()
+                        ], columns=["Field", "OCR reading"]),
                         hide_index=True,
                         width="stretch",
                     )

@@ -296,6 +296,26 @@ def extract_from_images(paths, lang="eng"):
     }
 
 
+def format_entity_reading(value):
+    """Return a stable, human-readable string for an OCR entity value.
+
+    OCR results are intentionally multi-valued: a field may be a scalar when
+    one image contains one match, or a list when several images contain
+    different matches. Keep that shape in the extraction pipeline, but flatten
+    it at the presentation boundary so Streamlit/Arrow receives one type.
+    """
+    if value is None:
+        return "Not detected"
+    if isinstance(value, dict):
+        if "value" in value:
+            return format_entity_reading(value["value"])
+        return json.dumps(value, ensure_ascii=False, sort_keys=True, default=str)
+    if isinstance(value, (list, tuple, set)):
+        readings = [format_entity_reading(item) for item in value]
+        return "; ".join(reading for reading in readings if reading != "Not detected") or "Not detected"
+    return str(value)
+
+
 # ---------------------------------------------------------------- self test
 
 SAMPLES = [

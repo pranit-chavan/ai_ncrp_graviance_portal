@@ -6,10 +6,23 @@ import unittest
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from modules.ocr_extract import extract_entities
+from modules.ocr_extract import extract_entities, format_entity_reading
 
 
 class TestOcrEntityExtraction(unittest.TestCase):
+    def test_ocr_readings_format_mixed_scalar_and_list_values_for_tables(self):
+        values = [
+            "4500",
+            ["4500", "9000"],
+            [{"value": "TEST-UPI-001", "confidence": 0.9}],
+            None,
+        ]
+
+        readings = [format_entity_reading(value) for value in values]
+
+        self.assertEqual(readings, ["4500", "4500; 9000", "TEST-UPI-001", "Not detected"])
+        self.assertTrue(all(isinstance(reading, str) for reading in readings))
+
     def test_transaction_reference_label_is_not_captured_as_the_value(self):
         text = "Transaction reference TEST-UPI-20261015-001"
 
