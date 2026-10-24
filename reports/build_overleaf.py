@@ -24,6 +24,12 @@ TABLE_CAPTIONS = {
     "Data": "Data persistence overview",
     "Area": "Repository-level evaluation findings",
     "Risk": "Risk and mitigation summary",
+    "User role": "Project user roles and outputs",
+    "Component": "Hardware requirements",
+    "Software / library": "Software and library requirements",
+    "Split scheme": "Dataset distribution for training, validation, and testing",
+    "Evaluation scheme": "Reported classifier performance parameters",
+    "Test area": "Test cases and test results",
 }
 
 
@@ -93,7 +99,7 @@ PREAMBLE = r"""\documentclass[12pt,a4paper,oneside]{report}
 \setlength{\parskip}{0pt}
 \setstretch{1.08}
 \setcounter{secnumdepth}{3}
-\setcounter{tocdepth}{2}
+\setcounter{tocdepth}{3}
 \setlist[enumerate]{leftmargin=1.1cm,itemsep=2pt,topsep=3pt}
 \setlist[itemize]{leftmargin=1.1cm,itemsep=2pt,topsep=3pt}
 \titleformat{\chapter}[hang]{\normalfont\Large\bfseries}{\thechapter}{0.7em}{}
@@ -239,19 +245,24 @@ def section_body(lines: list[str]) -> str:
                 chapter_title = title.split(". ", 1)[1] if ". " in title else title
                 output.append(r"\clearpage\chapter{" + escape_tex(chapter_title) + "}")
                 first_chapter = True
-            elif title.startswith("Appendix "):
+            elif title.startswith(("Appendix ", "Annexure ")):
                 output.append(r"\clearpage\chapter*{" + escape_tex(title) + r"}\addcontentsline{toc}{chapter}{" + escape_tex(title) + "}")
             elif title == "References":
                 output.append(r"\clearpage\chapter*{References}\addcontentsline{toc}{chapter}{References}")
             i += 1
             continue
-        if line.startswith("## ") or line.startswith("### "):
+        if line.startswith(("## ", "### ", "#### ")):
             if list_env:
                 output.append(r"\end{" + list_env + "}")
                 list_env = None
-            match = re.match(r"#{2,3}\s+(?:\d+(?:\.\d+)*\s+)?(.*)", line)
+            match = re.match(r"#{2,4}\s+(?:\d+(?:\.\d+)*\s+)?(.*)", line)
             title = escape_tex(match.group(1) if match else line.lstrip("# "))
-            command = r"\section" if line.startswith("## ") else r"\subsection"
+            if line.startswith("#### "):
+                command = r"\subsubsection"
+            elif line.startswith("### "):
+                command = r"\subsection"
+            else:
+                command = r"\section"
             output.append(command + "{" + title + "}")
             i += 1
             continue
@@ -280,7 +291,7 @@ def section_body(lines: list[str]) -> str:
             paragraph.append(lines[i].strip())
             i += 1
         text = " ".join(paragraph)
-        caption_match = re.match(r"\*\*Figure\s+\d+\.\*\*\s*(.*)", text)
+        caption_match = re.match(r"\*\*Figure\s+\d+(?:\.\d+)*\.\*\*\s*(.*)", text)
         if caption_match:
             output.append(r"\captionof{figure}{" + inline(caption_match.group(1)) + "}")
         else:

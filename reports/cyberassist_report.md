@@ -51,45 +51,42 @@ We thank our project guide, Prof. I. Priyadarshini, for guidance during the proj
 
 # Contents
 
-1. Introduction
-2. Literature Survey
-3. Problem Definition and Scope
-4. Project Plan
-5. Software Requirements Specification
-6. Detailed Design
-7. Results and Discussion
-8. Conclusion and Future Work
-- References
-- Appendix A. Representative API and data flow
-- Appendix B. Limitations and submission checklist
+The generated table of contents below includes all numbered headings in the report. The chapter structure follows the provided 64-page sample; project-specific modules, results, and annexures are adapted to this repository.
 
 # List of Figures
 
-1. Current system architecture
-2. Complaint intake and review workflow
-3. Evidence reconciliation model
+3.1 Complaint intake methodology
+4.1 Iterative project plan
+6.1 System architecture
+6.2 Intake and case review workflow
+6.3 Evidence reconciliation model
 
 # List of Tables
 
-1. Implemented capabilities and boundaries
-2. Functional requirements
-3. Data persistence overview
-4. Repository-level evaluation findings
-5. Risk and mitigation summary
+1.1 Project user roles and outputs
+3.1 Scope and project outcomes
+5.1 Hardware requirements
+5.2 Software and library requirements
+6.1 Data persistence overview
+7.1 Dataset distribution
+7.2 Evaluation values reported by the repository
+7.3 Software validation status
 
 # Chapter 1. Introduction
 
-## 1.1 Background
+## 1.1 Project Idea
 
 Cybercrime complaints can contain several kinds of information in different forms: a person’s narrative, a payment notification, a bank message, a chat screenshot, a voice description, or a transaction identifier. A complainant may not know which details are useful, and investigators need to review the narrative and supporting evidence together. Repeatedly asking for details already visible in an uploaded receipt creates friction and may lead to inconsistent records.
 
 This project addresses the information-collection and organization stage. It combines a guided intake with file-based evidence extraction and a separate investigator review experience. Its purpose is to help a person prepare a more complete, editable draft and to make the captured information easier to inspect. It is not a replacement for official channels or investigator judgment.
 
-## 1.2 Project evolution
+## 1.2 Motivation of the Project
 
-The Phase I report described a proposed NLP-based cybercrime complaint classifier. The current repository has grown into a broader local prototype: it includes a citizen-facing web interface, conversational and manual intake, OCR-based evidence extraction, voice input/transcription paths, case drafting and persistence, and an investigator queue. The report therefore documents the implementation found in the repository, rather than presenting Phase I proposals as completed work.
+The initial Phase I proposal focused on NLP-based complaint classification. Development expanded it into a guided intake and investigator-review workflow because classification alone does not solve the practical problems of collecting a complete account, reading transaction evidence, correcting recognition errors, and ensuring a submitted record can be found by a reviewer. This report documents the current repository rather than presenting proposed Phase I functionality as completed work.
 
 The system currently has two interface paths. FastAPI serves a separate static frontend from `static/`; `dashboard.py` retains the Streamlit application. These frontends share domain modules and service functionality, but they are distinct user interfaces and may not expose precisely identical interactions. The investigator workflow is part of the newer web interface and should be validated independently from the Streamlit view.
+
+The prototype aims to reduce repeated manual entry, use uploaded evidence to populate candidate facts, and preserve a clear handoff from complainant confirmation to investigator review. It is designed for local academic demonstration and does not automatically file reports with public authorities.
 
 ## 1.3 Objectives
 
@@ -108,6 +105,11 @@ The system currently has two interface paths. FastAPI serves a separate static f
 **Investigator or reviewer:** opens records received in the local inbox, checks the narrative and evidence, reviews extraction conflicts and model suggestions, and updates the case workflow.
 
 The terms “complainant” and “investigator” refer to prototype roles and do not imply authenticated real-world identities or official jurisdictional authority.
+
+| User role | Main actions | Output |
+|---|---|---|
+| Complainant | Describe the incident, upload evidence, correct extracted details, review and submit a draft | Structured complaint record and draft document |
+| Investigator / reviewer | Find a local case, inspect narrative and evidence, review suggested fields, update workflow | Locally updated review status and case notes |
 
 # Chapter 2. Literature Survey
 
@@ -143,7 +145,22 @@ The contribution is an integrated prototype workflow that connects intake, class
 
 People reporting a cyber incident may provide incomplete or unstructured descriptions, while useful facts can be contained in screenshots or documents. Existing manual collection can require repeated questions and re-entry. The project seeks to organize these inputs into a reviewable draft and local case record, while making uncertainty and source differences visible.
 
-## 3.2 Scope
+## 3.2 Methodology
+
+The project follows an input–analysis–review–handoff sequence. It collects a narrative and optional evidence, extracts candidate entities, identifies gaps or source conflicts, presents targeted questions, and lets the complainant review the draft. Once submitted, the local case record is made available to the investigator interface. Figure 3.1 summarizes this conceptual method; it describes the implemented workflow and is not a deployment diagram.
+
+**Figure 3.1.** Complaint intake methodology.
+
+```text
+Narrative / manual entry / voice transcript + image or PDF evidence
+                  -> extract and classify candidate information
+                  -> compare sources and identify missing details
+                  -> ask focused follow-up questions
+                  -> complainant reviews and confirms draft
+                  -> local case record -> investigator review
+```
+
+## 3.3 Project Outcomes
 
 | Included in the current repository | Not established by the current repository |
 |---|---|
@@ -155,7 +172,9 @@ People reporting a cyber incident may provide incomplete or unstructured descrip
 | Local investigator review queue and workflow updates | Role-based authentication, authorization, audit controls, or official assignment |
 | Optional configured Gemini/Ollama paths and deterministic fallbacks | Guaranteed LLM availability, correctness, privacy terms, or response consistency |
 
-## 3.3 Assumptions and constraints
+The principal outcome is an integrated academic prototype comprising two user-facing environments, a local API, a complaint classifier, evidence extraction and reconciliation, and local case review. The outcomes are implementation capabilities, not claims of field validation or production readiness.
+
+## 3.4 Assumptions and Constraints
 
 - Evidence is supplied by the user and may be incomplete, unclear, or unrelated.
 - OCR, ASR, and LLM outputs are fallible; the interface should require human confirmation.
@@ -167,11 +186,9 @@ People reporting a cyber incident may provide incomplete or unstructured descrip
 
 # Chapter 4. Project Plan
 
-## 4.1 Development approach
+## 4.1 Team Organization
 
-The project evolved iteratively from the Phase I classification idea toward an end-to-end prototype. Work can be understood in these stages: (1) taxonomy and baseline model, (2) narrative/entity extraction and conversational state, (3) OCR and evidence reconciliation, (4) case-file generation and local persistence, (5) web and Streamlit interfaces, and (6) investigator workflow and integration refinement. This sequence describes implementation evolution; it is not a claim that dated sprint records were present in the reviewed repository.
-
-## 4.2 Team and responsibilities
+### 4.1.1 Team Structure
 
 | Team member | Examination number | Responsibility record |
 |---|---|---|
@@ -180,9 +197,20 @@ The project evolved iteratively from the Phase I classification idea toward an e
 | Yash Kanhe | T231301060 | Team member; specific current module ownership to be confirmed by the team |
 | Chaitanya Mali | T231301074 | Team member; specific current module ownership to be confirmed by the team |
 
-No module ownership is assigned here because the source material does not establish a current responsibility matrix. The team may replace the final column with verified contributions before submission.
+No module ownership is assigned here because the source material does not establish a verified responsibility matrix. The team may replace the final column with approved contributions before submission.
 
-## 4.3 Deliverables
+## 4.2 Project Plan
+
+The project evolved iteratively from the Phase I classification idea toward an end-to-end prototype. Work can be understood in these stages: (1) taxonomy and baseline model, (2) narrative/entity extraction and conversational state, (3) OCR and evidence reconciliation, (4) case-file generation and local persistence, (5) web and Streamlit interfaces, and (6) investigator workflow and integration refinement. Figure 4.1 shows these stages as an ordered plan. It is not a dated Gantt chart because verified sprint dates and effort records were not supplied.
+
+**Figure 4.1.** Iterative project plan.
+
+```text
+Classifier baseline -> Intake and extraction -> Evidence/OCR reconciliation
+          -> Case persistence -> Citizen and investigator interfaces -> Integration refinement
+```
+
+## 4.3 Project Deliverables
 
 - FastAPI application and static frontend source.
 - Retained Streamlit dashboard.
@@ -221,13 +249,43 @@ No module ownership is assigned here because the source material does not establ
 - **Portability:** runs locally with Python and documented dependencies; some capabilities depend on external system packages or model/provider setup.
 - **Performance:** local classification and regex extraction are designed as lightweight operations; actual end-to-end latency depends on hardware, OCR, audio model, and LLM provider and has not been benchmarked here.
 
-## 5.3 Software and hardware environment
+## 5.3 Constraints
 
-The repository specifies Python dependencies for FastAPI, Streamlit, scikit-learn, NumPy, pandas, Pillow, PyMuPDF, pytesseract, and ReportLab. Whisper is optional. A compatible Python installation is required. Tesseract OCR is an external system dependency. Browser speech functionality requires a compatible browser and microphone permission. Optional model-backed conversation requires either a configured Gemini API or an Ollama service and model. A general-purpose development PC with sufficient memory for the selected local audio model is expected; no verified minimum hardware benchmark is supplied.
+- Evidence may be incomplete, unclear, unrelated, or manipulated; OCR does not verify authenticity.
+- OCR, ASR, classifier, and LLM outputs are fallible and require human review.
+- Local storage and the absence of production-grade authentication restrict appropriate use to a controlled environment.
+- Provider-backed functions depend on credentials, network access, or local model services and may be unavailable.
+- The available classifier dataset is generated and cannot establish real-world accuracy.
 
-## 5.4 External interfaces
+## 5.4 Hardware Requirements
 
-The FastAPI application provides HTTP endpoints for health/state, intake analysis, evidence upload/retrieval, audio transcription, chat/session messaging, case submission/import/list/detail/track, workflow changes, benchmark access, taxonomy, document generation, and evidence reconciliation. The static frontend communicates with these endpoints using browser requests. The Streamlit dashboard is a separate UI path. Endpoint availability does not imply connection to any external government or financial institution.
+The repository does not specify a verified minimum hardware configuration or a tested deployment target. Table 5.1 therefore records only the hardware classes implied by implemented functions; exact capacity should be set after measuring the intended installation.
+
+| Component | Requirement or note |
+|---|---|
+| Development / server computer | General-purpose computer able to run the supported Python environment and local web service; minimum CPU/RAM not benchmarked |
+| Client device | Modern desktop or mobile device with a supported browser |
+| Microphone | Optional; needed for browser speech capture |
+| Storage | Local disk for application, SQLite data, uploaded evidence, and generated drafts; capacity depends on usage and retention |
+| GPU | Not required by the TF-IDF/LinearSVC classifier; optional local speech models may have different runtime needs |
+
+## 5.5 Software Requirements
+
+Table 5.2 summarizes software dependencies and their purpose. Exact package pins are maintained in the repository requirements file and should be checked against the selected Python version at installation time.
+
+| Software / library | Purpose | Status or external dependency |
+|---|---|---|
+| Python, FastAPI, Uvicorn | API and application runtime | Required |
+| HTML, CSS, JavaScript | Standalone browser frontend | Served locally by the application |
+| Streamlit | Retained dashboard interface | Required for Streamlit path |
+| scikit-learn, NumPy, pandas | Text classification and data operations | Required by classifier path |
+| Pillow, PyMuPDF, pytesseract, Tesseract | Image/PDF processing and OCR | Tesseract executable must be installed separately |
+| ReportLab | Draft PDF generation | Required for PDF output path |
+| Browser SpeechRecognition API | Live speech-to-text where supported | Browser support and microphone permission required |
+| Whisper | Optional audio transcription | Optional package, model assets, and compatible runtime |
+| Gemini API or Ollama | Optional conversational model provider | Requires valid provider configuration or local service |
+
+## 5.6 Interfaces
 
 # Chapter 6. Detailed Design
 
@@ -259,7 +317,9 @@ FastAPI service --> conversation / gap logic     OCR / PDF text
 
 **Figure 1.** Current conceptual architecture derived from repository code. The Streamlit dashboard remains as a second interface path.
 
-## 6.2 Intake workflow
+## 6.2 Overview of Project Modules
+
+### 6.2.1 Data Collection and Intake Module
 
 1. A complainant starts a session and gives an incident description through text, voice-derived text, or the manual form.
 2. The intake logic extracts known details and evaluates what important information is missing.
@@ -272,7 +332,7 @@ FastAPI service --> conversation / gap logic     OCR / PDF text
 
 **Figure 2.** Complaint intake and review workflow.
 
-## 6.3 Evidence extraction and reconciliation
+### 6.2.2 Image Evidence Processing and OCR Module
 
 OCR is performed through Tesseract for supported images; PDF pages are made available to the extraction path through PyMuPDF. Regular expressions and known-name lists identify candidate amount, UTR/RRN/transaction reference, phone number, date, time, UPI ID, email, masked ID, bank, payment app, or platform. Candidates carry a value and a heuristic confidence field. This confidence indicates extraction plausibility, not a calibrated probability that the OCR is correct.
 
@@ -295,19 +355,19 @@ OCR candidate -------+---- only in image --> OCR-only candidate
                      +---- neither source -> information gap
 ```
 
-## 6.4 Classification and urgency support
+### 6.2.3 Complaint Classification Module
 
 The classifier loads `classifier.joblib`, `vectorizer.joblib`, and `label_encoder.joblib` from `models/`. It transforms complaint narrative using the saved vectorizer and obtains LinearSVC decision scores. The system ranks labels and returns the top alternatives. A bounded function of the top-versus-runner-up margin is displayed as confidence-like information. It is not a calibrated probability and must be interpreted with the stated caveat. The category taxonomy includes 21 labels in the saved model artifacts.
 
 The sentiment/urgency component identifies potential urgency cues, including an emergency or “golden hour” state. It is a prioritization aid and cannot determine whether a transfer can be reversed or guarantee a financial recovery. The legal mapping module provides suggested references for review, not a legal opinion or final section selection.
 
-## 6.5 Conversational and speech paths
+### 6.2.4 Conversational Intake and Speech Module
 
 The conversational intake stores user/assistant messages and draft fields in SQLite. A configured Gemini or Ollama provider can support follow-up conversation or narrative standardization. Code includes deterministic fallback behavior when a provider is unavailable or output fails validation. A model response can still be incomplete or unsuitable; validation and visible draft correction remain necessary.
 
 The interface supports browser speech recognition where available. An optional backend path transcribes uploaded audio with Whisper when installed and configured. Recognized words and especially amounts, names, dates, and transaction IDs should be corrected before submission. The application provides text entry so the user can correct voice transcription or proceed without audio.
 
-## 6.6 Persistence and data model
+### 6.2.5 Persistence and Data Model Module
 
 | Data | Storage location | Purpose / caution |
 |---|---|---|
@@ -320,15 +380,104 @@ The interface supports browser speech recognition where available. An optional b
 
 The repository’s `.gitignore` excludes local databases, case folders, uploads, evidence, logs, and datasets. This is important because these locations may contain sensitive information. Developers should continue to verify staged paths before committing.
 
-## 6.7 Investigator environment
+### 6.2.6 Case Output and Investigator Handoff Module
 
 The investigator interface is designed as a separate operational view. It loads locally received cases, presents a queue and filters, opens a case detail view, and exposes complaint summary, complainant-provided fields, suspected identifiers, attached evidence, OCR/reconciliation results, suggested classification or legal information, and workflow actions. Imported case JSON is validated before it is saved. Workflow changes are written back into local case/index storage.
 
 The investigator UI is only as complete as the case payload and local storage. Empty or incomplete records can exist, and imported records require validation. The current repository does not establish authenticated investigator identities, role-based permissions, secure remote access, an immutable audit log, or central backup. The application should be run only in an appropriately controlled environment until those controls are implemented.
 
+## 6.3 User Interface
+
+### 6.3.1 Citizen Intake Page
+
+The standalone citizen interface presents guided conversation, a manual correction path, speech controls, and evidence upload when supporting documents can answer a question. Uploaded evidence can be reviewed alongside extracted candidate values. These interface elements allow a person to complete or correct details before submission. The older Streamlit interface remains in the repository as a separate path.
+
+### 6.3.2 Investigator Dashboard
+
+The investigator environment provides a distinct queue and case review experience. It is intended to show locally submitted records and make the review workflow independent from citizen intake. It should not be interpreted as a secured multi-user deployment because authentication and role-based authorization are not established by the repository.
+
+### 6.3.3 Case Detail and History
+
+The case detail view associates the complaint narrative, complainant details, evidence files, OCR/reconciliation output, classification suggestions, and workflow status with the selected case. Session history and case persistence use local storage described in Section 6.2.5. A reviewer must check original evidence where extracted values are material.
+
+## 6.4 UML Diagrams
+
+The following diagrams are conceptual views of current application boundaries. They are not generated from a formal UML model and should be updated if service routes or persistence behavior change.
+
+**Figure 6.1.** System architecture and actors.
+
+```text
+Complainant -> Citizen UI -> FastAPI / domain modules -> Local session and case storage
+                         -> OCR / classifier / optional speech and LLM services
+Investigator -> Investigator UI -> Case API -> Local case records and evidence
+```
+
+**Figure 6.2.** Complaint intake and case review workflow.
+
+```text
+Start intake -> collect narrative -> extract gaps -> ask follow-up / accept evidence
+    -> reconcile and edit -> confirm draft -> submit local case -> investigator review
+```
+
+**Figure 6.3.** Evidence reconciliation model.
+
+```text
+Typed narrative -----+---- same value? ----> agreement to review
+                     +---- different value -> visible conflict
+OCR candidate -------+---- only in image --> OCR-only candidate
+                     +---- neither source -> information gap
+```
+
+## 6.5 Tools and Technology Used
+
+### 6.5.1 Hardware Requirements
+
+The project requires a general-purpose development or server computer and a browser client. No measured minimum CPU or memory configuration is available. The classifier does not require a GPU; an optional local speech model may need additional memory and processing capacity. See Table 5.1 for the hardware requirement summary.
+
+### 6.5.2 Software and Libraries
+
+The application uses Python, FastAPI, and a static browser frontend, while retaining Streamlit as a second interface. scikit-learn supplies the saved text-classification pipeline. Pillow, PyMuPDF, pytesseract, and the external Tesseract executable support evidence handling and OCR. ReportLab generates draft PDFs. Browser speech support, optional Whisper transcription, Gemini, and Ollama depend on the selected path and environment. See Table 5.2 for dependency roles.
+
+## 6.6 Algorithm
+
+1. Receive typed, manually entered, or speech-transcribed incident information and assign it to an intake session.
+2. Parse the narrative and current draft fields to identify known facts and remaining information gaps.
+3. If evidence is supplied, extract visible text and candidate entities using OCR and deterministic patterns.
+4. Compare narrative and evidence candidates, preserving matches, OCR-only candidates, missing values, and conflicts as distinct outcomes.
+5. Ask a follow-up tied to an unresolved information gap; update the draft from the complainant’s answer or confirmed evidence.
+6. Classify the confirmed narrative and prepare a structured draft with source information and suggested review cues.
+7. On submission, persist a case record and associate its evidence and generated draft outputs.
+8. Present the case in the local investigator queue for human inspection and workflow updates.
+
+The exact implementation is distributed across the API and domain modules. A model or OCR result must not override a confirmed user correction without making the discrepancy visible.
+
 # Chapter 7. Results and Discussion
 
-## 7.1 Implemented behavior observed in the repository
+## 7.1 Experimental Setup
+
+### 7.1.1 Dataset
+
+The repository README describes a synthetic classification dataset with 10,500 generated examples across 21 categories. It documents a random split of 7,350 training, 1,575 validation, and 1,575 test examples, and a template-disjoint split of 7,149 training, 1,680 validation, and 1,671 test examples. These are generated records, not a sample of real complainant data. No human-reviewed real-world dataset or external deployment cohort is established in the repository.
+
+| Split scheme | Training | Validation | Test | Dataset qualification |
+|---|---:|---:|---:|---|
+| Random split | 7,350 | 1,575 | 1,575 | Generated examples; vocabulary construction limits interpretation |
+| Template-disjoint split | 7,149 | 1,680 | 1,671 | Generated examples; 801 templates kept within a single split |
+
+### 7.1.2 Performance Parameters
+
+The repository README reports macro-F1 of 1.0000 for both split schemes. Table 7.2 records this as repository-reported benchmark output, not an independently rerun experiment. Since category vocabularies are separable by construction, the figures do not establish real-world performance. The model uses TF-IDF and LinearSVC; macro precision, macro recall, per-class error analysis, calibration, and external validation should be reported only when measured and preserved with reproducible evaluation artifacts.
+
+| Evaluation scheme | Repository-reported macro-F1 | Interpretation |
+|---|---:|---|
+| Random synthetic split | 1.0000 | Generated benchmark only; not real-world accuracy |
+| Template-disjoint synthetic split | 1.0000 | Generated benchmark only; not real-world accuracy |
+
+### 7.1.3 Efficiency Issues
+
+No reproducible end-to-end latency, throughput, memory, or OCR throughput benchmark is supplied. Text classification and rule-based entity extraction are intended to be lightweight, but actual response time depends on hardware, image/PDF size, OCR installation, optional speech model, and external LLM provider. Efficiency claims should be added only after measuring a documented environment and representative fictional test inputs.
+
+### 7.1.4 Implemented Behavior Observed in the Repository
 
 | Area | Repository evidence | Interpretation |
 |---|---|---|
@@ -342,18 +491,31 @@ The investigator UI is only as complete as the case payload and local storage. E
 
 These are code-level findings and do not certify every UI path, installation, test, or deployment scenario. This report does not claim that a full end-to-end test suite passed. The project’s test files should be run on the target machine with all required packages and local services available, and results should be recorded before submission.
 
-## 7.2 Model evaluation and interpretation
+The displayed margin-derived confidence is not calibrated. A future evaluation should measure calibration and category-wise precision/recall on representative, consented, de-identified data, with a pre-registered evaluation protocol and clear human oversight.
 
-The repository README records 10,500 generated examples and 21 categories. The random split contains 7,350 training, 1,575 validation, and 1,575 test rows. A template-disjoint split contains 7,149 training, 1,680 validation, and 1,671 test rows, with 801 templates kept within a single split. The README reports a macro-F1 of 1.0000 on both split schemes, but it explicitly warns that categories have vocabulary exclusive by construction. Therefore:
+## 7.2 Software Testing
 
-1. The generated labels are lexically separable under the benchmark construction.
-2. Real-world generalization and real incident accuracy have not been measured by this result.
-3. The score should not be used as a claim of production accuracy or investigator reliability.
-4. A hand-written, independently reviewed, privacy-safe gold set and external evaluation are required before making accuracy claims.
+The repository contains test files, but a full test-suite execution result is not available as evidence for this report. The test status below is therefore intentionally not marked as passed. Before academic submission, execute the existing tests in the target environment and record versions, output, and failures.
 
-The displayed margin-derived confidence is also not calibrated. A future evaluation should measure calibration and category-wise precision/recall on representative, consented, de-identified data, with a pre-registered evaluation protocol and clear human oversight.
+### 7.2.1 Test Cases and Test Results
 
-## 7.3 Strengths
+| Test area | Expected check | Result in this report |
+|---|---|---|
+| API and session flow | Start session, send messages, persist draft state | Not run for this report |
+| OCR and evidence upload | Accept supported file, extract candidate fields, preserve source | Not run for this report |
+| Conversation gap handling | Ask relevant questions and avoid repeating answered fields | Not run for this report |
+| Case submission | Create a case associated with its own evidence | Not run for this report |
+| Investigator queue | Show submitted case and persist review status changes | Not run for this report |
+| JSON import and validation | Reject invalid payloads and associate valid cases correctly | Not run for this report |
+| Failure paths | Handle absent OCR, ASR, Gemini, or Ollama dependencies clearly | Not run for this report |
+
+## 7.3 Summary
+
+The code-level review indicates that the repository has developed beyond a standalone classifier into an integrated complaint-intake and investigator-review prototype. It connects narrative collection, speech-to-text options, OCR candidate extraction, source reconciliation, category suggestions, editable draft preparation, and local case storage. These observations describe repository capabilities and do not certify that every deployment or UI flow works correctly.
+
+### 7.3.1 Result Analysis and Discussion
+
+#### Strengths
 
 - The workflow combines narrative, manual entry, OCR candidates, and investigator review instead of treating classification as the whole product.
 - OCR identifiers are extracted with deterministic patterns and can be traced to evidence text.
@@ -362,7 +524,7 @@ The displayed margin-derived confidence is also not calibrated. A future evaluat
 - Local case persistence allows a submitted complaint to appear in an investigator queue without relying on a static demo list.
 - The repository documents the limitations of its synthetic classification benchmark rather than presenting that score as real-world accuracy.
 
-## 7.4 Limitations and risks
+#### Limitations and Risks
 
 | Risk | Why it matters | Practical next step |
 |---|---|---|
@@ -375,19 +537,19 @@ The displayed margin-derived confidence is also not calibrated. A future evaluat
 | Suggested law and urgency | Could be misread as legal or recovery advice | Keep as non-binding prompts with review labels and official-source verification. |
 | Two frontends | Streamlit and standalone UI can diverge in behavior | Maintain a feature parity checklist and automate the same core workflows across interfaces. |
 
-## 7.5 Validation still required
+## 7.4 Validation Still Required
 
 Before a formal demonstration or deployment, validate: clean installation; OCR with representative fictional images; voice capture and correction in supported browsers; repeated multi-turn Q&A without duplicate questions; upload prompt timing; text/OCR conflict display; case submission and investigator queue persistence; import validation; workflow updates; draft generation; failure behavior for missing Tesseract, Whisper, Gemini, and Ollama; and safeguards preventing runtime case data from entering Git. Record software versions, device/browser, test data source, expected result, actual result, and any defects. Test with fictional records only.
 
 # Chapter 8. Conclusion and Future Work
 
-## 8.1 Conclusion
+## 8.1 Conclusions
 
 The current project has expanded from a complaint classifier into a local cybercrime intake and investigator-review prototype. It connects conversational/manual reporting, voice-derived text, OCR-based candidate extraction, evidence reconciliation, category suggestions, draft generation, and local case storage. The separate investigator interface provides a path to review submitted records and update their workflow. The implementation’s most important design principle is that OCR, ASR, and model output remain reviewable suggestions rather than verified facts.
 
 The project is suitable for continued academic development and controlled demonstration. It is not an official complaint-filing service or production-ready case-management system. The synthetic classification benchmark does not establish real-world accuracy, and local storage does not supply production security controls. Those limits must remain explicit in demonstrations and documentation.
 
-## 8.2 Future work
+## 8.2 Future Work
 
 1. Improve the dataset using a legally and ethically approved, consented, de-identified process; establish a human-reviewed gold set and evaluate out of distribution.
 2. Calibrate or remove margin-derived confidence and provide per-class error analysis.
@@ -399,7 +561,11 @@ The project is suitable for continued academic development and controlled demons
 8. Validate statutory references against current official sources and keep them explicitly non-binding until qualified review.
 9. Define an approved deployment and official-filing integration only with institutional and government authorization.
 
-# References
+## 8.3 Applications
+
+Potential applications include academic demonstrations of complaint-intake workflows, controlled usability studies with fictional scenarios, and internal prototyping of evidence-to-case organization. The current implementation is not established as an official reporting channel, live police case-management tool, bank investigation system, or production service for real victim data.
+
+# Annexure A. References
 
 [1] A. Joulin, E. Grave, P. Bojanowski, and T. Mikolov, “Bag of Tricks for Efficient Text Classification,” *Proceedings of the 15th Conference of the European Chapter of the Association for Computational Linguistics*, 2017; arXiv:1607.01759. https://arxiv.org/abs/1607.01759
 
@@ -417,21 +583,14 @@ The project is suitable for continued academic development and controlled demons
 
 [8] Project repository reviewed for this report: `server.py`, `dashboard.py`, `static/`, `modules/`, `models/`, `tests/`, `README.md`, `README2.md`, and `.gitignore`, snapshot reviewed 24 October 2026.
 
-# Appendix A. Representative API and data flow
+# Annexure B. Plagiarism Report
 
-The current service exposes, among other routes, health and state endpoints; intake analysis; evidence upload and retrieval; audio transcription; conversation/session messaging; case submission, import, list, retrieval, and tracking; workflow/adjudication actions; benchmark and taxonomy information; document generation; and evidence reconciliation. Exact request models and validation rules are defined in `server.py`; this report intentionally summarizes them rather than reproducing mutable API schemas.
+Attach the institute-approved plagiarism or similarity report here if required. No verified report was supplied with the project materials, so no similarity score or clearance is claimed.
 
-At a high level, the submitted case record associates the confirmed narrative with classification, extracted/reconciled entity data, attachments, generated document references, and investigator workflow metadata. The original uploaded evidence remains a separate file. The investigator should verify that an attachment belongs to the displayed case before relying on extracted fields.
+# Annexure C. Paper Published (if any)
 
-# Appendix B. Limitations and submission checklist
+Attach the published paper, acceptance letter, or citation here if applicable. No publication evidence was supplied for this report.
 
-- Confirm the official report title and academic year with the department.
-- Confirm spellings and roles for the project guide, Head of Department, and team members.
-- Add an approved certificate/signature page; the included certificate is intentionally unsigned.
-- Replace general responsibility statements with verified individual contributions if required.
-- Add only screenshots captured from the current build using fictional records; do not include real complainant information, credentials, or private evidence.
-- Run the complete project test suite in the intended environment and include the actual result, package versions, and unresolved test failures.
-- Verify that the investigator review queue displays newly submitted records and that each case shows its own evidence and extraction results.
-- Remove unverified performance and deployment claims. In particular, do not present the synthetic-split 1.0000 macro-F1 as real-world accuracy.
-- Obtain institutional review for privacy, consent, data retention, legal references, and any real user study or deployment.
-- Confirm official submission instructions with the relevant authority; this software does not submit a complaint externally.
+# Annexure D. Sponsorship Detail (if any)
+
+Add verified sponsor name, support type, amount or in-kind contribution, and approval details here if applicable. No sponsorship details were supplied.
