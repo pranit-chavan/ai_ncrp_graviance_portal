@@ -1,4 +1,4 @@
-"""Build the editable LaTeX source and review PDF from cyberassist_report.md."""
+"""Build the review PDF from cyberassist_report.md; see build_overleaf.py for Overleaf source."""
 
 from __future__ import annotations
 
@@ -348,10 +348,8 @@ def build_pdf(lines: list[str]):
 
 def main():
     lines = SOURCE.read_text(encoding="utf-8").splitlines()
-    build_tex(lines)
     build_pdf(lines)
     print(f"Created {PDF_OUT}")
-    print(f"Created {TEX_OUT}")
 
 
 if __name__ == "__main__":

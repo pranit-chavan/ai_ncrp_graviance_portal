@@ -1,0 +1,399 @@
+\documentclass[12pt,a4paper,oneside]{report}
+\usepackage[a4paper,left=25mm,right=25mm,top=23mm,bottom=22mm]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{mathptmx}
+\usepackage{graphicx,array,longtable,tabularx,booktabs,ragged2e,caption,xurl,hyperref,enumitem,fancyhdr,titlesec,setspace}
+\hypersetup{colorlinks=true,linkcolor=black,urlcolor=blue,citecolor=black}
+\setlength{\parindent}{1cm}
+\setlength{\parskip}{0pt}
+\setstretch{1.08}
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{2}
+\setlist[enumerate]{leftmargin=1.1cm,itemsep=2pt,topsep=3pt}
+\setlist[itemize]{leftmargin=1.1cm,itemsep=2pt,topsep=3pt}
+\titleformat{\chapter}[hang]{\normalfont\Large\bfseries}{\thechapter}{0.7em}{}
+\titlespacing*{\chapter}{0pt}{-6pt}{15pt}
+\titleformat{\section}{\normalfont\large\bfseries}{\thesection}{0.7em}{}
+\titleformat{\subsection}{\normalfont\normalsize\bfseries}{\thesubsection}{0.7em}{}
+\newcolumntype{L}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+\fancypagestyle{front}{\fancyhf{}\fancyfoot[C]{\thepage}\renewcommand{\headrulewidth}{0pt}}
+\fancypagestyle{main}{\fancyhf{}\fancyfoot[L]{KKWIEER, Department of Computer Engineering, 2025}\fancyfoot[R]{Page \thepage}\renewcommand{\headrulewidth}{0pt}\renewcommand{\footrulewidth}{0.4pt}}
+\captionsetup{font=small,labelfont=bf,justification=raggedright,singlelinecheck=false}
+\begin{document}
+
+
+\begin{titlepage}
+\thispagestyle{empty}
+\centering
+\vspace*{8mm}
+{\large A PROJECT REPORT ON\par}
+\vspace{8mm}
+{\Large\bfseries Intelligent Cybercrime Complaint Analysis and Category Classification System using NLP\par}
+\vspace{4mm}
+{\large\bfseries Cybercrime Complaint Analysis and Investigator Review System\par}
+\vspace{12mm}
+Submitted towards the\par
+Partial Fulfilment of the Requirements of\par
+\vspace{8mm}
+{\large\bfseries BACHELOR OF ENGINEERING\par}
+{\large\bfseries IN\par}
+{\large\bfseries Computer Engineering\par}
+\vspace{6mm}
+{\large By\par}
+\vspace{2mm}
+\begin{tabular}{p{0.45\textwidth}p{0.43\textwidth}}
+\textbf{Pranit Chavan} & Exam No: T231301016 \\
+\textbf{Harshal Dahiphalkar} & Exam No: T231301021 \\
+\textbf{Yash Kanhe} & Exam No: T231301060 \\
+\textbf{Chaitanya Mali} & Exam No: T231301074 \\
+\end{tabular}
+\vspace{5mm}
+
+{\large Under the guidance of\par}
+\vspace{2mm}
+{\large\bfseries Prof. I. Priyadarshini\par}
+\vspace{5mm}
+\includegraphics[width=2.5cm]{kkwagh_logo.png}\par
+\vspace{3mm}
+Department of Computer Engineering\par
+K. K. Wagh Institute of Engineering Education \& Research\par
+Hirabai Haridas Vidyanagari, Amrutdham, Panchavati, Nashik 422003\par
+(An Autonomous Institute affiliated to Savitribai Phule Pune University)\par
+\vspace{3mm}
+Academic Year 2025--2026
+\end{titlepage}
+
+
+\clearpage
+\thispagestyle{empty}
+\begin{center}
+{\Large\bfseries CERTIFICATE\par}
+\vspace{8mm}
+\textit{This is to certify that the project report entitled}\par
+\vspace{2mm}
+{\large\bfseries Intelligent Cybercrime Complaint Analysis and Category Classification System using NLP\par}
+{\normalsize Cybercrime Complaint Analysis and Investigator Review System\par}
+\textit{being submitted by}\par
+\vspace{3mm}
+\begin{tabular}{p{0.48\textwidth}p{0.38\textwidth}}
+\textbf{Pranit Chavan} & Exam No: T231301016 \\
+\textbf{Harshal Dahiphalkar} & Exam No: T231301021 \\
+\textbf{Yash Kanhe} & Exam No: T231301060 \\
+\textbf{Chaitanya Mali} & Exam No: T231301074 \\
+\end{tabular}
+\end{center}
+
+\vspace{6mm}
+is a record of project work carried out under the guidance of Prof. I. Priyadarshini in partial fulfilment of the requirements for the degree of Bachelor of Engineering in Computer Engineering during academic year 2025--2026.
+
+This updated report documents work completed beyond the Phase I submission and is submitted for academic review. Final certificate wording and signatures must be verified and approved by the department.
+
+\vspace{16mm}
+\begin{tabularx}{\textwidth}{X X}
+\textbf{Prof. I. Priyadarshini} & \hfill \textbf{Dr. Snehal Kamalapur} \\
+Internal Guide & \hfill Head of Department, Computer Engineering \\
+Signature: \rule{45mm}{0.4pt} & \hfill Signature: \rule{45mm}{0.4pt} \\
+Date: \rule{35mm}{0.4pt} & \hfill Date: \rule{35mm}{0.4pt} \\
+\end{tabularx}
+
+\vspace{13mm}
+\textbf{External Examiner}\par
+Signature: \rule{45mm}{0.4pt}\hspace{15mm}Date: \rule{30mm}{0.4pt}\par
+Place: Nashik
+
+
+\clearpage\pagenumbering{Roman}\pagestyle{front}
+
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[C]{\thepage}\renewcommand{\headrulewidth}{0pt}}
+
+\clearpage\chapter*{Abstract}\addcontentsline{toc}{chapter}{Abstract}
+
+People reporting online fraud often need to describe an incident, identify payment details, preserve evidence, and explain what happened to an investigator. This project provides a local web application that guides a complainant through a conversational or manual intake, accepts typed text, speech transcripts, and evidence files, and prepares a structured complaint draft. A separate investigator environment stores submitted case records in a local inbox for review.\par\medskip
+The current implementation combines a FastAPI service with a standalone HTML, CSS, and JavaScript interface. The earlier Streamlit dashboard remains in the repository. Complaint text can be classified into a 21-label taxonomy using a saved TF-IDF and LinearSVC model. OCR uses Tesseract, with PDF/image handling and deterministic pattern extraction for fields such as amounts, transaction references, UPI IDs, dates, times, bank names, payment apps, and masked account details. Extracted evidence is shown alongside the complainant's account; agreement, evidence-only values, missing fields, and conflicts are represented separately so that uncertain evidence is not silently treated as confirmed fact. A conversational assistant asks follow-up questions, while a manual form and editing controls provide an alternative. Speech capture/transcription is available through browser speech recognition and optional local Whisper processing, depending on the selected path and installed dependencies.\par\medskip
+After confirmation, the application can create a structured case record and draft PDF. The investigator interface supports a local review queue, case detail review, evidence inspection, workflow updates, and JSON case import. Local SQLite databases persist intake sessions and indexing/workflow information; case JSON and evidence files are stored separately in local folders. Legal references and urgency indicators are suggestions for review, not decisions.\par\medskip
+The project is a functional academic prototype, not an official reporting service or production case-management platform. The included classification data are generated and intentionally vocabulary-separated; the repository itself warns that excellent benchmark scores on these splits do not measure real-world accuracy. Human verification, privacy safeguards, access control, independent evaluation, and operational deployment remain essential future work.\par\medskip
+\textbf{Keywords:} cybercrime intake, complaint drafting, text classification, OCR, evidence reconciliation, speech transcription, investigator review, human oversight.\par\medskip
+
+\clearpage\chapter*{Acknowledgement}\addcontentsline{toc}{chapter}{Acknowledgement}
+
+We thank our project guide, Prof. I. Priyadarshini, for guidance during the project, and Dr. Snehal Kamalapur, Head of the Department of Computer Engineering, for academic support. We also acknowledge the K. K. Wagh Institute of Engineering Education \& Research and Savitribai Phule Pune University. The project builds on open-source software and research cited in the references. This acknowledgement should be reviewed and edited by the student team before submission.\par\medskip
+
+\vfill\begin{flushright}Pranit Chavan\\Harshal Dahiphalkar\\Yash Kanhe\\Chaitanya Mali\end{flushright}
+
+\clearpage\tableofcontents
+
+\clearpage\addcontentsline{toc}{chapter}{List of Figures}\listoffigures
+
+\clearpage\addcontentsline{toc}{chapter}{List of Tables}\listoftables
+
+\clearpage\pagenumbering{arabic}\pagestyle{main}
+
+\fancypagestyle{plain}{\fancyhf{}\fancyfoot[L]{KKWIEER, Department of Computer Engineering, 2025}\fancyfoot[R]{Page \thepage}\renewcommand{\headrulewidth}{0pt}\renewcommand{\footrulewidth}{0.4pt}}
+
+\clearpage\chapter{Introduction}
+\section{Background}
+Cybercrime complaints can contain several kinds of information in different forms: a person's narrative, a payment notification, a bank message, a chat screenshot, a voice description, or a transaction identifier. A complainant may not know which details are useful, and investigators need to review the narrative and supporting evidence together. Repeatedly asking for details already visible in an uploaded receipt creates friction and may lead to inconsistent records.\par\medskip
+This project addresses the information-collection and organization stage. It combines a guided intake with file-based evidence extraction and a separate investigator review experience. Its purpose is to help a person prepare a more complete, editable draft and to make the captured information easier to inspect. It is not a replacement for official channels or investigator judgment.\par\medskip
+\section{Project evolution}
+The Phase I report described a proposed NLP-based cybercrime complaint classifier. The current repository has grown into a broader local prototype: it includes a citizen-facing web interface, conversational and manual intake, OCR-based evidence extraction, voice input/transcription paths, case drafting and persistence, and an investigator queue. The report therefore documents the implementation found in the repository, rather than presenting Phase I proposals as completed work.\par\medskip
+The system currently has two interface paths. FastAPI serves a separate static frontend from \texttt{static/}; \texttt{dashboard.py} retains the Streamlit application. These frontends share domain modules and service functionality, but they are distinct user interfaces and may not expose precisely identical interactions. The investigator workflow is part of the newer web interface and should be validated independently from the Streamlit view.\par\medskip
+\section{Objectives}
+\begin{itemize}
+\item Provide an accessible intake path using conversation, a manual form, typed input, and speech-derived text.
+\item Collect key facts and ask targeted follow-up questions where information remains missing.
+\item Let a complainant upload evidence and review OCR-derived fields before using them in a draft.
+\item Identify a likely complaint category as decision support and display uncertainty and alternatives.
+\item Produce a structured, editable complaint draft and a downloadable document.
+\item Store submitted records in a local investigator review workflow, with evidence associated with its individual case.
+\item Keep the process understandable to non-technical users and preserve human review at important decision points.
+\end{itemize}
+\section{Intended users}
+\textbf{Complainant:} describes an incident, uploads evidence, reviews extracted details, corrects the draft, and chooses to submit the local case record.\par\medskip
+\textbf{Investigator or reviewer:} opens records received in the local inbox, checks the narrative and evidence, reviews extraction conflicts and model suggestions, and updates the case workflow.\par\medskip
+The terms ``complainant'' and ``investigator'' refer to prototype roles and do not imply authenticated real-world identities or official jurisdictional authority.\par\medskip
+\clearpage\chapter{Literature Survey}
+\section{Text classification}
+TF-IDF represents text using weighted terms and is a common baseline for document categorization. Linear support-vector classification provides an efficient linear decision boundary and supports multiclass classification through a one-versus-rest approach in scikit-learn. This combination is useful as a lightweight, inspectable baseline for categorizing complaint narratives. It does not by itself establish semantic understanding, calibrated probabilities, or operational suitability. The implementation uses the highest decision margin and a bounded transformation of the gap between top margins as a confidence-like score; this number is a heuristic and must not be interpreted as a calibrated probability.\par\medskip
+Joulin et al. describe efficient text classification with bag-of-words and n-gram features as a practical baseline [1]. The current project uses a TF-IDF + LinearSVC implementation rather than fastText, but the reference supports the broader use of sparse lexical representations as baselines.\par\medskip
+\section{Optical character recognition}
+OCR converts image pixels into text that can be searched and processed. The project uses Tesseract through \texttt{pytesseract}, then applies deterministic patterns and known-name matching to extract candidate entities. This approach is auditable and avoids asking a generative model to invent exact transaction identifiers. OCR remains sensitive to image quality, fonts, cropping, contrast, transliteration, and character confusion. A recognized value must therefore retain provenance and be checked against the original attachment.\par\medskip
+\section{Speech recognition}
+Automatic speech recognition produces text from audio and can make intake more accessible. The repository supports browser speech recognition for live capture in supported browsers and optional local Whisper transcription for uploaded audio when its package and model dependencies are available. Radford et al. describe Whisper's multilingual weakly supervised training and its robustness across several speech tasks [2]. Recognition errors are still possible, especially with noise, accents, code-switching, names, and numeric identifiers. The user must be able to inspect and correct transcripts before relying on them.\par\medskip
+\section{Conversational intake and human-centered automation}
+A conversational interface can guide a person through details that are easy to omit. For reliable data collection, questions should be tied to explicit information gaps, responses should update a visible draft, and previously answered fields should not be repeatedly requested. The current implementation combines LLM-backed behavior with deterministic state and fallback logic. Provider availability and response quality depend on configuration, and every generated question or narrative needs validation. This project therefore treats the assistant as a drafting aid, not an authoritative source.\par\medskip
+\section{Evidence reconciliation}
+An OCR result and a complainant statement are separate sources. If the two agree, the match can be surfaced for confirmation; if OCR supplies a value not mentioned in the narrative, it can fill a candidate field; if they disagree, the difference should remain visible for review. The repository's reconciliation module implements these distinct outcomes and generates missing-information gaps. This is preferable to silently overwriting one source with another, but it does not establish authenticity of an image or prove that a transaction occurred.\par\medskip
+\section{Position of the project}
+The contribution is an integrated prototype workflow that connects intake, classification support, evidence extraction, review, and local case persistence. It is not a new OCR engine, language model, or validated cybercrime risk model. Its engineering value is in connecting these components with explicit review steps and a separate investigator experience.\par\medskip
+\clearpage\chapter{Problem Definition and Scope}
+\section{Problem statement}
+People reporting a cyber incident may provide incomplete or unstructured descriptions, while useful facts can be contained in screenshots or documents. Existing manual collection can require repeated questions and re-entry. The project seeks to organize these inputs into a reviewable draft and local case record, while making uncertainty and source differences visible.\par\medskip
+\section{Scope}
+\captionof{table}{Implemented capabilities and boundaries}
+\begin{longtable}{|>{\RaggedRight\arraybackslash}p{0.475\textwidth}|>{\RaggedRight\arraybackslash}p{0.475\textwidth}|}
+\hline
+\textbf{Included in the current repository} & \textbf{Not established by the current repository} \\\hline
+Local citizen intake through separate web frontend; legacy Streamlit app remains & Official filing to NCRP, a police portal, bank, or payment network \\\hline
+Typed conversation, manual form, and voice-to-text options & Verified identity, legally valid electronic signature, or actual victim verification \\\hline
+Image/PDF upload and OCR-based candidate field extraction & Forensic proof of authenticity, chain of custody, or guaranteed OCR accuracy \\\hline
+Category prediction, urgency cues, and suggested legal references & Legal advice, final legal classification, or automatic enforcement action \\\hline
+Editable draft and generated PDF / structured JSON & Production-grade multi-tenant deployment or secure internet-facing service \\\hline
+Local investigator review queue and workflow updates & Role-based authentication, authorization, audit controls, or official assignment \\\hline
+Optional configured Gemini/Ollama paths and deterministic fallbacks & Guaranteed LLM availability, correctness, privacy terms, or response consistency \\\hline
+\end{longtable}
+\vspace{2mm}
+\section{Assumptions and constraints}
+\begin{itemize}
+\item Evidence is supplied by the user and may be incomplete, unclear, or unrelated.
+\item OCR, ASR, and LLM outputs are fallible; the interface should require human confirmation.
+\item Tesseract must be installed and discoverable for image OCR. PDF and image support requires the Python dependencies listed in \texttt{requirements.txt}.
+\item Local Whisper transcription requires its optional package, model assets, and compatible runtime. Browser speech recognition depends on browser support and permissions.
+\item Gemini use requires valid configuration and external network access; Ollama paths require a locally available service and model.
+\item Case and evidence storage is local filesystem/SQLite persistence. The repository does not provide production user authentication or a secure cloud storage design.
+\item The classifier's available training/evaluation dataset is generated. Its lexical construction makes reported split performance unsuitable as a real-world accuracy estimate.
+\clearpage\chapter{Project Plan}
+\end{itemize}
+\section{Development approach}
+The project evolved iteratively from the Phase I classification idea toward an end-to-end prototype. Work can be understood in these stages: (1) taxonomy and baseline model, (2) narrative/entity extraction and conversational state, (3) OCR and evidence reconciliation, (4) case-file generation and local persistence, (5) web and Streamlit interfaces, and (6) investigator workflow and integration refinement. This sequence describes implementation evolution; it is not a claim that dated sprint records were present in the reviewed repository.\par\medskip
+\section{Team and responsibilities}
+\begin{longtable}{|>{\RaggedRight\arraybackslash}p{0.317\textwidth}|>{\RaggedRight\arraybackslash}p{0.317\textwidth}|>{\RaggedRight\arraybackslash}p{0.317\textwidth}|}
+\hline
+\textbf{Team member} & \textbf{Examination number} & \textbf{Responsibility record} \\\hline
+Pranit Chavan & T231301016 & Team member; specific current module ownership to be confirmed by the team \\\hline
+Harshal Dahiphalkar & T231301021 & Team member; specific current module ownership to be confirmed by the team \\\hline
+Yash Kanhe & T231301060 & Team member; specific current module ownership to be confirmed by the team \\\hline
+Chaitanya Mali & T231301074 & Team member; specific current module ownership to be confirmed by the team \\\hline
+\end{longtable}
+\vspace{2mm}
+No module ownership is assigned here because the source material does not establish a current responsibility matrix. The team may replace the final column with verified contributions before submission.\par\medskip
+\section{Deliverables}
+\begin{itemize}
+\item FastAPI application and static frontend source.
+\item Retained Streamlit dashboard.
+\item Classification and taxonomy artifacts stored under \texttt{models/} and project modules.
+\item OCR, entity extraction, reconciliation, speech, conversational-intake, and case-building modules.
+\item Local investigator case store and review interface.
+\item Automated test files under \texttt{tests/} and supporting project documentation.
+\item This updated implementation report and its reproducible source.
+\clearpage\chapter{Software Requirements Specification}
+\end{itemize}
+\section{Functional requirements}
+\captionof{table}{Functional requirements}
+\begin{longtable}{|>{\RaggedRight\arraybackslash}p{0.317\textwidth}|>{\RaggedRight\arraybackslash}p{0.317\textwidth}|>{\RaggedRight\arraybackslash}p{0.317\textwidth}|}
+\hline
+\textbf{ID} & \textbf{Requirement} & \textbf{Current implementation summary} \\\hline
+FR-01 & Start a complaint intake session & Frontend creates a session identifier; FastAPI persists session and messages locally. \\\hline
+FR-02 & Accept incident information & Conversation, manual form, typed answer, and supported speech paths are present. \\\hline
+FR-03 & Ask follow-up questions & Conversational module tracks a complaint docket and information gaps; model-backed and fallback behavior are configured in code. \\\hline
+FR-04 & Upload supporting evidence & Upload endpoint accepts supported formats with size/type limits and stores local evidence. \\\hline
+FR-05 & Extract candidate facts from images/PDFs & OCR and deterministic entity patterns yield candidate values with per-value metadata. \\\hline
+FR-06 & Compare text and evidence & Reconciliation returns agreements, OCR-only facts, missing fields, and conflicts. \\\hline
+FR-07 & Classify complaint text & Saved TF-IDF/LinearSVC assets return a predicted label, alternatives, margins, and a heuristic confidence-like value. \\\hline
+FR-08 & Review and edit the draft & Citizen frontend includes manual editing/confirmation paths before case submission. \\\hline
+FR-09 & Create a case record & Submission writes structured JSON and generated documents, then makes the record available to the local investigator inbox. \\\hline
+FR-10 & Review and update a case & Investigator paths include queue listing, case detail, workflow updates, adjudication/syndication endpoints, and evidence review. \\\hline
+FR-11 & Import an existing case & JSON import endpoint validates structure and stores a received record; evidence can be associated with the imported case. \\\hline
+FR-12 & Track or retrieve a local case & Case lookup and tracking endpoints operate on local project storage. \\\hline
+\end{longtable}
+\vspace{2mm}
+\section{Nonfunctional requirements}
+\begin{itemize}
+\item \textbf{Usability:} separate citizen and investigator contexts; plain-language labels; visible values and corrections.
+\item \textbf{Reliability:} missing OCR/LLM/ASR dependencies should produce an error or fallback rather than silently claiming successful extraction.
+\item \textbf{Traceability:} retain source distinctions and show when data are model- or OCR-derived.
+\item \textbf{Privacy:} minimize unnecessary collection and protect local case files. Current prototype does not meet production access-control requirements.
+\item \textbf{Maintainability:} service, UI, extraction, classification, persistence, and investigator logic are separated into modules.
+\item \textbf{Portability:} runs locally with Python and documented dependencies; some capabilities depend on external system packages or model/provider setup.
+\item \textbf{Performance:} local classification and regex extraction are designed as lightweight operations; actual end-to-end latency depends on hardware, OCR, audio model, and LLM provider and has not been benchmarked here.
+\end{itemize}
+\section{Software and hardware environment}
+The repository specifies Python dependencies for FastAPI, Streamlit, scikit-learn, NumPy, pandas, Pillow, PyMuPDF, pytesseract, and ReportLab. Whisper is optional. A compatible Python installation is required. Tesseract OCR is an external system dependency. Browser speech functionality requires a compatible browser and microphone permission. Optional model-backed conversation requires either a configured Gemini API or an Ollama service and model. A general-purpose development PC with sufficient memory for the selected local audio model is expected; no verified minimum hardware benchmark is supplied.\par\medskip
+\section{External interfaces}
+The FastAPI application provides HTTP endpoints for health/state, intake analysis, evidence upload/retrieval, audio transcription, chat/session messaging, case submission/import/list/detail/track, workflow changes, benchmark access, taxonomy, document generation, and evidence reconciliation. The static frontend communicates with these endpoints using browser requests. The Streamlit dashboard is a separate UI path. Endpoint availability does not imply connection to any external government or financial institution.\par\medskip
+\clearpage\chapter{Detailed Design}
+\section{Architecture}
+The design has a browser UI layer, local API/service layer, domain processing modules, and local persistence. Optional external model providers are dependencies of selected conversation or narrative paths; they are not the source of truth for OCR identifiers. The model and evidence tools provide suggestions or extracted candidates, while the user and investigator review the final content.\par\medskip
+\begin{quote}\ttfamily\footnotesize Complainant browser\\  |-- Static HTML/CSS/JS intake and manual form\\  |-- Browser speech capture (where supported)\\  |-- Evidence upload -----------------------------+\\  |                                                 |\\  v                                                 v\\FastAPI service --> conversation / gap logic     OCR / PDF text\\  |               --> TF-IDF + LinearSVC         regex entity extraction\\  |               --> optional Gemini/Ollama       |\\  |               --> optional local Whisper       v\\  |                                            reconciliation\\  |                                                 |\\  +--> SQLite session/draft store                  v\\  +--> case JSON / PDF files <-------------- confirmed draft\\                        |\\                        v\\                 local investigator inbox\\                        |\\            separate investigator review UI\end{quote}
+\captionof{figure}{Current conceptual architecture derived from repository code. The Streamlit dashboard remains as a second interface path.}
+\section{Intake workflow}
+\begin{enumerate}
+\item A complainant starts a session and gives an incident description through text, voice-derived text, or the manual form.
+\item The intake logic extracts known details and evaluates what important information is missing.
+\item The assistant asks a follow-up question based on the current gap state. The draft and conversation are persisted in SQLite during the session.
+\item If a relevant item is requested or available, the complainant uploads an image or PDF. The file is stored locally, and the OCR path returns extracted text and candidate fields.
+\item The interface presents candidate OCR data for review. Reconciliation compares the fields to the complainant's description and marks agreement, OCR-only data, gaps, or conflicts.
+\item The complainant corrects the transcript, extracted values, and narrative, then confirms the draft.
+\item The application classifies the confirmed narrative as decision support and generates a structured case record and draft document.
+\item The local investigator environment loads the submitted case, reviews the narrative and evidence, and updates its workflow status.
+\end{enumerate}
+\captionof{figure}{Complaint intake and review workflow.}
+\section{Evidence extraction and reconciliation}
+OCR is performed through Tesseract for supported images; PDF pages are made available to the extraction path through PyMuPDF. Regular expressions and known-name lists identify candidate amount, UTR/RRN/transaction reference, phone number, date, time, UPI ID, email, masked ID, bank, payment app, or platform. Candidates carry a value and a heuristic confidence field. This confidence indicates extraction plausibility, not a calibrated probability that the OCR is correct.\par\medskip
+The reconciliation module deliberately keeps typed and OCR sources separate. It reports:\par\medskip
+\begin{itemize}
+\item \textbf{Agreement:} the same relevant value appears in the typed account and evidence.
+\item \textbf{OCR-only:} evidence contains a candidate value not stated in the narrative.
+\item \textbf{Conflict:} the two sources differ, so the mismatch remains reviewable.
+\item \textbf{Gap:} neither source currently supplies the requested information.
+\end{itemize}
+The application must not treat a candidate OCR value as verified transaction truth. The complainant or investigator should inspect the original file, especially for long numeric identifiers and low-quality images.\par\medskip
+\captionof{figure}{Evidence reconciliation model.}
+\begin{quote}\ttfamily\footnotesize Typed narrative -----+---- same value? ----> agreement to review\\                     |\\                     +---- different value -> visible conflict\\OCR candidate -------+---- only in image --> OCR-only candidate\\                     +---- neither source -> information gap\end{quote}
+\section{Classification and urgency support}
+The classifier loads \texttt{classifier.joblib}, \texttt{vectorizer.joblib}, and \texttt{label\_encoder.joblib} from \texttt{models/}. It transforms complaint narrative using the saved vectorizer and obtains LinearSVC decision scores. The system ranks labels and returns the top alternatives. A bounded function of the top-versus-runner-up margin is displayed as confidence-like information. It is not a calibrated probability and must be interpreted with the stated caveat. The category taxonomy includes 21 labels in the saved model artifacts.\par\medskip
+The sentiment/urgency component identifies potential urgency cues, including an emergency or ``golden hour'' state. It is a prioritization aid and cannot determine whether a transfer can be reversed or guarantee a financial recovery. The legal mapping module provides suggested references for review, not a legal opinion or final section selection.\par\medskip
+\section{Conversational and speech paths}
+The conversational intake stores user/assistant messages and draft fields in SQLite. A configured Gemini or Ollama provider can support follow-up conversation or narrative standardization. Code includes deterministic fallback behavior when a provider is unavailable or output fails validation. A model response can still be incomplete or unsuitable; validation and visible draft correction remain necessary.\par\medskip
+The interface supports browser speech recognition where available. An optional backend path transcribes uploaded audio with Whisper when installed and configured. Recognized words and especially amounts, names, dates, and transaction IDs should be corrected before submission. The application provides text entry so the user can correct voice transcription or proceed without audio.\par\medskip
+\section{Persistence and data model}
+\captionof{table}{Data persistence overview}
+\begin{longtable}{|>{\RaggedRight\arraybackslash}p{0.317\textwidth}|>{\RaggedRight\arraybackslash}p{0.317\textwidth}|>{\RaggedRight\arraybackslash}p{0.317\textwidth}|}
+\hline
+\textbf{Data} & \textbf{Storage location} & \textbf{Purpose / caution} \\\hline
+Intake sessions, messages, draft fields & Local SQLite (\texttt{complaints.db}) & Supports session history and evolving draft; includes complainant-supplied content. \\\hline
+Case index / workflow data & Local SQLite (\texttt{case\_index.db}) and case records & Supports local queue/search/status and should be protected as operational case data. \\\hline
+Structured submitted case & JSON files under \texttt{investigator\_inbox/} & Includes case content and references to evidence; local runtime data, excluded from source control. \\\hline
+Uploaded evidence & Local \texttt{uploads/} and case-specific evidence storage & May contain sensitive personal and financial data; runtime storage only. \\\hline
+Generated draft reports & Local case file output / document endpoints & Draft output should be reviewed before use and is not an official filing. \\\hline
+Model artifacts & \texttt{models/} & Serialized classifier, vectorizer, label encoder, and benchmark metadata. \\\hline
+\end{longtable}
+\vspace{2mm}
+The repository's \texttt{.gitignore} excludes local databases, case folders, uploads, evidence, logs, and datasets. This is important because these locations may contain sensitive information. Developers should continue to verify staged paths before committing.\par\medskip
+\section{Investigator environment}
+The investigator interface is designed as a separate operational view. It loads locally received cases, presents a queue and filters, opens a case detail view, and exposes complaint summary, complainant-provided fields, suspected identifiers, attached evidence, OCR/reconciliation results, suggested classification or legal information, and workflow actions. Imported case JSON is validated before it is saved. Workflow changes are written back into local case/index storage.\par\medskip
+The investigator UI is only as complete as the case payload and local storage. Empty or incomplete records can exist, and imported records require validation. The current repository does not establish authenticated investigator identities, role-based permissions, secure remote access, an immutable audit log, or central backup. The application should be run only in an appropriately controlled environment until those controls are implemented.\par\medskip
+\clearpage\chapter{Results and Discussion}
+\section{Implemented behavior observed in the repository}
+\captionof{table}{Repository-level evaluation findings}
+\begin{longtable}{|>{\RaggedRight\arraybackslash}p{0.317\textwidth}|>{\RaggedRight\arraybackslash}p{0.317\textwidth}|>{\RaggedRight\arraybackslash}p{0.317\textwidth}|}
+\hline
+\textbf{Area} & \textbf{Repository evidence} & \textbf{Interpretation} \\\hline
+Separate frontend & \texttt{server.py} serves \texttt{static/index.html}; \texttt{static/app.js} and \texttt{static/style.css} implement the interface & A standalone web UI exists in addition to Streamlit. \\\hline
+Intake and persistence & \texttt{/api/chat}, \texttt{/agent/session/\{session\_id\}/message}, \texttt{modules/database.py} & Session messages and draft fields are stored locally. \\\hline
+Evidence upload/OCR & \texttt{/api/upload\_evidence}, \texttt{modules/ocr\_extract.py}, \texttt{modules/reconcile.py} & File upload, candidate extraction, and source comparison are implemented. External Tesseract setup is required. \\\hline
+Voice & Browser capture code and transcription endpoints/modules & Voice is available through browser support and/or optional backend transcription; availability depends on environment. \\\hline
+Classification & \texttt{modules/classifier\_service.py} and saved artifacts under \texttt{models/} & TF-IDF/LinearSVC predicts a category and returns alternatives plus a heuristic margin score. \\\hline
+Case submission/review & \texttt{/api/cases/submit}, \texttt{modules/investigator\_store.py}, case routes & Local records can be placed in the investigator inbox and reviewed. \\\hline
+Data safety & \texttt{.gitignore} excludes local evidence, database, logs, and case folders & Runtime records are intended to stay out of source control. \\\hline
+\end{longtable}
+\vspace{2mm}
+These are code-level findings and do not certify every UI path, installation, test, or deployment scenario. This report does not claim that a full end-to-end test suite passed. The project's test files should be run on the target machine with all required packages and local services available, and results should be recorded before submission.\par\medskip
+\section{Model evaluation and interpretation}
+The repository README records 10,500 generated examples and 21 categories. The random split contains 7,350 training, 1,575 validation, and 1,575 test rows. A template-disjoint split contains 7,149 training, 1,680 validation, and 1,671 test rows, with 801 templates kept within a single split. The README reports a macro-F1 of 1.0000 on both split schemes, but it explicitly warns that categories have vocabulary exclusive by construction. Therefore:\par\medskip
+\begin{enumerate}
+\item The generated labels are lexically separable under the benchmark construction.
+\item Real-world generalization and real incident accuracy have not been measured by this result.
+\item The score should not be used as a claim of production accuracy or investigator reliability.
+\item A hand-written, independently reviewed, privacy-safe gold set and external evaluation are required before making accuracy claims.
+\end{enumerate}
+The displayed margin-derived confidence is also not calibrated. A future evaluation should measure calibration and category-wise precision/recall on representative, consented, de-identified data, with a pre-registered evaluation protocol and clear human oversight.\par\medskip
+\section{Strengths}
+\begin{itemize}
+\item The workflow combines narrative, manual entry, OCR candidates, and investigator review instead of treating classification as the whole product.
+\item OCR identifiers are extracted with deterministic patterns and can be traced to evidence text.
+\item The reconciliation design retains conflicts and separates evidence-only fields from the complainant's own description.
+\item Draft editing and manual intake provide a correction path when voice or LLM output is wrong.
+\item Local case persistence allows a submitted complaint to appear in an investigator queue without relying on a static demo list.
+\item The repository documents the limitations of its synthetic classification benchmark rather than presenting that score as real-world accuracy.
+\end{itemize}
+\section{Limitations and risks}
+\captionof{table}{Risk and mitigation summary}
+\begin{longtable}{|>{\RaggedRight\arraybackslash}p{0.317\textwidth}|>{\RaggedRight\arraybackslash}p{0.317\textwidth}|>{\RaggedRight\arraybackslash}p{0.317\textwidth}|}
+\hline
+\textbf{Risk} & \textbf{Why it matters} & \textbf{Practical next step} \\\hline
+Generated dataset bias & Artificial vocabulary and templates can inflate benchmark scores & Build a reviewed, consented, de-identified evaluation set; report per-class metrics and error analysis. \\\hline
+OCR / ASR errors & A wrong digit in an amount or reference can materially mislead review & Show source excerpts, let users correct every field, and retain original evidence for human inspection. \\\hline
+LLM variability & Questions or summaries may be repetitive, incomplete, or unsupported & Keep questions state-driven; validate extracted facts; regression-test multi-turn scenarios. \\\hline
+Uncalibrated classifier score & UI may make heuristic margins look like a probability & Rename/explain the score and calibrate it only with representative labeled data. \\\hline
+Local storage exposure & Case files and evidence may contain personal/financial data & Add authentication, role controls, encryption, retention/deletion policy, access logs, and secure backups before deployment. \\\hline
+No official integration & Local case creation does not notify authorities or banks & Clearly tell users where official filing must occur; pursue only approved integrations. \\\hline
+Suggested law and urgency & Could be misread as legal or recovery advice & Keep as non-binding prompts with review labels and official-source verification. \\\hline
+Two frontends & Streamlit and standalone UI can diverge in behavior & Maintain a feature parity checklist and automate the same core workflows across interfaces. \\\hline
+\end{longtable}
+\vspace{2mm}
+\section{Validation still required}
+Before a formal demonstration or deployment, validate: clean installation; OCR with representative fictional images; voice capture and correction in supported browsers; repeated multi-turn Q\&A without duplicate questions; upload prompt timing; text/OCR conflict display; case submission and investigator queue persistence; import validation; workflow updates; draft generation; failure behavior for missing Tesseract, Whisper, Gemini, and Ollama; and safeguards preventing runtime case data from entering Git. Record software versions, device/browser, test data source, expected result, actual result, and any defects. Test with fictional records only.\par\medskip
+\clearpage\chapter{Conclusion and Future Work}
+\section{Conclusion}
+The current project has expanded from a complaint classifier into a local cybercrime intake and investigator-review prototype. It connects conversational/manual reporting, voice-derived text, OCR-based candidate extraction, evidence reconciliation, category suggestions, draft generation, and local case storage. The separate investigator interface provides a path to review submitted records and update their workflow. The implementation's most important design principle is that OCR, ASR, and model output remain reviewable suggestions rather than verified facts.\par\medskip
+The project is suitable for continued academic development and controlled demonstration. It is not an official complaint-filing service or production-ready case-management system. The synthetic classification benchmark does not establish real-world accuracy, and local storage does not supply production security controls. Those limits must remain explicit in demonstrations and documentation.\par\medskip
+\section{Future work}
+\begin{enumerate}
+\item Improve the dataset using a legally and ethically approved, consented, de-identified process; establish a human-reviewed gold set and evaluate out of distribution.
+\item Calibrate or remove margin-derived confidence and provide per-class error analysis.
+\item Add source highlighting, confidence/provenance displays, and explicit confirmation for each OCR/ASR field.
+\item Expand conversation regression tests to verify one meaningful question at a time, real-time field updates, no repeated answered questions, and OCR-aware gap suppression.
+\item Add secure authentication, authorization, encryption at rest, configurable retention/deletion, immutable audit events, backup and recovery, and deployment threat modeling.
+\item Align Streamlit and standalone frontend capabilities with a shared workflow checklist and cross-interface acceptance tests.
+\item Improve accessibility, multilingual/code-switching support, keyboard navigation, and low-bandwidth behavior.
+\item Validate statutory references against current official sources and keep them explicitly non-binding until qualified review.
+\item Define an approved deployment and official-filing integration only with institutional and government authorization.
+\clearpage\chapter*{References}\addcontentsline{toc}{chapter}{References}
+\end{enumerate}
+[1] A. Joulin, E. Grave, P. Bojanowski, and T. Mikolov, ``Bag of Tricks for Efficient Text Classification,'' \emph{Proceedings of the 15th Conference of the European Chapter of the Association for Computational Linguistics}, 2017; arXiv:1607.01759. https://arxiv.org/abs/1607.01759\par\medskip
+[2] A. Radford et al., ``Robust Speech Recognition via Large-Scale Weak Supervision,'' \emph{Proceedings of the 40th International Conference on Machine Learning}, PMLR 202, 2023; arXiv:2212.04356. https://arxiv.org/abs/2212.04356\par\medskip
+[3] scikit-learn developers, ``LinearSVC,'' scikit-learn API documentation. https://scikit-learn.org/stable/modules/generated/sklearn.svm.LinearSVC.html\par\medskip
+[4] R. Smith, ``An Overview of the Tesseract OCR Engine,'' \emph{Ninth International Conference on Document Analysis and Recognition (ICDAR 2007)}, vol. 2, pp. 629-633, 2007. https://tesseract-ocr.github.io/docs/tesseracticdar2007.pdf\par\medskip
+[5] OpenAI, ``Whisper: Robust Speech Recognition via Large-Scale Weak Supervision,'' project repository and model usage documentation. https://github.com/openai/whisper\par\medskip
+[6] K. K. Wagh Institute of Engineering Education \& Research, Department of Computer Engineering, ``Intelligent Cybercrime Complaint Analysis and Category Classification System using NLP,'' Phase I research seminar report, PID 18, 23 April 2026. Used for team, guide, department, and institutional metadata; technical design in this updated report is based on the current repository.\par\medskip
+[7] ``new report.pdf,'' user-provided sample report for a different project. Used only as a reference for report organization and front-matter/chapter conventions; its project content has not been reused.\par\medskip
+[8] Project repository reviewed for this report: \texttt{server.py}, \texttt{dashboard.py}, \texttt{static/}, \texttt{modules/}, \texttt{models/}, \texttt{tests/}, \texttt{README.md}, \texttt{README2.md}, and \texttt{.gitignore}, snapshot reviewed 24 October 2026.\par\medskip
+\clearpage\chapter*{Appendix A. Representative API and data flow}\addcontentsline{toc}{chapter}{Appendix A. Representative API and data flow}
+The current service exposes, among other routes, health and state endpoints; intake analysis; evidence upload and retrieval; audio transcription; conversation/session messaging; case submission, import, list, retrieval, and tracking; workflow/adjudication actions; benchmark and taxonomy information; document generation; and evidence reconciliation. Exact request models and validation rules are defined in \texttt{server.py}; this report intentionally summarizes them rather than reproducing mutable API schemas.\par\medskip
+At a high level, the submitted case record associates the confirmed narrative with classification, extracted/reconciled entity data, attachments, generated document references, and investigator workflow metadata. The original uploaded evidence remains a separate file. The investigator should verify that an attachment belongs to the displayed case before relying on extracted fields.\par\medskip
+\clearpage\chapter*{Appendix B. Limitations and submission checklist}\addcontentsline{toc}{chapter}{Appendix B. Limitations and submission checklist}
+\begin{itemize}
+\item Confirm the official report title and academic year with the department.
+\item Confirm spellings and roles for the project guide, Head of Department, and team members.
+\item Add an approved certificate/signature page; the included certificate is intentionally unsigned.
+\item Replace general responsibility statements with verified individual contributions if required.
+\item Add only screenshots captured from the current build using fictional records; do not include real complainant information, credentials, or private evidence.
+\item Run the complete project test suite in the intended environment and include the actual result, package versions, and unresolved test failures.
+\item Verify that the investigator review queue displays newly submitted records and that each case shows its own evidence and extraction results.
+\item Remove unverified performance and deployment claims. In particular, do not present the synthetic-split 1.0000 macro-F1 as real-world accuracy.
+\item Obtain institutional review for privacy, consent, data retention, legal references, and any real user study or deployment.
+\item Confirm official submission instructions with the relevant authority; this software does not submit a complaint externally.
+\end{itemize}
+
+\end{document}
