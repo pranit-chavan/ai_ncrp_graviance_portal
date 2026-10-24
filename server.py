@@ -15,6 +15,7 @@ Full REST API powering:
 import os
 import sys
 import time
+import tempfile
 import json
 import glob
 import re
@@ -66,6 +67,7 @@ from modules.reconcile import reconcile
 from modules.auto_fill import generate_autofill_payload
 from modules.pattern_engine import find_linked_cases, build_suspect_dossier, sync_all_case_files
 from modules.doc_generator import generate_investigation_document, list_available_templates
+from modules import investigator_store
 
 app = FastAPI(title="National Cyber Crime Reporting Portal API", version="3.5.0")
 
@@ -90,9 +92,11 @@ app.add_middleware(
 STATIC_DIR = os.path.join(BASE_DIR, "static")
 CASE_DIR = os.path.join(BASE_DIR, "case_files")
 UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
+INVESTIGATOR_INBOX_DIR = os.path.join(BASE_DIR, "investigator_inbox")
 os.makedirs(STATIC_DIR, exist_ok=True)
 os.makedirs(CASE_DIR, exist_ok=True)
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+os.makedirs(INVESTIGATOR_INBOX_DIR, exist_ok=True)
 
 app.mount("/static", StaticFiles(directory=STATIC_DIR), name="static")
 
@@ -123,15 +127,15 @@ class ConfirmRequest(BaseModel):
 
 
 class GeneratePdfRequest(BaseModel):
-    lost_amount: Optional[Any] = "5000"
-    bank_name: Optional[str] = "SBI"
+    lost_amount: Optional[Any] = None
+    bank_name: Optional[str] = None
     utr_number: Optional[str] = ""
     suspect_identifier: Optional[str] = ""
     formal_narrative: str
     predicted_category: str = "UPI Related Frauds"
     confidence: float = 0.92
-    state: Optional[str] = "Maharashtra"
-    district: Optional[str] = "Mumbai Suburban"
+    state: Optional[str] = None
+    district: Optional[str] = None
 
 
 class AgentSessionMessageRequest(BaseModel):
@@ -162,6 +166,7 @@ class AdjudicateRequest(BaseModel):
     action: str  # "CONFIRM" or "RECLASSIFY"
     new_category: Optional[str] = None
     officer_note: Optional[str] = None
+    reviewer: Optional[str] = None
 
 
 class GenerateDocRequest(BaseModel):
@@ -176,12 +181,27 @@ class TrackRequest(BaseModel):
     reference: str
 
 
+class WorkflowUpdateRequest(BaseModel):
+    reference: str
+    status: str
+    assigned_to: Optional[str] = None
+    reviewer: str
+    note: str
+
+
 # =============================================================================
 # Helper Utilities
 # =============================================================================
 
 def _load_all_cases() -> List[Dict[str, Any]]:
-    cases = []
+    cases_by_reference = {}
+    inbox_cases, _errors = investigator_store.load_cases(INVESTIGATOR_INBOX_DIR)
+    for case in inbox_cases:
+        reference = str(case.get("reference", "")).strip()
+        if reference:
+            case["_filename"] = os.path.basename(case.get("_path", ""))
+            cases_by_reference[re.sub(r"[^A-Za-z0-9]", "", reference).upper()] = case
+
     for path in sorted(glob.glob(os.path.join(CASE_DIR, "*.json"))):
         try:
             with open(path, "r", encoding="utf-8") as f:
@@ -189,9 +209,13 @@ def _load_all_cases() -> List[Dict[str, Any]]:
             if isinstance(data, dict):
                 data["_path"] = path
                 data["_filename"] = os.path.basename(path)
-                cases.append(data)
+                reference = str(data.get("reference", "")).strip()
+                if reference:
+                    key = re.sub(r"[^A-Za-z0-9]", "", reference).upper()
+                    cases_by_reference.setdefault(key, data)
         except Exception:
             pass
+    cases = list(cases_by_reference.values())
     cases.sort(key=lambda c: c.get("generated_at", ""), reverse=True)
     return cases
 
@@ -209,6 +233,16 @@ def _find_case_by_ref(ref_str: str) -> Optional[Dict[str, Any]]:
         if clean_target in f_name:
             return c
     return None
+
+
+def _write_case_record(case: Dict[str, Any]) -> None:
+    """Persist investigator changes to the source store without dropping audit metadata."""
+    path = case.get("_path")
+    if not path or not os.path.isfile(path):
+        raise HTTPException(status_code=500, detail="Case record path is unavailable.")
+    payload = {key: value for key, value in case.items() if key not in {"_path", "_filename"}}
+    with open(path, "w", encoding="utf-8") as case_file:
+        json.dump(payload, case_file, indent=2, ensure_ascii=False)
 
 
 # =============================================================================
@@ -324,25 +358,96 @@ async def analyze_intake_endpoint(req: IntakeAnalyzeRequest):
 
 @app.post("/api/upload_evidence")
 async def upload_evidence_endpoint(file: UploadFile = File(...)):
-    """Upload screenshot/receipt, run OCR, and return extracted financial/suspect entities."""
+    """Save supported case evidence and OCR images/PDFs when possible."""
     try:
-        filename = f"evid_{int(time.time())}_{file.filename}"
+        original_name = os.path.basename(file.filename or "evidence-image")
+        is_pdf = (file.content_type or "").lower() == "application/pdf" or original_name.lower().endswith(".pdf")
+        is_image = (file.content_type or "").lower().startswith("image/") or original_name.lower().endswith((".png", ".jpg", ".jpeg", ".webp"))
+        allowed_extensions = {".pdf", ".png", ".jpg", ".jpeg", ".webp", ".txt", ".mp4", ".wav", ".mp3", ".m4a", ".ogg", ".flac", ".docx", ".xlsx", ".csv"}
+        if os.path.splitext(original_name)[1].lower() not in allowed_extensions:
+            raise HTTPException(status_code=415, detail="Choose a supported image, PDF, audio, video, text, or office document.")
+        content = await file.read(25 * 1024 * 1024 + 1)
+        if len(content) > 25 * 1024 * 1024:
+            raise HTTPException(status_code=413, detail="Evidence files must be 25 MB or smaller.")
+        if (is_image or is_pdf) and len(content) > 5 * 1024 * 1024:
+            raise HTTPException(status_code=413, detail="Images and PDFs for OCR must be 5 MB or smaller.")
+        filename = f"evid_{time.time_ns()}_{original_name}"
         save_path = os.path.join(UPLOAD_DIR, filename)
-        content = await file.read()
+        os.makedirs(UPLOAD_DIR, exist_ok=True)
         with open(save_path, "wb") as f:
             f.write(content)
 
-        ocr_res = extract_from_images([save_path])
+        ocr_res = {"per_image": [], "entities": {}, "errors": []}
+        if is_pdf:
+            try:
+                import fitz
+            except ImportError as exc:
+                os.remove(save_path)
+                raise HTTPException(status_code=503, detail="PDF reading is unavailable. Install the project dependencies and restart.") from exc
+            try:
+                doc = fitz.open(save_path)
+                if doc.page_count > 10:
+                    doc.close()
+                    os.remove(save_path)
+                    raise HTTPException(status_code=413, detail="PDF evidence is limited to 10 pages.")
+                with tempfile.TemporaryDirectory(dir=UPLOAD_DIR) as temp_dir:
+                    page_paths = []
+                    for index, page in enumerate(doc):
+                        pix = page.get_pixmap(matrix=fitz.Matrix(2, 2), alpha=False)
+                        page_path = os.path.join(temp_dir, f"page-{index + 1}.png")
+                        pix.save(page_path)
+                        page_paths.append(page_path)
+                    doc.close()
+                    ocr_res = extract_from_images(page_paths)
+            except HTTPException:
+                raise
+            except Exception as exc:
+                if os.path.exists(save_path):
+                    os.remove(save_path)
+                raise HTTPException(status_code=422, detail=f"Could not read this PDF: {exc}") from exc
+        elif is_image:
+            ocr_res = extract_from_images([save_path])
+        pages = ocr_res.get("per_image", [])
+        per_image = pages[0] if pages else {}
+        raw_text = "\n".join(p.get("raw_text", "") for p in pages)
         return JSONResponse({
             "ok": True,
             "filename": filename,
-            "file_path": save_path,
-            "chars_read": ocr_res.get("per_image", [{}])[0].get("chars", 0),
+            "chars_read": sum(p.get("chars", 0) for p in pages),
             "entities": ocr_res.get("entities", {}),
-            "raw_snippet": ocr_res.get("per_image", [{}])[0].get("raw_text", "")[:300]
+            "raw_snippet": raw_text[:1200],
+            "ocr_errors": ocr_res.get("errors", []),
+            "ocr_supported": bool(is_pdf or is_image),
         })
+    except HTTPException:
+        raise
     except Exception as e:
         return JSONResponse({"ok": False, "error": str(e)}, status_code=500)
+
+
+@app.get("/api/evidence/{filename}")
+async def get_evidence_endpoint(filename: str):
+    """Serve an uploaded evidence image by its stored basename."""
+    safe_name = os.path.basename(filename)
+    if not safe_name or safe_name != filename:
+        raise HTTPException(status_code=404, detail="Evidence file not found.")
+    evidence_path = os.path.join(UPLOAD_DIR, safe_name)
+    if not os.path.isfile(evidence_path):
+        evidence_path = None
+        cases, _errors = investigator_store.load_cases(INVESTIGATOR_INBOX_DIR)
+        for case in cases:
+            for item in case.get("received_evidence_files", []):
+                if os.path.basename(str(item.get("name", ""))) == safe_name:
+                    evidence_path = investigator_store.resolve_evidence_path(
+                        case, item.get("path", ""), INVESTIGATOR_INBOX_DIR
+                    )
+                    if evidence_path:
+                        break
+            if evidence_path:
+                break
+        if not evidence_path:
+            raise HTTPException(status_code=404, detail="Evidence file not found.")
+    return FileResponse(evidence_path, filename=safe_name)
 
 
 @app.post("/api/transcribe_audio")
@@ -375,11 +480,24 @@ async def submit_case_endpoint(payload: Dict[str, Any]):
     Step 3: Final Registration & Case File Assembly.
     Builds official JSON record, court-ready PDF, indexes into case_index.db.
     """
+    if payload.get("investigator_consent") is not True:
+        raise HTTPException(
+            status_code=422,
+            detail="Confirm that this record may be saved and shown in this app's local investigator workspace.",
+        )
+
     try:
         comp = payload.get("complainant") or {}
         inc = payload.get("incident") or {}
-        narrative = payload.get("standardised_narrative") or payload.get("incident_text") or "Cyber fraud incident reported."
-        raw_text = payload.get("incident_text") or narrative
+        raw_text = str(payload.get("incident_text") or "").strip()
+        narrative = str(payload.get("standardised_narrative") or "").strip()
+        placeholders = {"not supplied", "not available - module a did not run", "cyber fraud incident reported."}
+        if not narrative or narrative.casefold() in placeholders:
+            narrative = raw_text
+        if not raw_text or raw_text.casefold() in placeholders:
+            raw_text = narrative
+        if not narrative or narrative.casefold() in placeholders:
+            raise HTTPException(status_code=422, detail="Add the complainant's incident description or voice transcript before saving this case.")
 
         # Classify
         clf_res = classify_complaint_text(narrative)
@@ -403,24 +521,81 @@ async def submit_case_endpoint(payload: Dict[str, Any]):
             category=inc.get("category") or "Online Financial Fraud",
             modus_operandi=inc.get("modus_operandi") or "",
             incident_location=inc.get("location") or [],
+            entities=payload.get("reviewed_evidence_entities") or payload.get("entities") or {},
+            attachments=evidence_list,
+            evidence_table=evidence_list,
             transactions=transactions,
             suspect_transactions=suspect_transactions,
             suspects=suspects,
             reconciliation=payload.get("reconciliation") or {},
             sentiment=payload.get("sentiment") or {}
         )
+        case_record["local_investigator_consent"] = {
+            "confirmed": True,
+            "recorded_at": datetime.now().astimezone().isoformat(timespec="seconds"),
+            "purpose": "Local investigator workspace review",
+        }
+        # Keep this submission tied to the one intake session that produced it.
+        # Both typed turns and speech transcripts are saved as the complaint's raw text;
+        # evidence/OCR stays on this case's own attachments and extracted entities.
+        intake_session_id = str(payload.get("intake_session_id") or "").strip()
+        if intake_session_id:
+            case_record["intake_metadata"] = {
+                "session_id": intake_session_id[:100],
+                "source": "web voice/text intake",
+                "evidence_count": len(evidence_list),
+            }
 
         ref_str = case_record["reference"]
         safe_filename = ref_str.replace("/", "-")
+        os.makedirs(CASE_DIR, exist_ok=True)
         json_path = os.path.join(CASE_DIR, f"{safe_filename}.json")
         pdf_path = os.path.join(CASE_DIR, f"{safe_filename}.pdf")
+        inbox_path = os.path.join(INVESTIGATOR_INBOX_DIR, f"{investigator_store._safe_reference(ref_str)}.json")
+        if os.path.exists(json_path) or os.path.exists(inbox_path):
+            raise HTTPException(status_code=409, detail="This case reference already exists. Please submit again.")
 
-        # Save JSON
-        with open(json_path, "w", encoding="utf-8") as f:
-            json.dump(case_record, f, indent=2, ensure_ascii=False)
+        json_created = False
+        pdf_created = False
+        inbox_case_created = False
+        try:
+            with open(json_path, "x", encoding="utf-8") as f:
+                json.dump(case_record, f, indent=2, ensure_ascii=False)
+            json_created = True
+            pdf_created = True
+            write_pdf(case_record, pdf_path)
 
-        # Generate PDF
-        write_pdf(case_record, pdf_path)
+            # Accepted frontend submissions enter the same local inbox as
+            # Streamlit submissions, with uploaded originals copied safely.
+            received_case = investigator_store.import_case_file(
+                json.dumps(case_record, ensure_ascii=False).encode("utf-8"),
+                INVESTIGATOR_INBOX_DIR,
+            )
+            inbox_case_created = True
+            evidence_payloads = []
+            for item in evidence_list:
+                filename = os.path.basename(str(item.get("filename", ""))) if isinstance(item, dict) else ""
+                source_path = os.path.join(UPLOAD_DIR, filename)
+                if filename and os.path.isfile(source_path):
+                    with open(source_path, "rb") as evidence_file:
+                        evidence_payloads.append((filename, evidence_file.read()))
+            investigator_store.save_received_evidence(received_case, evidence_payloads, INVESTIGATOR_INBOX_DIR)
+            investigator_store.save_case(received_case, INVESTIGATOR_INBOX_DIR)
+            case_record.update({key: received_case[key] for key in ("status", "_investigator_received_at", "_activity_log") if key in received_case})
+            with open(json_path, "w", encoding="utf-8") as f:
+                json.dump(case_record, f, indent=2, ensure_ascii=False)
+        except Exception:
+            if json_created and os.path.isfile(json_path):
+                os.remove(json_path)
+            if pdf_created and os.path.isfile(pdf_path):
+                os.remove(pdf_path)
+            if inbox_case_created and os.path.isfile(inbox_path):
+                os.remove(inbox_path)
+            evidence_dir = os.path.join(INVESTIGATOR_INBOX_DIR, f"{investigator_store._safe_reference(ref_str)}_evidence")
+            if inbox_case_created and os.path.isdir(evidence_dir):
+                import shutil
+                shutil.rmtree(evidence_dir)
+            raise
 
         # Sync to graph index
         try:
@@ -435,10 +610,56 @@ async def submit_case_endpoint(payload: Dict[str, Any]):
             "pdf_url": f"/api/pdf/{safe_filename}.pdf",
             "case": case_record
         })
+    except HTTPException:
+        raise
     except Exception as e:
         import traceback
         traceback.print_exc()
         return JSONResponse({"ok": False, "error": str(e)}, status_code=500)
+
+
+@app.post("/api/cases/import")
+async def import_investigator_case(
+    case_file: UploadFile = File(...),
+    evidence_files: Optional[List[UploadFile]] = File(None),
+):
+    """Import an existing structured case and its original evidence into the local review inbox."""
+    try:
+        case_bytes = await case_file.read(investigator_store.MAX_CASE_FILE_BYTES + 1)
+        if len(case_bytes) > investigator_store.MAX_CASE_FILE_BYTES:
+            raise HTTPException(status_code=413, detail="The structured case file must be 10 MB or smaller.")
+        try:
+            case_json = json.loads(case_bytes.decode("utf-8-sig"))
+        except (UnicodeDecodeError, json.JSONDecodeError) as exc:
+            raise HTTPException(status_code=422, detail="Choose a valid UTF-8 JSON case record.") from exc
+        if not isinstance(case_json, dict):
+            raise HTTPException(status_code=422, detail="The case file must contain a JSON object.")
+        evidence_payloads = []
+        for evidence_file in evidence_files or []:
+            content = await evidence_file.read(investigator_store.MAX_EVIDENCE_FILE_BYTES + 1)
+            if len(content) > investigator_store.MAX_EVIDENCE_FILE_BYTES:
+                raise HTTPException(status_code=413, detail="Each evidence file must be 25 MB or smaller.")
+            evidence_payloads.append((os.path.basename(evidence_file.filename or "evidence"), content))
+        case = investigator_store.import_case_file(case_bytes, INVESTIGATOR_INBOX_DIR)
+        try:
+            investigator_store.save_received_evidence(case, evidence_payloads, INVESTIGATOR_INBOX_DIR)
+            investigator_store.save_case(case, INVESTIGATOR_INBOX_DIR)
+        except Exception:
+            case_path = case.get("_path")
+            if case_path and os.path.isfile(case_path):
+                os.remove(case_path)
+            evidence_dir = os.path.join(INVESTIGATOR_INBOX_DIR, f"{investigator_store._safe_reference(case.get('reference', ''))}_evidence")
+            if os.path.isdir(evidence_dir):
+                import shutil
+                shutil.rmtree(evidence_dir)
+            raise
+        return JSONResponse({"ok": True, "reference": case.get("reference")})
+    except HTTPException:
+        raise
+    except FileExistsError as exc:
+        raise HTTPException(status_code=409, detail=str(exc)) from exc
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
 # =============================================================================
@@ -454,6 +675,7 @@ async def list_cases_endpoint(category: Optional[str] = None, priority: Optional
     total_loss = 0.0
     golden_hour_count = 0
     pending_count = 0
+    conflict_count = 0
     category_counts: Dict[str, int] = {}
     urgency_counts: Dict[str, int] = {}
 
@@ -472,10 +694,12 @@ async def list_cases_endpoint(category: Optional[str] = None, priority: Optional
         urgency_counts[urg] = urgency_counts.get(urg, 0) + 1
         if sent.get("is_golden_hour"):
             golden_hour_count += 1
+        if (c.get("reconciliation") or {}).get("has_conflicts"):
+            conflict_count += 1
 
         # Status
         status = c.get("status") or "PENDING OFFICER REVIEW"
-        if "PENDING" in status.upper():
+        if status.upper() in {"RECEIVED - AWAITING REVIEW", "IN REVIEW", "AWAITING INFORMATION", "PENDING OFFICER REVIEW"}:
             pending_count += 1
 
         # Category
@@ -495,10 +719,11 @@ async def list_cases_endpoint(category: Optional[str] = None, priority: Optional
             "total_loss_inr": total_loss,
             "golden_hour_count": golden_hour_count,
             "pending_count": pending_count,
+            "conflict_count": conflict_count,
             "category_distribution": category_counts,
             "urgency_distribution": urgency_counts
         },
-        "cases": filtered
+        "cases": [{key: value for key, value in case.items() if key not in {"_path", "_filename"}} for case in filtered]
     })
 
 
@@ -515,7 +740,7 @@ async def get_case_detail_endpoint(case_ref: str):
     case["has_pdf"] = os.path.exists(pdf_path)
     case["pdf_url"] = f"/api/pdf/{safe_name}.pdf" if case["has_pdf"] else None
 
-    return JSONResponse(case)
+    return JSONResponse({key: value for key, value in case.items() if key not in {"_path", "_filename"}})
 
 
 @app.post("/api/cases/track")
@@ -548,6 +773,37 @@ async def track_case_endpoint(req: TrackRequest):
     })
 
 
+@app.post("/api/cases/workflow")
+async def update_case_workflow(req: WorkflowUpdateRequest):
+    """Record a local investigator status, assignment, and review note."""
+    allowed = {
+        "RECEIVED - AWAITING REVIEW", "IN REVIEW", "AWAITING INFORMATION",
+        "REFERRED FOR FOLLOW-UP", "REVIEW COMPLETE", "CONFIRMED BY OFFICER",
+        "RECLASSIFIED BY OFFICER", "PENDING OFFICER REVIEW", "CATEGORY REVIEWED",
+    }
+    status = req.status.strip().upper()
+    reviewer, note = req.reviewer.strip(), req.note.strip()
+    if status not in allowed:
+        raise HTTPException(status_code=400, detail="Choose a valid case status.")
+    if not reviewer or not note:
+        raise HTTPException(status_code=422, detail="Reviewer initials and a short note are required.")
+    case = _find_case_by_ref(req.reference)
+    if not case:
+        raise HTTPException(status_code=404, detail="Case record not found.")
+    path = case.get("_path")
+    if not path or not os.path.isfile(path):
+        raise HTTPException(status_code=500, detail="Case record path is unavailable.")
+    previous = case.get("status") or "RECEIVED - AWAITING REVIEW"
+    case["status"] = status
+    case["assigned_to"] = req.assigned_to.strip() or None if req.assigned_to else None
+    investigator_store.add_activity(
+        case, reviewer, "Workflow updated",
+        f"Status: {previous} → {status}. Assigned to: {case['assigned_to'] or 'Unassigned'}. {note}",
+    )
+    _write_case_record(case)
+    return JSONResponse({"ok": True, "status": status, "assigned_to": case["assigned_to"]})
+
+
 # =============================================================================
 # Investigator Adjudication, Module L & Module M
 # =============================================================================
@@ -555,6 +811,12 @@ async def track_case_endpoint(req: TrackRequest):
 @app.post("/api/cases/adjudicate")
 async def adjudicate_case_endpoint(req: AdjudicateRequest):
     """Officer action: confirm or reclassify offence category."""
+    reviewer = (req.reviewer or "").strip()
+    officer_note = (req.officer_note or "").strip()
+    if not reviewer or not officer_note:
+        raise HTTPException(status_code=422, detail="Reviewer initials and a short review note are required.")
+    if req.action == "RECLASSIFY" and req.new_category not in KNOWN_CATEGORIES:
+        raise HTTPException(status_code=422, detail="Choose a valid incident type before reclassifying.")
     case = _find_case_by_ref(req.reference)
     if not case:
         raise HTTPException(status_code=404, detail="Case record not found.")
@@ -570,9 +832,11 @@ async def adjudicate_case_endpoint(req: AdjudicateRequest):
     elif req.action == "RECLASSIFY":
         if not req.new_category:
             raise HTTPException(status_code=400, detail="New category must be provided for reclassification.")
-        old_cat = case.get("classification", {}).get("sub_category", "UNCLASSIFIED")
-        if not isinstance(case.get("classification"), dict):
-            case["classification"] = {}
+        old_classification = case.get("classification")
+        if not isinstance(old_classification, dict):
+            old_classification = {}
+            case["classification"] = old_classification
+        old_cat = old_classification.get("sub_category", "UNCLASSIFIED")
         case["classification"]["sub_category"] = req.new_category
         case["classification"]["source"] = "Officer override"
         case["classification"]["requires_confirmation"] = False
@@ -597,10 +861,11 @@ async def adjudicate_case_endpoint(req: AdjudicateRequest):
     else:
         raise HTTPException(status_code=400, detail="Invalid action.")
 
-    # Save to disk
-    to_write = {k: v for k, v in case.items() if not k.startswith("_")}
-    with open(path, "w", encoding="utf-8") as f:
-        json.dump(to_write, f, indent=2, ensure_ascii=False)
+    investigator_store.add_activity(
+        case, reviewer, "Suggested category reviewed" if req.action == "CONFIRM" else "Suggested category changed",
+        officer_note,
+    )
+    _write_case_record(case)
 
     # Re-write PDF
     try:
@@ -626,7 +891,9 @@ async def syndicate_correlation_endpoint(payload: Dict[str, Any]):
         raise HTTPException(status_code=400, detail="Provide case reference or case_data.")
 
     try:
-        links = find_linked_cases(case_input)
+        inbox_index = os.path.join(INVESTIGATOR_INBOX_DIR, "case_index.db")
+        sync_all_case_files(INVESTIGATOR_INBOX_DIR, db_path=inbox_index)
+        links = find_linked_cases(case_input, db_path=inbox_index)
         primary_suspect = None
         for sid in links.get("shared_identifiers", []):
             if "PHONE:" in sid or "UPI:" in sid:
@@ -635,7 +902,7 @@ async def syndicate_correlation_endpoint(payload: Dict[str, Any]):
 
         dossier = None
         if primary_suspect:
-            dossier = build_suspect_dossier(primary_suspect)
+            dossier = build_suspect_dossier(primary_suspect, db_path=inbox_index)
 
         return JSONResponse({
             "ok": True,
@@ -851,8 +1118,8 @@ async def confirm_endpoint(req: ConfirmRequest):
         pass
 
     # Law Enforcement Routing (Deterministic static lookup)
-    user_state = fields.get("state") or fields.get("complainant_state") or "Maharashtra"
-    user_district = fields.get("district") or fields.get("city") or "Mumbai Suburban"
+    user_state = fields.get("state") or fields.get("complainant_state")
+    user_district = fields.get("district") or fields.get("city")
     routing_info = route_complaint(
         state=user_state,
         district=user_district,
@@ -903,13 +1170,15 @@ async def generate_pdf_endpoint(req: GeneratePdfRequest):
             try:
                 amt = float(str(req.lost_amount).replace(",", "").replace("₹", "").strip())
             except Exception:
-                amt = 5000.0
+                raise HTTPException(status_code=422, detail="Enter a valid transaction amount.")
+            if amt <= 0:
+                raise HTTPException(status_code=422, detail="Transaction amount must be greater than zero.")
             txns.append({
-                "bank_name": req.bank_name or "Bank",
-                "account_number": "XXXX-XXXX",
+                "bank_name": req.bank_name or "Not provided",
+                "account_number": "Not provided",
                 "amount": amt,
-                "utr_number": req.utr_number or "Pending Verification",
-                "date": datetime.now().strftime("%Y-%m-%d")
+                "utr_number": req.utr_number or "Not provided",
+                "date": "Not provided"
             })
 
         suspects = []
@@ -921,8 +1190,8 @@ async def generate_pdf_endpoint(req: GeneratePdfRequest):
             })
 
         routing_info = route_complaint(
-            state=req.state or "Maharashtra",
-            district=req.district or "Mumbai Suburban"
+            state=req.state,
+            district=req.district
         )
 
         case_record = build_case_file(

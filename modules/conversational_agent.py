@@ -201,6 +201,21 @@ def extract_structured_docket(message: str, current_docket: Dict[str, Any]) -> D
     bank = docket.get("bank_name")
     if not bank:
         BANK_MAP = {
+            "state bank of india": "State Bank of India",
+            "bank of india": "Bank of India",
+            "bank of maharashtra": "Bank of Maharashtra",
+            "punjab national bank": "Punjab National Bank",
+            "bank of baroda": "Bank of Baroda",
+            "canara bank": "Canara Bank",
+            "union bank of india": "Union Bank of India",
+            "indian bank": "Indian Bank",
+            "central bank of india": "Central Bank of India",
+            "indusind bank": "IndusInd Bank",
+            "yes bank": "Yes Bank",
+            "kotak mahindra bank": "Kotak Mahindra Bank",
+            "hdfc bank": "HDFC Bank",
+            "icici bank": "ICICI Bank",
+            "axis bank": "Axis Bank",
             "एसबीआई": "State Bank of India",
             "एसबीआय": "State Bank of India",
             "स्टेट बैंक": "State Bank of India",
@@ -221,18 +236,29 @@ def extract_structured_docket(message: str, current_docket: Dict[str, Any]) -> D
             "केनरा": "Canara Bank",
             "कोटक": "Kotak Mahindra Bank",
             "पेटीएम": "Paytm Payments Bank",
-            "फोनपे": "PhonePe",
-            "गूगल पे": "Google Pay",
-            "gpay": "Google Pay"
         }
-        for k, v in BANK_MAP.items():
-            if k in msg_lower:
+        for k, v in sorted(BANK_MAP.items(), key=lambda item: len(item[0]), reverse=True):
+            if re.search(rf"(?<!\w){re.escape(k)}(?!\w)", msg_lower):
                 bank = v
                 break
 
+    PAYMENT_APP_MAP = {
+        "google pay": "Google Pay", "googlepay": "Google Pay", "gpay": "Google Pay",
+        "phonepe": "PhonePe", "phone pe": "PhonePe", "paytm": "Paytm",
+        "bhim": "BHIM UPI", "amazon pay": "Amazon Pay", "mobikwik": "MobiKwik",
+    }
+    payment_app = next((label for token, label in sorted(PAYMENT_APP_MAP.items(), key=lambda item: len(item[0]), reverse=True)
+                        if re.search(rf"(?<!\w){re.escape(token)}(?!\w)", msg_lower)), None)
+    # A wallet can answer the bank/wallet question. Keep the app in the channel
+    # slot as well, and prefer a separately named bank when both are supplied.
+    if not bank and payment_app:
+        bank = payment_app
+
     # 3. Platform Involved
     platform = docket.get("platform_involved") or docket.get("platform")
-    if any(k in msg_lower for k in ["telegram", "टेलीग्राम"]):
+    if payment_app:
+        platform = payment_app
+    elif any(k in msg_lower for k in ["telegram", "टेलीग्राम"]):
         platform = "Telegram"
     elif any(k in msg_lower for k in ["whatsapp", "व्हाट्सएप", "व्हॉट्सअ‍ॅप"]):
         platform = "WhatsApp"
@@ -306,6 +332,17 @@ def extract_structured_docket(message: str, current_docket: Dict[str, Any]) -> D
             incident_dt = "Yesterday"
         else:
             incident_dt = None
+    explicit_time = re.search(
+        r"\b((?:[01]?\d|2[0-3]):[0-5]\d(?::[0-5]\d)?\s?(?:a\.?m\.?|p\.?m\.?)?|(?:0?[1-9]|1[0-2])\s?(?:a\.?m\.?|p\.?m\.?))\b",
+        msg_lower,
+        re.I,
+    )
+    if explicit_time:
+        time_value = explicit_time.group(1).strip()
+        if not incident_dt:
+            incident_dt = time_value
+        elif time_value.casefold() not in str(incident_dt).casefold():
+            incident_dt = f"{incident_dt} {time_value}"
 
     # 9. Detect if user message is a generic greeting vs actual incident report
     GREETING_TOKENS = {
@@ -526,21 +563,21 @@ def select_next_question(
     if is_financial and docket.get("financial_loss_amount") and not docket.get("utr_number") and "utr" not in unknown_fields and retry_counts.get("utr", 0) < 2:
         if language == "mr":
             return (
-                "आपल्याला बँकेकडून आलेल्या मेसेजमध्ये १२ अंकी यूटीआर (UTR) किंवा व्यवहार संदर्भ क्रमांक आहे का?",
-                "Do you have the 12-digit UTR or transaction reference number from your bank SMS?",
+                "बँकेच्या मेसेज किंवा पावतीवरील UTR/RRN व्यवहार संदर्भ क्रमांक काय आहे? स्क्रीनशॉट खाली अपलोड करा; मी त्यातून वाचण्याचा प्रयत्न करेन.",
+                "What UTR or RRN reference is shown on your bank message or receipt? Upload its screenshot below and I can read it for you.",
                 "utr"
             )
         elif language == "hi":
             return (
-                "क्या आपके पास बैंक से आया १२ अंकों का यूटीआर (UTR) या ट्रांजैक्शन रेफरेंस नंबर है?",
-                "What transaction reference is shown beside UTR, RRN, or transaction ID on the receipt or bank message?",
+                "बैंक के संदेश या रसीद पर दिख रहा UTR/RRN संदर्भ नंबर क्या है? उसका स्क्रीनशॉट नीचे अपलोड करें, मैं उसमें से पढ़ने की कोशिश करूँगा।",
+                "What UTR or RRN reference is shown on your bank message or receipt? Upload its screenshot below and I can read it for you.",
                 "utr"
             )
         else:
             question = (
-                "I couldn’t identify the transaction reference. What number appears beside UTR, RRN, or transaction ID on the receipt or bank message?"
+                "I couldn’t identify the reference yet. What UTR or RRN is shown on your bank message or receipt? You can upload its screenshot below and I’ll read it for you."
                 if retry_counts.get("utr", 0)
-                else "What transaction reference is shown beside UTR, RRN, or transaction ID on the receipt or bank message?"
+                else "What UTR or RRN is shown on your bank message or receipt? You can upload its screenshot below and I’ll read it for you."
             )
             return (
                 question,
@@ -1039,6 +1076,7 @@ def conduct_counselor_turn(
         "urgency_flag": docket.get("urgency_flag", False),
         "urgency_reason": docket.get("urgency_reason", "STANDARD"),
         "turn_count": turn_count,
+        "retry_counts": retry_counts,
         "unknown_fields": sorted(unknown_fields),
         "pending_field": target_field,
         "is_complete": is_complete,

@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/style.css?v=20261024-complaint-isolation">
 </head>
 <body>
 
@@ -26,6 +26,11 @@
           <span class="brand-title">CyberAssist</span>
           <span class="brand-prototype-tag">Unofficial Prototype</span>
         </div>
+      </div>
+
+      <div class="investigator-header-context">
+        <span class="investigator-context-mark">IR</span>
+        <span><strong>Investigator workspace</strong><small>Case review environment</small></span>
       </div>
 
       <!-- Quick Screen Navigator (for Mentor Presentation Demo) -->
@@ -50,8 +55,8 @@
       <div class="navbar-right">
         <!-- Language Switcher Pills -->
         <div class="lang-pill-group">
-          <button type="button" class="lang-pill" id="btn-lang-en" data-lang="en">English</button>
-          <button type="button" class="lang-pill active" id="btn-lang-hi" data-lang="hi">हिन्दी</button>
+          <button type="button" class="lang-pill active" id="btn-lang-en" data-lang="en">English</button>
+          <button type="button" class="lang-pill" id="btn-lang-hi" data-lang="hi">हिन्दी</button>
           <button type="button" class="lang-pill" id="btn-lang-mr" data-lang="mr">मराठी</button>
         </div>
 
@@ -69,18 +74,28 @@
     
     <!-- Left Sidebar Menu -->
     <aside class="app-sidebar">
-      <nav class="sidebar-menu">
+      <nav class="sidebar-menu" id="primary-side-nav" aria-label="Complaint preparation navigation">
         <a href="#" class="sidebar-link" id="nav-dashboard">
           <span class="link-icon">📊</span>
-          <span class="link-text">Case review</span>
+          <span class="link-text" id="nav-dashboard-label">Review queue</span>
         </a>
         <a href="#" class="sidebar-link active" id="nav-report">
           <span class="link-icon">🛡️</span>
-          <span class="link-text">Prepare a complaint</span>
+          <span class="link-text" id="nav-report-label">Prepare a complaint</span>
+        </a>
+        <a href="#" class="sidebar-link" id="nav-track">
+          <span class="link-icon">🔎</span><span class="link-text">Check complaint status</span>
+        </a>
+        <a href="#investigator-operations" class="sidebar-link investigator-only-link" id="nav-investigator-operations">
+          <span class="link-icon">📈</span><span class="link-text">Operations overview</span>
+        </a>
+        <a href="#investigator-import" class="sidebar-link investigator-only-link" id="nav-investigator-import">
+          <span class="link-icon">📥</span><span class="link-text">Import a case</span>
         </a>
       </nav>
 
       <div class="sidebar-footer">
+        <div class="investigator-sidebar-note"><span class="workspace-status-dot"></span><span><strong>Investigator workspace</strong><small>Local review records</small></span></div>
         <div class="session-box">
           <div class="session-lbl">Session Reference</div>
           <div class="session-val" id="lbl-session-id">CYB-2026-LIVE</div>
@@ -237,13 +252,20 @@
               <!-- Rendered via JS -->
             </div>
 
+            <div class="voice-evidence-panel" id="voice-evidence-panel" hidden>
+              <div><strong>Have a bank SMS, receipt, or screenshot?</strong><p>The app can read the amount, date, bank, payment app, and UTR/RRN from it. Check the extracted values before using them.</p></div>
+              <label class="voice-evidence-button" for="voice-evidence-upload">Upload screenshot or PDF</label>
+              <input id="voice-evidence-upload" type="file" accept="image/*,.pdf,application/pdf" multiple hidden>
+              <div id="voice-evidence-ocr-status" class="evidence-ocr-status" role="status" aria-live="polite" hidden></div>
+            </div>
+
             <!-- Voice Controls Dock -->
             <div class="voice-action-dock">
               <div class="dock-row-primary">
                 <select class="select-voice-lang" id="select-voice-lang">
-                  <option value="hi" selected>हिन्दी (hi-IN)</option>
+                  <option value="hi">हिन्दी (hi-IN)</option>
                   <option value="mr">मराठी (mr-IN)</option>
-                  <option value="en">English (en-IN)</option>
+                  <option value="en" selected>English (en-IN)</option>
                 </select>
 
                 <!-- Big Blue Push-to-Talk Button -->
@@ -270,6 +292,11 @@
               <div class="dock-row-input">
                 <input type="text" id="input-voice-text" class="input-text-fallback" placeholder="Tap microphone to speak, or type here..." autocomplete="off">
                 <button type="button" id="btn-voice-send" class="btn-text-send">➤</button>
+              </div>
+              <div class="voice-note-row">
+                <label class="voice-evidence-button" for="voice-note-upload">Upload a voice note</label>
+                <input id="voice-note-upload" type="file" accept="audio/*,.wav,.mp3,.m4a,.ogg,.flac" hidden>
+                <span id="voice-note-status" class="field-hint" role="status" aria-live="polite"></span>
               </div>
             </div>
 
@@ -373,6 +400,19 @@
         </div>
 
         <form class="clean-form-card" id="form-manual-complaint">
+          <h3 class="section-title">Your contact details</h3>
+          <p class="field-hint">Name and phone help the local investigator follow up. Add only details you are comfortable sharing.</p>
+          <div class="form-row-3">
+            <div class="field-group"><label class="field-label" for="man-name">Your full name <span class="req">*</span></label><input class="field-input" id="man-name" autocomplete="name" required></div>
+            <div class="field-group"><label class="field-label" for="man-phone">Phone number <span class="req">*</span></label><input class="field-input" id="man-phone" type="tel" autocomplete="tel" required></div>
+            <div class="field-group"><label class="field-label" for="man-email">Email (optional)</label><input class="field-input" id="man-email" type="email" autocomplete="email"></div>
+          </div>
+          <div class="form-row-3">
+            <div class="field-group"><label class="field-label" for="man-relation">Reporting for</label><select class="field-select" id="man-relation"><option value="Self">Myself</option><option value="Other">Someone else</option></select></div>
+            <div class="field-group"><label class="field-label" for="man-city">City / district</label><input class="field-input" id="man-city" autocomplete="address-level2"></div>
+            <div class="field-group"><label class="field-label" for="man-address">Address (optional)</label><input class="field-input" id="man-address" autocomplete="street-address"></div>
+          </div>
+          <hr class="form-divider">
           
           <!-- Row 1: Category, Sub-Category, Date/Time -->
           <div class="form-row-3">
@@ -380,7 +420,7 @@
               <label class="field-label">Category of Complaint <span class="req">*</span></label>
               <select class="field-select" id="man-category" required>
                 <option value="">-- Select Main Category --</option>
-                <option value="Online Financial Fraud" selected>Online Financial Fraud</option>
+                <option value="Online Financial Fraud">Online Financial Fraud</option>
                 <option value="Online and Social Media Related Crime">Online and Social Media Related Crime</option>
                 <option value="Hacking / Damage to Computer">Hacking / Damage to Computer</option>
               </select>
@@ -391,7 +431,7 @@
               <select class="field-select" id="man-subcategory" required>
                 <option value="">-- Select Sub-Category --</option>
                 <optgroup label="Online Financial Fraud (6 Sub-Categories)">
-                  <option value="UPI Related Frauds" selected>UPI Related Frauds</option>
+                  <option value="UPI Related Frauds">UPI Related Frauds</option>
                   <option value="Internet Banking Related Fraud">Internet Banking Related Fraud</option>
                   <option value="Debit/Credit Card Fraud / SIM Swap Fraud">Debit/Credit Card Fraud / SIM Swap Fraud</option>
                   <option value="E-Wallet Related Fraud">E-Wallet Related Fraud</option>
@@ -438,16 +478,26 @@
               <select class="field-select" id="man-bank">
                 <option value="">-- Select Bank / Wallet --</option>
                 <option value="State Bank of India">State Bank of India (SBI)</option>
+                <option value="Bank of India">Bank of India (BOI)</option>
                 <option value="Punjab National Bank">Punjab National Bank (PNB)</option>
                 <option value="Bank of Maharashtra">Bank of Maharashtra</option>
                 <option value="Bank of Baroda">Bank of Baroda</option>
+                <option value="Union Bank of India">Union Bank of India</option>
+                <option value="Central Bank of India">Central Bank of India</option>
+                <option value="Indian Bank">Indian Bank</option>
+                <option value="Canara Bank">Canara Bank</option>
                 <option value="HDFC Bank">HDFC Bank</option>
                 <option value="ICICI Bank">ICICI Bank</option>
                 <option value="Axis Bank">Axis Bank</option>
                 <option value="Kotak Mahindra Bank">Kotak Mahindra Bank</option>
+                <option value="IndusInd Bank">IndusInd Bank</option>
+                <option value="Yes Bank">Yes Bank</option>
+                <option value="IDBI Bank">IDBI Bank</option>
                 <option value="Paytm Payments Bank">Paytm</option>
                 <option value="PhonePe">PhonePe</option>
                 <option value="Google Pay">Google Pay</option>
+                <option value="BHIM UPI">BHIM UPI</option>
+                <option value="Paytm">Paytm wallet</option>
               </select>
             </div>
 
@@ -462,8 +512,15 @@
             <div class="field-group">
               <label class="field-label">Platform / Channel <span class="req">*</span></label>
               <select class="field-select" id="man-platform" required>
+                <option value="" selected disabled>-- Select a platform or channel --</option>
                 <option value="Phone Call">Phone Call</option>
                 <option value="WhatsApp">WhatsApp</option>
+                <option value="UPI">UPI app or service</option>
+                <option value="Google Pay">Google Pay</option>
+                <option value="PhonePe">PhonePe</option>
+                <option value="Paytm">Paytm</option>
+                <option value="BHIM UPI">BHIM UPI</option>
+                <option value="Amazon Pay">Amazon Pay</option>
                 <option value="Telegram">Telegram</option>
                 <option value="Instagram">Instagram</option>
                 <option value="Facebook">Facebook</option>
@@ -480,16 +537,31 @@
 
             <div class="field-group">
               <label class="field-label">Age of person affected <span class="field-hint">(optional)</span></label>
-              <input type="number" class="field-input" id="man-age" placeholder="e.g. 25" min="1" max="120" value="25">
+              <input type="number" class="field-input" id="man-age" placeholder="e.g. 25" min="1" max="120">
             </div>
           </div>
 
-          <!-- Row 4: Law Enforcement Routing (State & District) & Evidence Upload -->
-          <div class="form-row-3">
+          <section class="repeatable-details-section" aria-labelledby="additional-transactions-title">
+            <h3 class="section-title" id="additional-transactions-title">Other debits (optional)</h3>
+            <p class="field-hint">The amount, bank, and UTR above are the first debit. Add another row only for a separate transaction.</p>
+            <div id="additional-transaction-rows"></div>
+            <button type="button" class="btn-secondary-action" id="btn-add-transaction">＋ Add another debit</button>
+          </section>
+
+          <section class="repeatable-details-section" aria-labelledby="recipient-transactions-title">
+            <h3 class="section-title" id="recipient-transactions-title">Recipient details (optional)</h3>
+            <p class="field-hint">Add only recipient or destination details shown in your evidence. You can add more than one.</p>
+            <div id="recipient-transaction-rows"></div>
+            <button type="button" class="btn-secondary-action" id="btn-add-recipient">＋ Add recipient detail</button>
+          </section>
+
+          <!-- Row 4: Law Enforcement Routing -->
+          <div class="form-row-2">
             <div class="field-group">
               <label class="field-label">State / UT (Jurisdiction) <span class="req">*</span></label>
               <select class="field-select" id="man-state" required>
-                <option value="Maharashtra" selected>Maharashtra</option>
+                <option value="" selected disabled>-- Select state or UT --</option>
+                <option value="Maharashtra">Maharashtra</option>
                 <option value="Delhi">Delhi (NCT)</option>
                 <option value="Karnataka">Karnataka</option>
                 <option value="Telangana">Telangana</option>
@@ -503,13 +575,9 @@
 
             <div class="field-group">
               <label class="field-label">District / City <span class="req">*</span></label>
-              <input type="text" class="field-input" id="man-district" placeholder="e.g. Mumbai Suburban, Pune, Noida" value="Mumbai Suburban" required>
+              <input type="text" class="field-input" id="man-district" placeholder="e.g. Mumbai Suburban, Pune, Noida" required>
             </div>
 
-            <div class="field-group">
-              <label class="field-label">Add screenshots or documents <span class="field-hint">(optional)</span></label>
-              <input type="file" class="field-input" id="man-evidence-file" accept="image/*">
-            </div>
           </div>
 
           <!-- Row 4: Describe What Happened -->
@@ -530,13 +598,14 @@
             <div class="field-group">
               <label class="field-label">Upload Files</label>
               <div class="file-upload-box">
-                <input type="file" id="man-file-upload" class="file-input-hidden" accept="image/*,application/pdf">
+                <input type="file" id="man-file-upload" class="file-input-hidden" accept="image/*,.pdf,.txt,.mp4,.wav,.mp3,.m4a,.ogg,.flac,.docx,.xlsx,.csv" multiple>
                 <label for="man-file-upload" class="file-upload-label">
                   <span class="upload-icon">📁</span>
                   <span class="upload-btn-text">Upload Files</span>
-                  <span class="upload-hint">PDF, Images (Max 5MB each)</span>
+                  <span class="upload-hint">Screenshots, PDFs, audio, video, or documents (Max 25MB each; OCR reads images and PDFs)</span>
                 </label>
               </div>
+              <div id="evidence-ocr-status" class="evidence-ocr-status" role="status" aria-live="polite" hidden></div>
             </div>
           </div>
 
@@ -550,6 +619,15 @@
             </button>
           </div>
 
+        </form>
+      </section>
+
+      <section class="screen-view" id="page-track">
+        <div class="screen-header"><h1 class="screen-title">Check complaint status</h1><p class="screen-subtitle">Enter the reference shown after saving. This checks records in this local prototype only.</p></div>
+        <form class="clean-form-card" id="form-track-case">
+          <div class="field-group"><label class="field-label" for="track-reference">Complaint reference</label><input class="field-input" id="track-reference" autocomplete="off" required placeholder="For example, CYB-2026-123456"></div>
+          <button class="btn-primary-action" type="submit" id="btn-track-case">Check status</button>
+          <div id="track-result" class="track-result" role="status" aria-live="polite" hidden></div>
         </form>
       </section>
 
@@ -586,7 +664,7 @@
 
             <div class="narrative-display-area" id="narrative-display-area">
               <p class="narrative-paragraph" id="review-narrative-text">
-                On 21 October 2026, the complainant reported an unauthorized cyber fraud incident via digital channel. An amount of INR 5,000 was fraudulently debited from the bank account.
+                Your complaint draft will appear here after you describe what happened.
               </p>
               <textarea class="narrative-edit-textarea" id="review-narrative-edit" rows="6" style="display: none;"></textarea>
             </div>
@@ -605,48 +683,58 @@
             <div class="extracted-details-table" id="extracted-details-table">
               <div class="detail-row">
                 <span class="detail-key">Category</span>
-                <span class="detail-val" id="rev-category">Online Financial Fraud</span>
+                <span class="detail-val" id="rev-category">Not provided</span>
               </div>
               <div class="detail-row">
                 <span class="detail-key">Sub-Category</span>
-                <span class="detail-val" id="rev-subcategory">UPI Related Frauds</span>
+                <span class="detail-val" id="rev-subcategory">Not provided</span>
               </div>
               <div class="detail-row">
                 <span class="detail-key">Date &amp; Time</span>
-                <span class="detail-val" id="rev-datetime">21-10-2026, 7:30 PM</span>
+                <span class="detail-val" id="rev-datetime">Not provided</span>
               </div>
               <div class="detail-row">
                 <span class="detail-key">Amount</span>
-                <span class="detail-val font-bold" id="rev-amount">₹ 5,000</span>
+                <span class="detail-val font-bold" id="rev-amount">Not provided</span>
               </div>
               <div class="detail-row">
                 <span class="detail-key">Platform</span>
-                <span class="detail-val" id="rev-platform">Phone Call</span>
+                <span class="detail-val" id="rev-platform">Not provided</span>
               </div>
               <div class="detail-row">
                 <span class="detail-key">Bank</span>
-                <span class="detail-val" id="rev-bank">SBI</span>
+                <span class="detail-val" id="rev-bank">Not provided</span>
               </div>
               <div class="detail-row">
                 <span class="detail-key">Transaction ID</span>
-                <span class="detail-val font-mono" id="rev-utr">123456789012</span>
+                <span class="detail-val font-mono" id="rev-utr">Not provided</span>
               </div>
               <div class="detail-row">
                 <span class="detail-key">Suspect Contact</span>
-                <span class="detail-val" id="rev-suspect">+91 9876543210</span>
+                <span class="detail-val" id="rev-suspect">Not provided</span>
               </div>
               <div class="detail-row">
                 <span class="detail-key">Complainant Age</span>
-                <span class="detail-val" id="rev-age">25 (Adult)</span>
+                <span class="detail-val" id="rev-age">Not provided</span>
               </div>
               <div class="detail-row highlight-row">
                 <span class="detail-key">Routed Police Station</span>
-                <span class="detail-val font-bold text-primary" id="rev-police-station">Cyber Crime Police Station BKC, Mumbai Police</span>
+                <span class="detail-val font-bold text-primary" id="rev-police-station">Location not provided</span>
               </div>
             </div>
 
           </div>
 
+        </div>
+
+        <div class="clean-form-card review-contact-card">
+          <h3 class="section-title">Your contact details</h3>
+          <p class="field-hint">Required to save a complaint record. These details stay in this local prototype.</p>
+          <div class="form-row-3">
+            <div class="field-group"><label class="field-label" for="review-name">Full name <span class="req">*</span></label><input class="field-input" id="review-name" autocomplete="name" required></div>
+            <div class="field-group"><label class="field-label" for="review-phone">Phone number <span class="req">*</span></label><input class="field-input" id="review-phone" type="tel" autocomplete="tel" required></div>
+            <div class="field-group"><label class="field-label" for="review-email">Email (optional)</label><input class="field-input" id="review-email" type="email" autocomplete="email"></div>
+          </div>
         </div>
 
         <!-- Verification Agreement Checkbox -->
@@ -775,13 +863,18 @@
             </ul>
 
             <div class="result-action-buttons">
+              <label class="agreement-checkbox-label local-consent-label">
+                <input type="checkbox" id="chk-local-consent" class="styled-checkbox">
+                <span>I agree to save this record on this computer and make it visible in this app’s local investigator workspace. This prototype has no sign-in or access controls.</span>
+              </label>
               <button type="button" class="btn-download-pdf-clean" id="btn-download-pdf-result">
                 📄 Download Draft (PDF)
               </button>
-              <button type="button" class="btn-save-continue" id="btn-save-continue">
+              <button type="button" class="btn-save-continue" id="btn-save-continue" disabled>
                 Save and Continue &rarr;
               </button>
             </div>
+            <p id="saved-case-reference" class="saved-case-reference" role="status" aria-live="polite" hidden></p>
           </div>
 
         </div>
@@ -791,22 +884,22 @@
       <!-- ================================================================= -->
       <!-- MODULE F: LAW ENFORCEMENT & OFFICER DASHBOARD                     -->
       <!-- ================================================================= -->
-      <section class="screen-view" id="page-dashboard">
+      <section class="screen-view investigator-environment" id="page-dashboard">
         <div class="dashboard-header-banner">
           <div>
             <div class="dash-badges-row">
-              <span class="badge-police-portal">Independent prototype</span>
+              <span class="badge-police-portal">Investigator workspace</span>
               <span class="badge-live-stream">Local records only</span>
             </div>
-            <h1 class="dash-main-title">Review complaint records</h1>
-            <p class="dash-main-sub">Records saved in this prototype. This is not connected to police or NCRP systems.</p>
+            <h1 class="dash-main-title">Case review</h1>
+            <p class="dash-main-sub">Review submitted complaints, check evidence, and record the next action. This workspace is not connected to police or NCRP systems.</p>
           </div>
           <div class="dash-actions">
             <button type="button" class="btn-refresh-cases" id="btn-refresh-cases">Refresh records</button>
           </div>
         </div>
 
-        <!-- 4 Metric Cards -->
+        <!-- Investigator queue summary -->
         <div class="dash-metrics-grid">
           <div class="dash-metric-card">
             <div class="metric-lbl">Saved records</div>
@@ -826,33 +919,50 @@
           <div class="dash-metric-card">
             <div class="metric-lbl">Needs review</div>
             <div class="metric-num text-warning" id="stat-pending-cases">0</div>
-            <div class="metric-sub">Based on saved status</div>
+            <div class="metric-sub">Waiting for an investigator action</div>
+          </div>
+          <div class="dash-metric-card metric-conflicts">
+            <div class="metric-lbl">Evidence differences</div>
+            <div class="metric-num text-warning" id="stat-evidence-conflicts">0</div>
+            <div class="metric-sub">Compare the image and complaint</div>
           </div>
         </div>
 
         <!-- Filter & Search Bar -->
         <div class="dash-filter-bar">
           <div class="search-input-wrapper">
-            <input type="text" id="dash-search-input" class="dash-search-input" placeholder="Search reference, person, or incident type">
+            <input type="search" id="dash-search-input" class="dash-search-input" aria-label="Search cases" placeholder="Search case reference, name, phone, or complaint text">
           </div>
-          <select id="dash-category-filter" class="dash-select-filter">
+          <select id="dash-category-filter" class="dash-select-filter" aria-label="Filter by incident category">
             <option value="">All Categories</option>
             <option value="Online Financial Fraud">Online Financial Fraud</option>
             <option value="Online and Social Media Related Crime">Online and Social Media Related Crime</option>
             <option value="Hacking / Damage to Computer">Hacking / Damage to Computer</option>
           </select>
-          <select id="dash-urgency-filter" class="dash-select-filter">
+          <select id="dash-urgency-filter" class="dash-select-filter" aria-label="Filter by review priority">
             <option value="">All Priorities</option>
             <option value="EMERGENCY_GOLDEN_HOUR">Urgent (recent financial loss)</option>
             <option value="HIGH">High Priority</option>
             <option value="STANDARD">Standard Priority</option>
+          </select>
+          <select id="dash-status-filter" class="dash-select-filter" aria-label="Filter by case status">
+            <option value="">All case statuses</option>
+            <option value="RECEIVED - AWAITING REVIEW">Received — awaiting review</option>
+            <option value="IN REVIEW">In review</option>
+            <option value="AWAITING INFORMATION">Waiting for information</option>
+            <option value="REFERRED FOR FOLLOW-UP">Follow-up needed</option>
+            <option value="REVIEW COMPLETE">Review complete</option>
+            <option value="CATEGORY REVIEWED">Category reviewed</option>
+            <option value="CONFIRMED BY OFFICER">Confirmed by officer</option>
+            <option value="RECLASSIFIED BY OFFICER">Reclassified by officer</option>
+            <option value="PENDING OFFICER REVIEW">Pending officer review</option>
           </select>
         </div>
 
         <!-- Cases Queue Table -->
         <div class="dash-table-card">
           <div class="dash-table-header">
-            <h3 class="table-card-title">Saved complaints</h3>
+          <h3 class="table-card-title">Cases in the review queue</h3>
             <span class="table-counter-badge" id="dash-table-count">Showing 0 records</span>
           </div>
           <div class="table-responsive">
@@ -860,13 +970,15 @@
               <thead>
                 <tr>
                   <th>Reference</th>
-                  <th>Date</th>
-                  <th>Person reporting</th>
+                  <th>Incident date</th>
+                  <th>Complainant</th>
                   <th>Suggested incident type</th>
                   <th>Local area</th>
                   <th>Possible reported loss</th>
                   <th>Review priority</th>
                   <th>Status</th>
+                  <th>Assigned investigator</th>
+                  <th>Evidence check</th>
                   <th>View</th>
                 </tr>
               </thead>
@@ -876,6 +988,24 @@
             </table>
           </div>
         </div>
+
+        <section class="operations-panel" id="investigator-operations" aria-labelledby="operations-title">
+          <div class="dash-table-header"><div><h2 id="operations-title">Operations overview</h2><p class="screen-subtitle">Local case trends and model benchmark, when benchmark data is available.</p></div><button type="button" class="btn-refresh-cases" id="btn-load-benchmark">Load model benchmark</button></div>
+          <div id="operations-summary" class="operations-summary" aria-live="polite">Refresh records to see category and status totals.</div>
+          <div id="benchmark-summary" class="benchmark-summary" aria-live="polite"></div>
+        </section>
+
+        <section class="investigator-import-panel" id="investigator-import" aria-labelledby="import-case-title">
+          <h2 id="import-case-title">Import a case for review</h2>
+          <p>Add a structured case record and, if available, its original evidence files to this local review queue.</p>
+          <form id="form-import-case" class="investigator-import-form">
+            <label>Case record (JSON)<input id="import-case-file" type="file" accept=".json,application/json" required></label>
+            <label>Evidence files (optional)<input id="import-evidence-files" type="file" multiple accept="image/*,.pdf,.txt,.mp4,.wav,.mp3,.m4a,.ogg,.flac,.docx,.xlsx,.csv" aria-describedby="import-case-help"></label>
+            <button type="submit" class="btn-primary-action" id="btn-import-case">Import case</button>
+            <p id="import-case-help" class="field-hint">Attach up to 20 files. Each file must be under 25 MB; total size must be under 100 MB.</p>
+            <p id="import-case-status" role="status" aria-live="polite"></p>
+          </form>
+        </section>
 
       </section>
 
@@ -907,6 +1037,6 @@
     <span id="toast-text">Notification message</span>
   </div>
 
-  <script src="/static/app.js"></script>
+  <script src="/static/app.js?v=20261024-complaint-isolation"></script>
 </body>
 </html>

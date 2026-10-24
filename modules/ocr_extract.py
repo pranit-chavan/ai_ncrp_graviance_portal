@@ -96,8 +96,8 @@ PATTERNS = {
         "label": "Card last 4 digits",
     },
     "date": {
-        "re": re.compile(r"\b(\d{1,2}[-/\s](?:\d{1,2}|Jan|Feb|Mar|Apr|May|Jun|Jul|"
-                         r"Aug|Sep|Oct|Nov|Dec)[a-z]*[-/\s]\d{2,4})\b", re.I),
+        "re": re.compile(r"\b((?:\d{4}[-/]\d{1,2}[-/]\d{1,2})|(?:\d{1,2}[-/\s](?:\d{1,2}|Jan|Feb|Mar|Apr|May|Jun|Jul|"
+                         r"Aug|Sep|Oct|Nov|Dec)[a-z]*[-/\s]\d{2,4}))\b", re.I),
         "label": "Date",
     },
     "time": {
@@ -117,6 +117,14 @@ PLATFORMS = [
     "WhatsApp", "Telegram", "Instagram", "Facebook", "Snapchat",
     "SBI", "HDFC", "ICICI", "Axis", "Kotak", "PNB", "Bank of Baroda", "Canara",
     "Naukri", "LinkedIn", "Shine", "Indeed",
+]
+
+PAYMENT_APPS = ["Google Pay", "PhonePe", "Amazon Pay", "MobiKwik", "Paytm", "BHIM UPI", "BHIM", "GPay"]
+BANK_NAMES = [
+    "State Bank of India", "Bank of India", "Bank of Maharashtra", "Punjab National Bank",
+    "Bank of Baroda", "Union Bank of India", "Central Bank of India", "Indian Bank",
+    "Canara Bank", "HDFC Bank", "ICICI Bank", "Axis Bank", "Kotak Mahindra Bank",
+    "IndusInd Bank", "Yes Bank", "IDBI Bank", "SBI", "PNB", "BOI",
 ]
 
 
@@ -196,6 +204,20 @@ def extract_entities(text):
     if plats:
         found["platform"] = [{"value": p, "confidence": 0.85, "label": "Platform"}
                              for p in plats]
+
+    app_aliases = {"Google Pay": "Google Pay", "PhonePe": "PhonePe", "Amazon Pay": "Amazon Pay",
+                   "MobiKwik": "MobiKwik", "Paytm": "Paytm", "BHIM UPI": "BHIM UPI",
+                   "BHIM": "BHIM UPI", "GPay": "Google Pay"}
+    apps = [app_aliases[p] for p in PAYMENT_APPS if re.search(rf"(?<!\w){re.escape(p)}(?!\w)", text, re.I)]
+    if apps:
+        found["payment_app"] = [{"value": p, "confidence": 0.9, "label": "Payment app"}
+                                for p in dict.fromkeys(apps)]
+
+    bank_aliases = {"SBI": "State Bank of India", "PNB": "Punjab National Bank", "BOI": "Bank of India"}
+    banks = [bank_aliases.get(p, p) for p in sorted(BANK_NAMES, key=len, reverse=True)
+             if re.search(rf"(?<!\w){re.escape(p)}(?!\w)", text, re.I)]
+    if banks:
+        found["bank_name"] = [{"value": banks[0], "confidence": 0.9, "label": "Bank"}]
 
     return found
 

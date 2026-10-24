@@ -40,6 +40,13 @@ class TestOcrEntityExtraction(unittest.TestCase):
 
         self.assertEqual(found["platform"][0]["value"], "UPI")
 
+    def test_bank_and_payment_app_are_extracted_as_distinct_fields(self):
+        found = extract_entities("Google Pay | State Bank of India | UTR: 326712345678")
+
+        self.assertEqual(found["payment_app"][0]["value"], "Google Pay")
+        self.assertEqual(found["bank_name"][0]["value"], "State Bank of India")
+        self.assertEqual(found["transaction_ref"][0]["value"], "326712345678")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -40,7 +40,7 @@ from modules.ai_assistant import (
     _digits,
     _normalize_text,
 )
-from modules.conversational_agent import conduct_counselor_turn
+from modules.conversational_agent import conduct_counselor_turn, extract_structured_docket
 
 
 # ============================================================================
@@ -425,6 +425,41 @@ class TestFormatForDisplay(unittest.TestCase):
 
 class TestConversationalIntakeUnknownAnswers(unittest.TestCase):
 
+    def test_payment_app_and_named_bank_fill_separate_slots(self):
+        docket = extract_structured_docket("From Google Pay, State Bank of India.", {})
+
+        self.assertEqual(docket["platform_involved"], "Google Pay")
+        self.assertEqual(docket["bank_name"], "State Bank of India")
+
+    def test_utr_follow_up_offers_upload_for_ocr(self):
+        first = conduct_counselor_turn(
+            "A UPI scam debited INR 20000 from my account.", [], current_docket={}, language="en", use_llm=False
+        )
+        history = [
+            {"role": "user", "content": "A UPI scam debited INR 20000 from my account."},
+            {"role": "assistant", "content": first["spoken_response"]},
+        ]
+        second = conduct_counselor_turn(
+            "From Google Pay, State Bank of India.", history, current_docket=first, language="en", use_llm=False
+        )
+
+        self.assertEqual(second["platform_involved"], "Google Pay")
+        self.assertEqual(second["bank_name"], "State Bank of India")
+        self.assertEqual(second["pending_field"], "utr")
+        self.assertIn("upload its screenshot below", second["spoken_response"].lower())
+
+        ocr_docket = {**second, "utr_number": "326712345678", "evidence_available": True}
+        history.extend([
+            {"role": "user", "content": "From Google Pay, State Bank of India."},
+            {"role": "assistant", "content": second["spoken_response"]},
+        ])
+        after_upload = conduct_counselor_turn(
+            "I uploaded the bank message screenshot.", history, current_docket=ocr_docket,
+            language="en", use_llm=False,
+        )
+        self.assertEqual(after_upload["utr_number"], "326712345678")
+        self.assertNotEqual(after_upload["pending_field"], "utr")
+
     def test_greeting_does_not_assume_financial_loss(self):
         result = conduct_counselor_turn(
             "hello hello", [], current_docket={}, language="en", use_llm=False
@@ -456,6 +491,33 @@ class TestConversationalIntakeUnknownAnswers(unittest.TestCase):
         self.assertIn("bank", second_turn["unknown_fields"])
         self.assertEqual(second_turn["pending_field"], "utr")
         self.assertIn("record that as unknown", second_turn["spoken_response"])
+
+    def test_follow_up_answers_update_slots_and_advance_in_client_docket(self):
+        first = conduct_counselor_turn(
+            "I lost money after a UPI scam.", [], current_docket={}, language="en", use_llm=False
+        )
+        self.assertEqual(first["pending_field"], "amount")
+
+        history = [
+            {"role": "user", "content": "I lost money after a UPI scam."},
+            {"role": "assistant", "content": first["spoken_response"]},
+        ]
+        second = conduct_counselor_turn(
+            "15000", history, current_docket=first, language="en", use_llm=False
+        )
+        self.assertEqual(second["financial_loss_amount"], 15000.0)
+        self.assertNotEqual(second["pending_field"], "amount")
+        self.assertIn("retry_counts", second)
+
+        history.extend([
+            {"role": "user", "content": "15000"},
+            {"role": "assistant", "content": second["spoken_response"]},
+        ])
+        third = conduct_counselor_turn(
+            "SBI", history, current_docket=second, language="en", use_llm=False
+        )
+        self.assertEqual(third["bank_name"], "State Bank of India")
+        self.assertNotEqual(third["pending_field"], "bank")
 
     def test_gemini_reply_is_used_when_it_passes_guards(self):
         with patch(
