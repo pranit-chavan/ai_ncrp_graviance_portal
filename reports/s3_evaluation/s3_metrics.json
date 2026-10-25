@@ -932,6 +932,8 @@
         98
       ]
     ],
-    "misclassified_count": 6
+    "misclassified_count": 6,
+    "prediction_count": 1960,
+    "prediction_generated_at_utc": "2026-10-25T19:47:33.156546+00:00"
   }
 }

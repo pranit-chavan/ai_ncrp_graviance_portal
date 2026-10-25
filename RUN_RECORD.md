@@ -326,3 +326,7 @@ yt-dlp==2026.7.4
 zipp==3.23.1
 zstandard==0.25.0
 ```
+
+## Independent S3 confirmation rerun
+
+On 2026-10-26 local time, `python scripts\run_s3_evaluation.py` was run again from the corrected S3 files without loading the prior model or predictions. The fresh run again used 8,487 train, 1,917 validation, and 1,960 test records and produced LinearSVC accuracy 0.996938775510204 and macro-F1 0.9970010804457539 (rounded in the paper to 0.9969 and 0.9970). It produced six misclassified records. The fresh `reports/s3_evaluation/linear_svc_predictions.json` contains 1,960 predictions with 1,960 unique test IDs; its filesystem modification time was 2026-10-25 19:47:33.164664 UTC (2026-10-26 01:17:33.164664 India time), and its embedded run timestamp is 2026-10-25 19:47:33.156546 UTC. The companion `linear_svc_predictions_metadata.json` records row count, unique-ID count, and SHA-256 `4927f2c512369834f26b0cb734bdd5a5ccfdd377b399711c3de2a5f256c4266b`. Per-class support sums to 1,960. This independently confirms that the repeated rounded macro-F1 was generated from the corrected split in a fresh run.

@@ -6,11 +6,13 @@ which contains a hard-coded DistilBERT reference row and deployment claims.
 """
 
 import csv
+import hashlib
 import glob
 import json
 import os
 import platform
 import sys
+from datetime import datetime, timezone
 
 import sklearn
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -104,11 +106,21 @@ def main():
         y_test, svc_predictions, labels=range(len(labels))
     ).tolist()
     errors = []
+    prediction_rows = []
     for record, truth, pred in zip(test, y_test, svc_predictions):
+        prediction_rows.append({
+            "id": record.get("id"),
+            "true_label": labels[truth],
+            "predicted_label": labels[pred],
+        })
         if truth != pred:
             errors.append({**record, "true_label": labels[truth],
                            "predicted_label": labels[pred]})
     result["linear_svc"]["misclassified_count"] = len(errors)
+    result["linear_svc"]["prediction_count"] = len(prediction_rows)
+    result["linear_svc"]["prediction_generated_at_utc"] = datetime.now(
+        timezone.utc
+    ).isoformat()
 
     out_json = os.path.join(OUT_DIR, "s3_metrics.json")
     with open(out_json, "w", encoding="utf-8") as handle:
@@ -116,6 +128,20 @@ def main():
     with open(os.path.join(OUT_DIR, "linear_svc_misclassified_records.json"),
               "w", encoding="utf-8") as handle:
         json.dump(errors, handle, ensure_ascii=False, indent=2)
+    with open(os.path.join(OUT_DIR, "linear_svc_predictions.json"),
+              "w", encoding="utf-8") as handle:
+        json.dump(prediction_rows, handle, ensure_ascii=False, indent=2)
+    prediction_path = os.path.join(OUT_DIR, "linear_svc_predictions.json")
+    with open(prediction_path, "rb") as handle:
+        prediction_sha256 = hashlib.sha256(handle.read()).hexdigest()
+    with open(os.path.join(OUT_DIR, "linear_svc_predictions_metadata.json"),
+              "w", encoding="utf-8") as handle:
+        json.dump({
+            "generated_at_utc": result["linear_svc"]["prediction_generated_at_utc"],
+            "row_count": len(prediction_rows),
+            "unique_id_count": len({row["id"] for row in prediction_rows}),
+            "sha256": prediction_sha256,
+        }, handle, indent=2)
     with open(os.path.join(OUT_DIR, "linear_svc_confusion_matrix.csv"),
               "w", encoding="utf-8", newline="") as handle:
         writer = csv.writer(handle)
