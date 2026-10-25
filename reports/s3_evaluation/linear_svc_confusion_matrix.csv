@@ -1,0 +1,22 @@
+true \ predicted,AePS Fraud,Cheating by Impersonation,Cyber Bullying / Stalking / Sexting,Damage to Computer / Computer System,Debit/Credit Card Fraud / SIM Swap Fraud,Demat / Depository Fraud,E-Wallet Related Fraud,Email Hacking,Email Phishing,Fake / Impersonating Profile,Impersonating Email (Business Email Compromise),Internet Banking Related Fraud,Intimidating Email,Online Job Fraud,Online Matrimonial Fraud,Profile Hacking / Identity Theft,Provocative Speech for Unlawful Acts,Tampering with Computer Source Document,UPI Related Frauds,Unauthorised Access / Data Breach,Website Defacement / Hacking
+AePS Fraud,89,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Cheating by Impersonation,0,67,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Cyber Bullying / Stalking / Sexting,0,0,105,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Damage to Computer / Computer System,0,0,0,96,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Debit/Credit Card Fraud / SIM Swap Fraud,0,0,0,0,97,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Demat / Depository Fraud,0,0,0,0,0,100,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+E-Wallet Related Fraud,0,0,0,0,0,0,89,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+Email Hacking,0,0,0,0,0,0,0,99,0,0,0,0,0,0,0,0,0,0,0,0,0
+Email Phishing,0,0,0,0,0,0,0,0,89,0,1,0,0,0,0,0,0,0,0,0,0
+Fake / Impersonating Profile,0,0,1,0,0,0,0,0,0,105,0,0,0,0,0,0,0,0,0,0,0
+Impersonating Email (Business Email Compromise),0,0,0,0,0,0,0,0,1,0,91,0,0,0,0,0,0,0,0,0,0
+Internet Banking Related Fraud,0,0,0,0,0,0,0,0,2,0,0,108,0,0,0,0,0,0,0,0,0
+Intimidating Email,0,0,0,0,0,0,0,0,0,0,0,0,69,0,0,0,0,0,0,0,0
+Online Job Fraud,0,0,0,0,0,0,0,0,0,0,0,0,0,101,0,0,0,0,0,0,0
+Online Matrimonial Fraud,0,0,0,0,0,0,0,0,0,0,0,0,0,0,99,0,0,0,0,0,0
+Profile Hacking / Identity Theft,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,77,0,0,0,0,0
+Provocative Speech for Unlawful Acts,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,67,0,0,0,0
+Tampering with Computer Source Document,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,105,0,0,0
+UPI Related Frauds,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,94,0,0
+Unauthorised Access / Data Breach,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,109,0
+Website Defacement / Hacking,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,98

@@ -1,0 +1,64 @@
+﻿model,label,precision,recall,f1,support
+LinearSVC,AePS Fraud,1.0,1.0,1.0,89
+LinearSVC,Cheating by Impersonation,1.0,1.0,1.0,67
+LinearSVC,Cyber Bullying / Stalking / Sexting,0.9905660377358491,1.0,0.995260663507109,105
+LinearSVC,Damage to Computer / Computer System,1.0,1.0,1.0,96
+LinearSVC,Debit/Credit Card Fraud / SIM Swap Fraud,1.0,1.0,1.0,97
+LinearSVC,Demat / Depository Fraud,1.0,1.0,1.0,100
+LinearSVC,E-Wallet Related Fraud,1.0,1.0,1.0,89
+LinearSVC,Email Hacking,0.99,1.0,0.9949748743718593,99
+LinearSVC,Email Phishing,0.967391304347826,0.9888888888888889,0.978021978021978,90
+LinearSVC,Fake / Impersonating Profile,1.0,0.9905660377358491,0.995260663507109,106
+LinearSVC,Impersonating Email (Business Email Compromise),0.9891304347826086,0.9891304347826086,0.9891304347826086,92
+LinearSVC,Internet Banking Related Fraud,1.0,0.9818181818181818,0.9908256880733946,110
+LinearSVC,Intimidating Email,1.0,1.0,1.0,69
+LinearSVC,Online Job Fraud,1.0,1.0,1.0,101
+LinearSVC,Online Matrimonial Fraud,1.0,1.0,1.0,99
+LinearSVC,Profile Hacking / Identity Theft,1.0,0.9871794871794872,0.9935483870967742,78
+LinearSVC,Provocative Speech for Unlawful Acts,1.0,1.0,1.0,67
+LinearSVC,Tampering with Computer Source Document,1.0,1.0,1.0,105
+LinearSVC,UPI Related Frauds,1.0,1.0,1.0,94
+LinearSVC,Unauthorised Access / Data Breach,1.0,1.0,1.0,109
+LinearSVC,Website Defacement / Hacking,1.0,1.0,1.0,98
+Logistic Regression (L2),AePS Fraud,1.0,1.0,1.0,89
+Logistic Regression (L2),Cheating by Impersonation,1.0,1.0,1.0,67
+Logistic Regression (L2),Cyber Bullying / Stalking / Sexting,0.9905660377358491,1.0,0.995260663507109,105
+Logistic Regression (L2),Damage to Computer / Computer System,1.0,1.0,1.0,96
+Logistic Regression (L2),Debit/Credit Card Fraud / SIM Swap Fraud,1.0,1.0,1.0,97
+Logistic Regression (L2),Demat / Depository Fraud,1.0,1.0,1.0,100
+Logistic Regression (L2),E-Wallet Related Fraud,1.0,1.0,1.0,89
+Logistic Regression (L2),Email Hacking,1.0,1.0,1.0,99
+Logistic Regression (L2),Email Phishing,0.9888888888888889,0.9888888888888889,0.9888888888888889,90
+Logistic Regression (L2),Fake / Impersonating Profile,0.9905660377358491,0.9905660377358491,0.9905660377358491,106
+Logistic Regression (L2),Impersonating Email (Business Email Compromise),0.989247311827957,1.0,0.9945945945945946,92
+Logistic Regression (L2),Internet Banking Related Fraud,1.0,0.990909090909091,0.9954337899543378,110
+Logistic Regression (L2),Intimidating Email,1.0,1.0,1.0,69
+Logistic Regression (L2),Online Job Fraud,1.0,1.0,1.0,101
+Logistic Regression (L2),Online Matrimonial Fraud,1.0,0.98989898989899,0.9949238578680203,99
+Logistic Regression (L2),Profile Hacking / Identity Theft,1.0,1.0,1.0,78
+Logistic Regression (L2),Provocative Speech for Unlawful Acts,1.0,1.0,1.0,67
+Logistic Regression (L2),Tampering with Computer Source Document,1.0,1.0,1.0,105
+Logistic Regression (L2),UPI Related Frauds,1.0,1.0,1.0,94
+Logistic Regression (L2),Unauthorised Access / Data Breach,1.0,1.0,1.0,109
+Logistic Regression (L2),Website Defacement / Hacking,1.0,1.0,1.0,98
+Complement Naive Bayes,AePS Fraud,1.0,1.0,1.0,89
+Complement Naive Bayes,Cheating by Impersonation,1.0,1.0,1.0,67
+Complement Naive Bayes,Cyber Bullying / Stalking / Sexting,1.0,0.9904761904761905,0.9952153110047847,105
+Complement Naive Bayes,Damage to Computer / Computer System,1.0,1.0,1.0,96
+Complement Naive Bayes,Debit/Credit Card Fraud / SIM Swap Fraud,1.0,1.0,1.0,97
+Complement Naive Bayes,Demat / Depository Fraud,1.0,1.0,1.0,100
+Complement Naive Bayes,E-Wallet Related Fraud,1.0,1.0,1.0,89
+Complement Naive Bayes,Email Hacking,1.0,1.0,1.0,99
+Complement Naive Bayes,Email Phishing,0.9777777777777777,0.9777777777777777,0.9777777777777777,90
+Complement Naive Bayes,Fake / Impersonating Profile,1.0,1.0,1.0,106
+Complement Naive Bayes,Impersonating Email (Business Email Compromise),0.9787234042553191,1.0,0.989247311827957,92
+Complement Naive Bayes,Internet Banking Related Fraud,1.0,0.9818181818181818,0.9908256880733946,110
+Complement Naive Bayes,Intimidating Email,1.0,1.0,1.0,69
+Complement Naive Bayes,Online Job Fraud,1.0,1.0,1.0,101
+Complement Naive Bayes,Online Matrimonial Fraud,0.99,1.0,0.9949748743718593,99
+Complement Naive Bayes,Profile Hacking / Identity Theft,1.0,1.0,1.0,78
+Complement Naive Bayes,Provocative Speech for Unlawful Acts,1.0,1.0,1.0,67
+Complement Naive Bayes,Tampering with Computer Source Document,1.0,1.0,1.0,105
+Complement Naive Bayes,UPI Related Frauds,1.0,1.0,1.0,94
+Complement Naive Bayes,Unauthorised Access / Data Breach,1.0,1.0,1.0,109
+Complement Naive Bayes,Website Defacement / Hacking,1.0,1.0,1.0,98
