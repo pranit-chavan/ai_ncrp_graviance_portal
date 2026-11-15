@@ -69,7 +69,7 @@ from modules.pattern_engine import find_linked_cases, build_suspect_dossier, syn
 from modules.doc_generator import generate_investigation_document, list_available_templates
 from modules import investigator_store
 
-app = FastAPI(title="National Cyber Crime Reporting Portal API", version="3.5.0")
+app = FastAPI(title="CyberAssist | Independent Cybercrime Complaint Analysis Prototype", version="3.5.0")
 
 DEFAULT_CORS_ORIGINS = (
     "http://localhost:8000,http://127.0.0.1:8000,"
@@ -264,7 +264,7 @@ async def health_check():
     cases_count = len(glob.glob(os.path.join(CASE_DIR, "*.json")))
     return JSONResponse({
         "status": "healthy",
-        "service": "National Cyber Crime Reporting Portal (NCRP) API",
+        "service": "CyberAssist Independent Prototype API",
         "version": "3.5.0",
         "classifier_loaded": clf_ok,
         "database": "SQLite (complaints.db, case_index.db)",

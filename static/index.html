@@ -3,12 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CyberAssist — Complaint preparation prototype</title>
+  <title>CyberAssist | Intelligent Cybercrime Complaint Analysis and Category Classification System using NLP</title>
   <meta name="description" content="An independent prototype for preparing and reviewing cybercrime complaint drafts.">
+  <link rel="icon" type="image/svg+xml" href="/static/cyberassist-mark.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/style.css?v=20261024-complaint-isolation">
+  <link rel="stylesheet" href="/static/style.css?v=20261115-citizen-experience">
+  <link rel="stylesheet" href="/static/citizen-refresh.css?v=20261115">
 </head>
 <body>
 
@@ -16,15 +18,9 @@
   <header class="app-navbar">
     <div class="navbar-inner">
       <div class="navbar-brand" id="brand-logo-btn">
-        <div class="brand-shield">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            <path d="M9 12l2 2 4-4"/>
-          </svg>
-        </div>
         <div class="brand-text">
           <span class="brand-title">CyberAssist</span>
-          <span class="brand-prototype-tag">Unofficial Prototype</span>
+          <span class="brand-prototype-tag">Cybercrime complaint support</span>
         </div>
       </div>
 
@@ -32,6 +28,17 @@
         <span class="investigator-context-mark">IR</span>
         <span><strong>Investigator workspace</strong><small>Case review environment</small></span>
       </div>
+
+      <nav class="citizen-nav" aria-label="Main navigation">
+        <button type="button" class="citizen-nav-link active" id="top-nav-home">Home</button>
+        <button type="button" class="citizen-nav-link" id="top-nav-help">How to report</button>
+        <button type="button" class="citizen-nav-link" id="top-nav-prepare">Prepare a draft</button>
+        <button type="button" class="citizen-nav-link" id="top-nav-track">Find a draft</button>
+      </nav>
+
+      <a class="header-hotline" href="tel:1930" aria-label="Call cybercrime helpline 1930">
+        <span>Urgent financial fraud?</span><strong>1930</strong>
+      </a>
 
       <!-- Quick Screen Navigator (for Mentor Presentation Demo) -->
       <nav class="flow-stepper-nav" aria-label="Workflow Navigation">
@@ -68,6 +75,14 @@
       </div>
     </div>
   </header>
+
+  <div class="complaint-progress" id="complaint-progress" hidden aria-label="Complaint draft progress">
+    <div class="progress-step active" data-progress-step="0"><span>1</span><strong>Describe</strong></div>
+    <div class="progress-track"><i></i></div>
+    <div class="progress-step" data-progress-step="1"><span>2</span><strong>Review details</strong></div>
+    <div class="progress-track"><i></i></div>
+    <div class="progress-step" data-progress-step="2"><span>3</span><strong>Review and save</strong></div>
+  </div>
 
   <!-- App Body Layout: Sidebar + Main Content -->
   <div class="app-layout">
@@ -113,85 +128,58 @@
       <!-- SCREEN 3: REPORT CYBERCRIME (CHOOSE MODE)                        -->
       <!-- ================================================================= -->
       <section class="screen-view active" id="page-choose-mode">
-        <div class="screen-header">
-          <h1 class="screen-title">Prepare a complaint</h1>
-          <p class="screen-subtitle">Choose whether to speak or fill in the details yourself.</p>
-        </div>
-
-        <!-- 2 Big Choice Cards -->
-        <div class="mode-choice-grid">
-          
-          <!-- Card 1: Speak to AI Assistant -->
-          <div class="mode-card primary-mode-card" id="card-choose-voice">
-            <div class="mode-icon-circle blue-circle">
-              <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
-                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
-                <line x1="12" y1="19" x2="12" y2="23"/>
-                <line x1="8" y1="23" x2="16" y2="23"/>
-              </svg>
+        <section class="home-hero" aria-labelledby="home-title">
+          <div class="home-copy">
+            <h1 id="home-title">Get help preparing a cybercrime report</h1>
+            <p>This independent project helps you organize what happened and prepare a draft to review. It does not file an official complaint.</p>
+            <div class="home-actions">
+              <div id="card-choose-voice">
+                <button type="button" class="home-primary-action" id="btn-start-voice">Prepare a complaint draft <span aria-hidden="true">→</span></button>
+              </div>
+              <div id="card-choose-manual">
+                <button type="button" class="home-secondary-action" id="btn-start-manual">Enter details yourself</button>
+              </div>
             </div>
-            <h2 class="mode-card-title">Speak with the assistant</h2>
-            <p class="mode-card-desc">Tell us what happened. The assistant may ask a few follow-up questions.</p>
-            <button type="button" class="btn-primary-card" id="btn-start-voice">
-              Start speaking &rarr;
-            </button>
+            <a class="official-portal-link" href="https://www.cybercrime.gov.in/" target="_blank" rel="noopener noreferrer">Report on the official portal <span aria-hidden="true">↗</span></a>
           </div>
+          <figure class="home-photo">
+            <img src="/static/assets/cyberassist-home.png" alt="A woman documenting an online incident at home" fetchpriority="high">
+            <figcaption>For real incidents, report through the official portal or contact the appropriate helpline.</figcaption>
+          </figure>
+        </section>
 
-          <!-- Card 2: Type Manually -->
-          <div class="mode-card outline-mode-card" id="card-choose-manual">
-            <div class="mode-icon-circle slate-circle">
-              <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="2" y="4" width="20" height="16" rx="2" ry="2"/>
-                <line x1="6" y1="8" x2="6.01" y2="8"/>
-                <line x1="10" y1="8" x2="10.01" y2="8"/>
-                <line x1="14" y1="8" x2="14.01" y2="8"/>
-                <line x1="18" y1="8" x2="18.01" y2="8"/>
-                <line x1="6" y1="12" x2="6.01" y2="12"/>
-                <line x1="10" y1="12" x2="10.01" y2="12"/>
-                <line x1="14" y1="12" x2="14.01" y2="12"/>
-                <line x1="18" y1="12" x2="18.01" y2="12"/>
-                <line x1="7" y1="16" x2="17" y2="16"/>
-              </svg>
-            </div>
-            <h2 class="mode-card-title">Fill in the details</h2>
-            <p class="mode-card-desc">Fill the complaint form manually at your own pace.</p>
-            <button type="button" class="btn-outline-card" id="btn-start-manual">
-              Fill in details &rarr;
-            </button>
+        <section class="home-helplines" aria-label="Important helplines">
+          <h2>Need help now?</h2>
+          <a href="tel:1930"><strong>1930</strong><span>Cyber financial fraud</span></a>
+          <a href="tel:112"><strong>112</strong><span>Police, fire or medical emergency</span></a>
+          <a href="tel:181"><strong>181</strong><span>Women’s helpline</span></a>
+        </section>
+
+        <section class="home-guidance" id="how-to-report" aria-label="Cybercrime reporting information">
+          <div>
+            <h2>Examples of cybercrime in India</h2>
+            <ul>
+              <li><strong>Payment fraud</strong><span>Money taken through a deceptive link, UPI request, or bank transaction.</span></li>
+              <li><strong>Impersonation</strong><span>Someone pretends to be a trusted person, company, or public service.</span></li>
+              <li><strong>Account access</strong><span>Someone gets into your email, social media, or other account without permission.</span></li>
+              <li><strong>Online harassment</strong><span>Threats, stalking, blackmail, or repeated abusive messages online.</span></li>
+            </ul>
           </div>
-
-        </div>
-
-        <!-- What Happens Next? Stepper Bar -->
-        <div class="next-steps-banner">
-          <div class="next-steps-title">What happens next?</div>
-          <div class="next-steps-stepper">
-            <div class="stepper-step">
-              <div class="step-num-badge">1</div>
-              <div class="step-text">Provide details<br><span class="step-sub">(Voice or Text)</span></div>
-            </div>
-            <div class="stepper-divider"></div>
-            <div class="stepper-step">
-              <div class="step-num-badge">2</div>
-              <div class="step-text">Review &amp; Edit<br><span class="step-sub">Complaint Draft</span></div>
-            </div>
-            <div class="stepper-divider"></div>
-            <div class="stepper-step">
-              <div class="step-num-badge">3</div>
-              <div class="step-text">See suggested type<br><span class="step-sub">Review before saving</span></div>
-            </div>
-            <div class="stepper-divider"></div>
-            <div class="stepper-step">
-              <div class="step-num-badge">4</div>
-              <div class="step-text">Save a copy<br><span class="step-sub">Keep the reference number</span></div>
-            </div>
+          <div>
+            <h2>What may help when reporting</h2>
+            <ul>
+              <li><strong>When it happened</strong><span>An approximate date and time are useful if you are unsure.</span></li>
+              <li><strong>Transaction details</strong><span>Amount and reference number, if money was involved.</span></li>
+              <li><strong>Relevant evidence</strong><span>Screenshots, messages, emails, payment alerts, or links.</span></li>
+              <li><strong>Where it happened</strong><span>The bank, payment app, website, or social platform involved.</span></li>
+            </ul>
+            <p class="home-safety-note">Never share passwords, PINs, one-time codes, or full card details here.</p>
           </div>
-        </div>
+        </section>
 
-        <!-- Prototype Disclaimer -->
-        <footer class="screen-disclaimer">
-          This is an educational and independent prototype. Not affiliated with the National Cyber Crime Reporting Portal (NCRP) or any government entity. It does not submit official complaints.
+        <footer class="home-disclaimer">
+          <p><strong>About this project</strong> CyberAssist is the Intelligent Cybercrime Complaint Analysis and Category Classification System using NLP, an independent academic prototype, not a government service. It stores records in this project workspace and has no sign-in or access controls. Depending on configuration, complaint text may be processed by an external AI provider. Use fictional details only.</p>
+          <button type="button" id="btn-reviewer-workspace" class="reviewer-link">Project reviewer workspace</button>
         </footer>
       </section>
 
@@ -201,15 +189,19 @@
       <section class="screen-view" id="page-voice">
         
         <!-- Voice Header Bar -->
+        <div class="voice-intro">
+          <h1>Tell us what happened</h1>
+          <p>Use your own words. You can speak or type, then review the details before saving.</p>
+        </div>
         <div class="view-sub-header">
           <div class="assistant-status-tag">
             <span class="status-mic-icon">🎙️</span>
-            <span class="assistant-label">AI Assistant</span>
+            <span class="assistant-label">Guided intake</span>
             <span class="status-indicator-dot ready" id="status-dot"></span>
-            <span class="status-indicator-text" id="status-text">Ready</span>
+            <span class="status-indicator-text" id="status-text">Ready to help</span>
           </div>
           <div class="view-header-actions">
-            <button type="button" class="btn-sub-link" id="btn-voice-to-manual">Switch to Manual Form</button>
+            <button type="button" class="btn-sub-link" id="btn-voice-to-manual">Prefer to type? Enter details</button>
           </div>
         </div>
 
@@ -280,7 +272,7 @@
                 </button>
 
                 <!-- Stop Button -->
-                <button type="button" class="btn-mic-stop" id="btn-mic-stop" title="Stop Recording">
+                <button type="button" class="btn-mic-stop" id="btn-mic-stop" title="Stop recording" hidden>
                   <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor">
                     <rect x="5" y="5" width="14" height="14" rx="2"/>
                   </svg>
@@ -306,7 +298,7 @@
           <div class="info-collected-card">
             <div class="info-card-header">
               <div class="info-title-group">
-                <h3 class="info-card-title">Information Collected</h3>
+                <h3 class="info-card-title">What may help</h3>
                 <span class="info-counter-badge" id="info-counter-badge">0 / 8</span>
               </div>
               <button type="button" class="btn-reset-fields" id="btn-reset-checklist">Reset</button>
@@ -316,48 +308,48 @@
             <div class="checklist-items-list">
               <div class="check-item" id="item-incident-type">
                 <span class="check-icon">○</span>
-                <span class="check-label">Incident Type</span>
+                <span class="check-label">Possible incident type</span>
                 <span class="check-val" id="val-incident-type">—</span>
               </div>
               <div class="check-item" id="item-amount">
                 <span class="check-icon">○</span>
-                <span class="check-label">Amount</span>
+                <span class="check-label">Money involved</span>
                 <span class="check-val" id="val-amount">—</span>
               </div>
               <div class="check-item" id="item-datetime">
                 <span class="check-icon">○</span>
-                <span class="check-label">Date &amp; Time</span>
+                <span class="check-label">When it happened</span>
                 <span class="check-val" id="val-datetime">—</span>
               </div>
               <div class="check-item" id="item-platform">
                 <span class="check-icon">○</span>
-                <span class="check-label">Platform / Channel</span>
+                <span class="check-label">Where it happened</span>
                 <span class="check-val" id="val-platform">—</span>
               </div>
               <div class="check-item" id="item-bank">
                 <span class="check-icon">○</span>
-                <span class="check-label">Bank / UPI / Wallet</span>
+                <span class="check-label">Bank or payment app</span>
                 <span class="check-val" id="val-bank">—</span>
               </div>
               <div class="check-item" id="item-suspect">
                 <span class="check-icon">○</span>
-                <span class="check-label">Suspect Details</span>
+                <span class="check-label">Sender details</span>
                 <span class="check-val" id="val-suspect">—</span>
               </div>
               <div class="check-item" id="item-evidence">
                 <span class="check-icon">○</span>
-                <span class="check-label">Evidence</span>
+                <span class="check-label">Screenshots or messages</span>
                 <span class="check-val" id="val-evidence">—</span>
               </div>
               <div class="check-item" id="item-narrative">
                 <span class="check-icon">○</span>
-                <span class="check-label">Incident Description</span>
+                <span class="check-label">Your description</span>
                 <span class="check-val" id="val-narrative">—</span>
               </div>
             </div>
 
             <!-- Quick 1-Click Mentor Demo Scenarios -->
-            <div class="scenarios-panel">
+            <div class="scenarios-panel" aria-hidden="true">
               <div class="scenarios-label">Quick Demo Scenarios (Mentor Presentation):</div>
               <div class="scenarios-pills">
                 <button type="button" class="pill-scenario" data-text="नमस्ते, आज सुबह मुझे बिजली विभाग के नाम से फर्जी कॉल आया और मेरे पीएनबी खाते से 65000 रुपये कट गए।">
@@ -374,8 +366,9 @@
 
             <!-- Bottom Forward Button -->
             <div class="info-card-footer">
-              <button type="button" class="btn-proceed-review" id="btn-proceed-from-voice">
-                Proceed to Review Draft &rarr;
+              <p class="voice-safety-note">Never share passwords, PINs, one-time codes, or full card details.</p>
+            <button type="button" class="btn-proceed-review" id="btn-proceed-from-voice">
+              Continue to review &rarr;
               </button>
             </div>
 
@@ -401,7 +394,7 @@
 
         <form class="clean-form-card" id="form-manual-complaint">
           <h3 class="section-title">Your contact details</h3>
-          <p class="field-hint">Name and phone help the local investigator follow up. Add only details you are comfortable sharing.</p>
+          <p class="field-hint">This is a demonstration. Use fictional details only; do not enter identity numbers, account credentials, or one-time codes.</p>
           <div class="form-row-3">
             <div class="field-group"><label class="field-label" for="man-name">Your full name <span class="req">*</span></label><input class="field-input" id="man-name" autocomplete="name" required></div>
             <div class="field-group"><label class="field-label" for="man-phone">Phone number <span class="req">*</span></label><input class="field-input" id="man-phone" type="tel" autocomplete="tel" required></div>
@@ -729,7 +722,7 @@
 
         <div class="clean-form-card review-contact-card">
           <h3 class="section-title">Your contact details</h3>
-          <p class="field-hint">Required to save a complaint record. These details stay in this local prototype.</p>
+          <p class="field-hint">Use fictional details only. Records are stored in this project workspace; depending on configuration, complaint text may be processed by an external AI provider.</p>
           <div class="form-row-3">
             <div class="field-group"><label class="field-label" for="review-name">Full name <span class="req">*</span></label><input class="field-input" id="review-name" autocomplete="name" required></div>
             <div class="field-group"><label class="field-label" for="review-phone">Phone number <span class="req">*</span></label><input class="field-input" id="review-phone" type="tel" autocomplete="tel" required></div>
@@ -865,7 +858,7 @@
             <div class="result-action-buttons">
               <label class="agreement-checkbox-label local-consent-label">
                 <input type="checkbox" id="chk-local-consent" class="styled-checkbox">
-                <span>I agree to save this record on this computer and make it visible in this app’s local investigator workspace. This prototype has no sign-in or access controls.</span>
+                <span>I understand this saves a draft in the project workspace, which has no sign-in or access controls. This is not an official complaint. Complaint text may be processed by an external AI provider depending on configuration. I will use fictional details only.</span>
               </label>
               <button type="button" class="btn-download-pdf-clean" id="btn-download-pdf-result">
                 📄 Download Draft (PDF)
@@ -1037,6 +1030,6 @@
     <span id="toast-text">Notification message</span>
   </div>
 
-  <script src="/static/app.js?v=20261024-complaint-isolation"></script>
+  <script src="/static/app.js?v=20261115-citizen-experience"></script>
 </body>
 </html>

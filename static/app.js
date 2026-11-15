@@ -279,7 +279,25 @@ document.addEventListener('DOMContentLoaded', () => {
 function showScreen(screenId, scrollToTop = true) {
   state.currentScreen = screenId;
   const isDashboard = screenId === 'page-dashboard';
+  const flowScreens = ['page-voice', 'page-manual', 'page-review', 'page-result'];
+  const progress = document.getElementById('complaint-progress');
+  const progressStage = screenId === 'page-result' ? 2 : screenId === 'page-review' ? 1 : 0;
+  if (progress) {
+    progress.hidden = !flowScreens.includes(screenId);
+    progress.querySelectorAll('[data-progress-step]').forEach(step => {
+      const index = Number(step.dataset.progressStep);
+      step.classList.toggle('active', index === progressStage);
+      step.classList.toggle('complete', index < progressStage);
+    });
+    progress.querySelectorAll('.progress-track').forEach((track, index) => {
+      track.classList.toggle('complete', index < progressStage);
+    });
+  }
   document.body.classList.toggle('dashboard-mode', isDashboard);
+  document.body.classList.toggle('intake-mode', flowScreens.includes(screenId));
+  document.getElementById('top-nav-home')?.classList.toggle('active', screenId === 'page-choose-mode');
+  document.getElementById('top-nav-prepare')?.classList.toggle('active', flowScreens.includes(screenId));
+  document.getElementById('top-nav-track')?.classList.toggle('active', screenId === 'page-track');
   navDashboard.classList.toggle('active', isDashboard);
   navTrack?.classList.toggle('active', screenId === 'page-track');
   navReport.classList.toggle('active', !isDashboard && screenId !== 'page-track');
@@ -456,6 +474,7 @@ async function startListening() {
   audioChunks = [];
 
   state.isListening = true;
+  btnMicStop.hidden = false;
   btnMicMain.classList.add('active-listening');
   btnMicLabel.textContent = 'Listening...';
   statusDot.className = 'status-indicator-dot recording';
@@ -501,10 +520,11 @@ async function startListening() {
 function stopListening() {
   clearTimeout(recognitionRestartTimer);
   state.isListening = false;
+  btnMicStop.hidden = true;
   btnMicMain.classList.remove('active-listening');
   btnMicLabel.textContent = 'Tap to Speak';
   statusDot.className = 'status-indicator-dot ready';
-  statusText.textContent = 'Ready';
+  statusText.textContent = 'Ready to help';
 
   // Stop Web Speech
   if (state.recognition) {
@@ -1573,6 +1593,20 @@ function initEventListeners() {
 
   // Brand logo & Dashboard links
   brandLogoBtn.addEventListener('click', () => showScreen('page-choose-mode'));
+  document.getElementById('top-nav-home')?.addEventListener('click', () => showScreen('page-choose-mode'));
+  document.getElementById('top-nav-help')?.addEventListener('click', () => {
+    showScreen('page-choose-mode', false);
+    requestAnimationFrame(() => document.getElementById('how-to-report')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
+  });
+  document.getElementById('top-nav-prepare')?.addEventListener('click', () => {
+    startNewComplaintIfPreviousWasSaved();
+    showScreen('page-voice');
+  });
+  document.getElementById('top-nav-track')?.addEventListener('click', () => showScreen('page-track'));
+  document.getElementById('btn-reviewer-workspace')?.addEventListener('click', () => {
+    showScreen('page-dashboard');
+    loadDashboardCases(false);
+  });
   navReport.addEventListener('click', (e) => { e.preventDefault(); startNewComplaintIfPreviousWasSaved(); showScreen('page-choose-mode'); });
   navDashboard.addEventListener('click', (e) => {
     e.preventDefault();

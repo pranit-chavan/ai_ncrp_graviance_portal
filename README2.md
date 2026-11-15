@@ -57,7 +57,15 @@ evidence of real-world complaint accuracy.
 ## Quick start
 
     pip install -r requirements.txt
-    streamlit run dashboard.py
+    python -m uvicorn server:app --host 127.0.0.1 --port 8501
+
+Open http://localhost:8501 for the citizen-facing HTML/CSS/JavaScript app. The
+FastAPI service provides the complaint intake, transcription, classification,
+evidence review, PDF, and investigator-workspace endpoints.
+
+The earlier Streamlit dashboard remains available for internal demonstrations:
+
+    streamlit run dashboard.py --server.port 8502
 
 Install Tesseract separately for image OCR. The generated case reference and
 PDF are local records, not official NCRP acknowledgements. Legal mappings are
