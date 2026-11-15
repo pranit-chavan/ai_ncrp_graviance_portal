@@ -45,15 +45,15 @@ UPLOAD_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "uploads")
 MAX_UPLOAD_MB = 5
 
 # ---- Portal Design System -------------------------------------------------
-GOV_BLUE = "#0a2540"
-GOV_BLUE_DARK = "#071729"
-GOV_BLUE_HEADER = "#133b70"
-GOV_BLUE_LIGHT = "#eef4fa"
+GOV_BLUE = "#12372f"
+GOV_BLUE_DARK = "#08291f"
+GOV_BLUE_HEADER = "#075e4d"
+GOV_BLUE_LIGHT = "#edf5f2"
 GOV_ACCENT_ORANGE = "#d97706"
-GOV_ACCENT_GREEN = "#15803d"
-GOV_GREY = "#f8fafc"
-GOV_BORDER = "#cbd5e1"
-SEQ_BLUE = "#1d4ed8"
+GOV_ACCENT_GREEN = "#087f5b"
+GOV_GREY = "#f7faf8"
+GOV_BORDER = "#d5e1dc"
+SEQ_BLUE = "#146c68"
 
 BAND_COLOR = {"HIGH": "#166534", "MEDIUM": "#854d0e", "LOW": "#991b1b", "NOT SUPPLIED": "#475569"}
 BAND_BG = {"HIGH": "#dcfce7", "MEDIUM": "#fef9c3", "LOW": "#fee2e2", "NOT SUPPLIED": "#f1f5f9"}
@@ -105,11 +105,11 @@ def inject_custom_css():
             font-family: Inter, "Segoe UI", -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
             color: #182b3b;
         }
-        .stApp { background: #f3f6fa; }
-        .block-container { max-width: 1320px; padding: 1.25rem 1.5rem 2.5rem; }
-        header[data-testid="stHeader"] { display: none !important; }
-        h1 { color: #102c46 !important; font-weight: 750 !important; letter-spacing: -0.035em !important; }
-        h2, h3 { color: #153853 !important; font-weight: 700 !important; letter-spacing: -0.02em !important; }
+        .stApp { background: #ffffff; }
+        .block-container { max-width: 1180px; padding: 1.1rem 2rem 3rem; }
+        header[data-testid="stHeader"] { background: #ffffff !important; }
+        h1 { color: #12372f !important; font-weight: 740 !important; letter-spacing: 0 !important; font-size: 2.2rem !important; }
+        h2, h3 { color: #12372f !important; font-weight: 700 !important; letter-spacing: 0 !important; }
         p, label, [data-testid="stMarkdownContainer"] { line-height: 1.55; }
         div[data-testid="stVerticalBlockBorderWrapper"] {
             background: #ffffff; border: 1px solid #dbe3ec; border-radius: 10px;
@@ -117,33 +117,42 @@ def inject_custom_css():
         div[data-testid="stExpander"] { border: 1px solid #dbe3ec; border-radius: 8px; background: #fff; }
         
         div.stButton > button[kind="primary"] {
-            background-color: #123451 !important;
+            background-color: #087f5b !important;
             color: #ffffff !important;
-            border: 1px solid #123451 !important;
-            border-radius: 6px !important;
+            border: 1px solid #087f5b !important;
+            border-radius: 5px !important;
             font-weight: 650 !important;
             min-height: 42px !important;
             padding: 8px 16px !important;
             transition: background-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out !important;
             box-shadow: 0 2px 4px rgba(10, 37, 64, 0.12) !important;
         }
+        [data-testid="stFormSubmitButton"] button {
+            background-color: #087f5b !important;
+            color: #ffffff !important;
+            border: 1px solid #087f5b !important;
+            border-radius: 5px !important;
+            font-weight: 650 !important;
+            min-height: 42px !important;
+            padding: 8px 16px !important;
+        }
         div.stButton > button[kind="primary"]:hover {
-            background-color: #0f5b68 !important;
-            border-color: #0f5b68 !important;
-            box-shadow: 0 2px 8px rgba(15, 91, 104, 0.18) !important;
+            background-color: #075e4d !important;
+            border-color: #075e4d !important;
+            box-shadow: 0 2px 8px rgba(8, 95, 77, 0.18) !important;
         }
         div.stButton > button[kind="secondary"] {
             background-color: #ffffff !important;
-            color: #123451 !important;
+            color: #12372f !important;
             border: 1px solid #cbd5e1 !important;
-            border-radius: 7px !important;
+            border-radius: 5px !important;
             font-weight: 650 !important;
             min-height: 44px !important;
             padding: 8px 16px !important;
         }
         div.stButton > button[kind="secondary"]:hover {
-            background-color: #eff6f7 !important;
-            border-color: #6b9da2 !important;
+            background-color: #edf5f2 !important;
+            border-color: #75a69b !important;
         }
         div[data-baseweb="input"] input, div[data-baseweb="textarea"] textarea {
             border-radius: 7px !important;
@@ -178,6 +187,17 @@ def inject_custom_css():
         }
         div[data-testid="stAlert"] { border-radius: 9px; }
         div[data-testid="stMetric"] { background: #fff; border: 1px solid #dbe3ec; border-radius: 8px; padding: 12px 14px; }
+        .ca-masthead { border-bottom: 1px solid #d5e1dc; background: #fff; }
+        .ca-helpline-band { background: #12372f; color: #fff; padding: 20px 24px; display:grid; grid-template-columns:1.15fr repeat(3,1fr); gap:20px; align-items:center; }
+        .ca-helpline-band h2 { color:#fff !important; font-size:1.15rem !important; margin:0; }
+        .ca-help-item { display:flex; flex-direction:column; gap:3px; min-width:0; border-left:1px solid rgba(255,255,255,.45); padding-left:18px; }
+        .ca-helpline-band a { color: #fff !important; text-decoration: none; }
+        .ca-help-item:first-of-type strong { color:#ffbf47; }
+        .ca-help-item strong { font-size:2rem; line-height:1.1; }
+        .ca-help-item span { font-size:.88rem; line-height:1.35; }
+        .ca-small-link a { color: #075e4d !important; font-weight: 650; }
+        div[data-testid="stImage"] img { max-height: 310px; object-fit: cover; }
+        section[data-testid="stSidebar"] [data-testid="stRadio"] label { min-height: 42px; }
         @media (max-width: 768px) {
             .block-container { padding: 1rem 1rem 2rem; }
             h1 { font-size: 1.8rem !important; }
@@ -188,6 +208,11 @@ def inject_custom_css():
             .portal-masthead { margin: -1rem -1rem 1.2rem -1rem !important; padding: 12px 16px !important; }
             .portal-hero { padding: 28px 20px !important; }
             .portal-hero-title { font-size: 1.55em !important; line-height: 1.25; }
+            .ca-masthead { margin:-1rem -1rem 1.2rem -1rem !important; padding:12px 16px !important; }
+            .ca-masthead a { white-space:normal !important; text-align:right; }
+            .ca-helpline-band { grid-template-columns:1fr 1fr; gap:16px; padding:18px; }
+            .ca-help-item { border-left:0; padding-left:0; }
+            .ca-help-item strong { font-size:1.65rem; }
         }
         </style>
         """,
@@ -306,12 +331,16 @@ MONEY_TRANSFER_METHODS = ["UPI", "IMPS", "NEFT/RTGS", "Debit Card", "Credit Card
 COMPLAINANT_ID_TYPES = ["Not provided", "Aadhaar Card", "PAN Card", "Voter ID", "Passport", "Driving License", "Other"]
 
 HELPLINES = [
-    ("1930", "National Cyber Crime Financial Helpline", GOV_BLUE),
-    ("1091 / 181", "Women in Distress Safety Helpline", "#831843"),
-    ("112", "Emergency Response Support System (ERSS)", "#991b1b"),
+    ("1930", "Cyber financial fraud", GOV_ACCENT_ORANGE),
+    ("112", "Police, fire or medical emergency", "#f8fafc"),
+    ("181", "Women’s helpline", "#f8fafc"),
 ]
 
-st.set_page_config(page_title="Cybercrime Intake & Investigation Portal | MVP", layout="wide")
+st.set_page_config(
+    page_title="CyberAssist | Intelligent Cybercrime Complaint Analysis and Category Classification System using NLP",
+    layout="wide",
+    initial_sidebar_state="auto",
+)
 inject_custom_css()
 
 
@@ -467,31 +496,13 @@ def render_legal_sections(legal):
 def header_bar():
     st.markdown(
         f"""
-        <div class="portal-masthead" style="background:linear-gradient(105deg,{GOV_BLUE_DARK},{GOV_BLUE});margin:-1.25rem -1.5rem 1.25rem -1.5rem;padding:14px 24px;
-                    border-bottom:2px solid {GOV_ACCENT_ORANGE};">
-          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
-          <div style="display:flex;align-items:center;gap:14px;">
-              <div style="background:#eaf1f8;color:{GOV_BLUE};font-weight:850;font-size:0.9em;
-                          width:44px;height:44px;border-radius:8px;display:flex;align-items:center;
-                          justify-content:center;letter-spacing:0.04em;border:1px solid rgba(255,255,255,.4);">
-                CI
-              </div>
-              <div>
-                <div style="color:#ffffff;font-size:1.12em;font-weight:800;letter-spacing:0.005em;line-height:1.25;">
-                  Cybercrime complaint workspace
-                </div>
-                <div style="color:#cbd5e1;font-size:0.78em;font-weight:500;">
-                  Independent prototype · Not connected to police or NCRP systems
-                </div>
-              </div>
+        <div class="ca-masthead" style="margin:-1.1rem -2rem 1.5rem -2rem;padding:14px 32px;">
+          <div style="max-width:1180px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:16px;">
+            <div>
+              <div style="color:{GOV_BLUE_DARK};font-size:1.35em;font-weight:800;line-height:1.2;">CyberAssist</div>
+              <div style="color:#53665f;font-size:.82em;margin-top:3px;">Cybercrime complaint support · Independent academic prototype</div>
             </div>
-            <div style="display:flex;align-items:center;gap:16px;">
-              <div style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.22);
-                          padding:7px 13px;border-radius:6px;color:#fff;font-size:0.77em;font-weight:700;
-                          letter-spacing:0.025em;">
-                Need urgent help? &nbsp; <span style="font-size:1.1em;color:#fde68a;">Call 1930</span>
-              </div>
-            </div>
+            <a href="tel:1930" style="color:{GOV_BLUE_HEADER};font-size:.95em;font-weight:750;text-decoration:none;white-space:nowrap;">Urgent financial fraud? Call 1930</a>
           </div>
         </div>
         """,
@@ -503,7 +514,7 @@ def section_header(text):
     st.markdown(
         f'<div style="background:transparent;border-left:3px solid {GOV_ACCENT_ORANGE};'
         f'padding:4px 12px;margin:23px 0 12px 0;font-weight:750;color:{GOV_BLUE};'
-        f'font-size:1.02em;letter-spacing:-.01em;">{html.escape(text)}</div>',
+        f'font-size:1.02em;letter-spacing:0;">{html.escape(text)}</div>',
         unsafe_allow_html=True,
     )
 
@@ -513,7 +524,7 @@ def req(text, mandatory=True):
 
 
 def progress_steps(current):
-    steps = ["1. Describe & clarify", "2. Confirm details", "3. Review & save"]
+    steps = ["Describe", "Review details", "Review and save"]
     cells = []
     for i, label in enumerate(steps, 1):
         if i < current:
@@ -570,6 +581,7 @@ if "wiz" not in st.session_state:
 
 
 def new_wizard():
+    st.session_state.pop("local_record_consent", None)
     st.session_state["wiz"] = {
         "incident_text": "", "category": "", "sub_category": "", "modus_operandi": "",
         "ai_sub_category": None, "ai_confidence": None, "ai_narrative_ok": None,
@@ -599,9 +611,9 @@ USER_PAGES = ["Home", "Report Cyber Crime", "Check Status"]
 INVESTIGATOR_PAGES = ["Case Queue", "Case Review", "Operations"]
 
 PAGE_LABELS_CITIZEN = {
-    "Home": "Overview",
-    "Report Cyber Crime": "Prepare complaint",
-    "Check Status": "Find saved record",
+    "Home": "Home",
+    "Report Cyber Crime": "Prepare a draft",
+    "Check Status": "Find a saved draft",
 }
 
 PAGE_LABELS_INVESTIGATOR = {
@@ -631,8 +643,7 @@ current_route = st.query_params.get("route", "")
 
 if current_route == "user":
     st.info(
-        "**Independent MVP:** Completed complaints are stored on this computer and appear in the local investigator workspace. This app does not send reports to NCRP or the police. "
-        "Do not enter passwords, PINs, one-time codes, or real identity documents."
+        "**Independent student prototype:** This creates a local project record, not an official complaint. Depending on configuration, text may be processed by an external AI provider. Use fictional details only; never enter passwords, PINs, one-time codes, or identity documents."
     )
 elif current_route == "investigator":
     st.warning(
@@ -652,7 +663,7 @@ if nav_pages is not None:
             f"""
             <div style="padding:10px 0 8px 0;border-bottom:1px solid #e2e8f0;margin-bottom:12px;">
               <div style="font-weight:800;color:{GOV_BLUE};font-size:1.05em;letter-spacing:0.02em;">
-                Cybercrime Portal
+                CyberAssist
               </div>
               <div style="font-size:0.78em;color:#64748b;font-weight:600;margin-top:2px;">
                 {'For people reporting an incident' if current_route == 'user' else 'For complaint review'}
@@ -689,13 +700,13 @@ if nav_pages is not None:
             f"""
             <div style="background:#f1f5f9;border:1px solid #cbd5e1;border-left:4px solid {GOV_BLUE};padding:10px 12px;border-radius:4px;">
               <div style="font-weight:700;color:{GOV_BLUE};font-size:0.8em;text-transform:uppercase;letter-spacing:0.04em;">
-                Urgent financial fraud?
+                If money was taken recently
               </div>
               <div style="font-size:1.2em;font-weight:800;color:#1e40af;margin-top:2px;">
                 1930
               </div>
               <div style="font-size:0.75em;color:#64748b;margin-top:2px;">
-                Call 1930 promptly and contact your bank
+                Call 1930 and contact your bank using its official number
               </div>
             </div>
             """,
@@ -713,42 +724,73 @@ if nav_pages is not None:
 # =============================================================================
 
 def page_landing():
+    st.title("Get help preparing a cybercrime report")
     st.markdown(
-        f"""
-        <div class="portal-hero" style="background:{GOV_BLUE};
-                    padding:30px 32px;border-radius:10px;color:white;margin-bottom:20px;
-                    border-bottom:3px solid {GOV_ACCENT_ORANGE};">
-          <div style="font-size:.78em;font-weight:700;color:#d5e2ee;">Independent prototype</div>
-          <div class="portal-hero-title" style="font-weight:750;letter-spacing:-.025em;margin-top:6px;">Complaint preparation and review</div>
-          <div style="opacity:.92;margin-top:10px;font-size:1.02em;max-width:800px;line-height:1.6;">
-            Prepare a complaint record or review records saved on this computer. This app does not send reports to police or NCRP.
-          </div>
-        </div>
-        """,
+        "CyberAssist helps you organize what happened and prepare a draft to review. "
+        "It is an independent academic prototype. It does **not** submit a complaint to the police, your bank, or the National Cyber Crime Reporting Portal."
+    )
+    action_col, portal_col = st.columns([1, 1.25], vertical_alignment="center")
+    with action_col:
+        if st.button("Prepare a complaint draft", type="primary", width="stretch"):
+            new_wizard()
+            st.query_params["route"] = "user"
+            st.session_state["nav_page"] = "Report Cyber Crime"
+            st.rerun()
+    with portal_col:
+        st.link_button("Report on the official portal", "https://www.cybercrime.gov.in/", width="stretch")
+
+    image_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", "assets", "cyberassist-home.png")
+    if os.path.isfile(image_path):
+        st.image(image_path, width="stretch", caption="Use the official portal or helpline for real incidents. This project is for demonstration only.")
+
+    helpline_items = "".join(
+        f'<div class="ca-help-item"><a href="tel:{html.escape(number)}"><strong>{html.escape(number)}</strong></a>'
+        f'<span>{html.escape(label)}</span></div>'
+        for number, label, _ in HELPLINES
+    )
+    st.markdown(
+        f'<section class="ca-helpline-band" aria-label="Emergency and cybercrime helplines">'
+        f'<h2>Need help now?</h2>{helpline_items}</section>',
         unsafe_allow_html=True,
     )
-    st.markdown("### What would you like to do?")
-    st.caption("Choose a task. This prototype does not use accounts or restrict access by role.")
-    c1, c2 = st.columns(2, gap="large")
-    with c1:
-        with st.container(border=True):
-            st.markdown("#### Report an incident")
-            st.write("Describe what happened, add any screenshots you have, and review the complaint record before saving it.")
-        st.write("")
-        if st.button("Prepare a complaint", use_container_width=True, type="primary"):
-            st.query_params["route"] = "user"
-            st.session_state["nav_page"] = "Home"
-            st.rerun()
 
-    with c2:
-        with st.container(border=True):
-            st.markdown("#### Review complaint records")
-            st.write("Open saved records, check the information and evidence, and note the next review step.")
-        st.write("")
-        if st.button("Open case register", use_container_width=True, type="secondary"):
-            st.query_params["route"] = "investigator"
-            st.session_state["nav_page"] = "Case Queue"
-            st.rerun()
+    left, right = st.columns(2, gap="large")
+    with left:
+        st.subheader("Examples of cybercrime in India")
+        st.markdown(
+            "- **Payment fraud:** money taken through a deceptive link, UPI request, or bank transaction.\n"
+            "- **Impersonation:** someone pretends to be a trusted person or organization.\n"
+            "- **Account access:** someone gets into your email, social media, or other account.\n"
+            "- **Online harassment:** threats, stalking, or repeated abusive messages online."
+        )
+    with right:
+        st.subheader("What may help when reporting")
+        st.markdown(
+            "- When the incident happened, even approximately.\n"
+            "- Payment amount and transaction reference, if money was involved.\n"
+            "- Relevant screenshots, messages, emails, or links.\n"
+            "- The bank, payment app, website, or social platform involved."
+        )
+        st.caption("Do not share passwords, PINs, one-time codes, or full card details in this prototype.")
+
+    st.markdown(
+        "**For real incidents:** report through the official portal or contact the appropriate helpline. "
+        "For a recent cyber financial fraud, call 1930 promptly and contact your bank using its official number."
+    )
+    st.caption(
+        "CyberAssist is an academic prototype. It is not affiliated with the Government of India. "
+        "Records are stored in this project workspace; the app has no sign-in or access controls. "
+        "Depending on configuration, complaint text may be processed by an external AI provider. Use fictional details only. "
+        "Project: Intelligent Cybercrime Complaint Analysis and Category Classification System using NLP."
+    )
+
+    if not st.query_params.get("route"):
+        with st.expander("Project demonstration workspace"):
+            st.warning("The local review workspace is for demonstration only and has no login or access controls.")
+            if st.button("Open local review workspace"):
+                st.query_params["route"] = "investigator"
+                st.session_state["nav_page"] = "Case Queue"
+                st.rerun()
 
 
 # =============================================================================
@@ -756,55 +798,7 @@ def page_landing():
 # =============================================================================
 
 def page_home():
-    st.title("Report an incident")
-    st.markdown(
-        f"""
-        <div class="portal-hero" style="background:#fff;border:1px solid #dbe3ec;border-left:5px solid {GOV_ACCENT_ORANGE};
-                    padding:25px 28px;border-radius:10px;color:{GOV_BLUE};margin:8px 0 20px 0;box-shadow:0 4px 14px rgba(16,44,70,.04);">
-          <div style="font-size:1.42em;font-weight:800;letter-spacing:-.02em;">Prepare a cybercrime complaint record</div>
-          <div style="color:#526477;margin-top:7px;max-width:840px;font-size:.96em;line-height:1.6;">
-            Explain what happened in your own words. The AI assistant can clarify missing details and suggest a category. You review the information before saving it for the local investigator workspace.
-          </div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-    c1, c2 = st.columns([1, 1])
-    with c1:
-        if st.button("Begin complaint intake", type="primary", width="stretch"):
-            new_wizard()
-            st.session_state["nav_page"] = "Report Cyber Crime"
-            st.rerun()
-    with c2:
-        if st.button("Find a saved record", width="stretch"):
-            st.session_state["nav_page"] = "Check Status"
-            st.rerun()
-
-    section_header("How the intake works")
-    flow = st.columns(4)
-    for column, number, title, detail in zip(
-        flow,
-        ["01", "02", "03", "04"],
-        ["Describe", "Clarify", "Review", "Save"],
-        ["Tell us what happened", "Answer relevant follow-ups", "Check evidence and suggested category", "Create a local case record"],
-    ):
-        with column.container(border=True):
-            st.markdown(f"**{number} · {title}**")
-            st.caption(detail)
-
-    section_header("Emergency support")
-    cols = st.columns(3)
-    for col, (num, label, color) in zip(cols, HELPLINES):
-        col.markdown(
-            f"""<div style="border:1px solid #cbd5e1;border-top:3.5px solid {color};border-radius:4px;
-                            padding:14px;text-align:center;background:white;">
-                  <div style="font-size:1.5em;font-weight:800;color:{color};">{num}</div>
-                  <div style="color:#475569;font-size:0.82em;font-weight:600;margin-top:4px;">{label}</div>
-                </div>""",
-            unsafe_allow_html=True,
-        )
-
-    st.warning("If money was taken recently, call **1930** promptly and contact your bank through its official app or phone number. This MVP cannot submit a report or freeze a payment.")
+    page_landing()
 
 
 # =============================================================================
@@ -814,8 +808,8 @@ def page_home():
 def pre_filing_checklist():
     with st.expander("Before you start (optional)", expanded=False):
         st.markdown(
-            "You can describe events in your own words. If available, keep the approximate date, transaction reference, and screenshots nearby. "
-            "You can say when you do not know a detail. Never share a PIN, password, or one-time code."
+            "Describe events in your own words. If available, keep the approximate date, transaction reference, and relevant screenshots nearby. "
+            "You can skip details you do not know. Never share a password, PIN, one-time code, or full card details. Use fictional information in this academic prototype."
         )
 
 
@@ -1174,10 +1168,11 @@ def _run_full_triage(wiz):
 
 
 def page_report_wizard():
-    st.title("Prepare your complaint record")
-    st.caption("Start with your account of what happened. The assistant may ask a few relevant questions; you stay in control and can review or edit everything before saving.")
+    st.title("Prepare a complaint draft")
+    st.caption("Use everyday language. You can review and change the draft before saving it on this computer.")
     progress_steps(st.session_state["wizard_step"])
     pre_filing_checklist()
+    st.link_button("Go to the official cybercrime portal", "https://www.cybercrime.gov.in/")
     step = st.session_state["wizard_step"]
     if step == 1:
         render_step1()
@@ -1191,9 +1186,9 @@ def render_step1():
     wiz = st.session_state["wiz"]
     intake = wiz.setdefault("guided_intake", {"started": False, "complete": False, "messages": [], "docket": {}, "language": "en", "initial_statement": ""})
 
-    section_header("Step 1 · Tell us what happened")
+    section_header("Start a complaint draft")
     st.markdown(
-        "Use everyday language. You do not need legal or technical terms, and approximate details are okay. The assistant will ask one follow-up at a time when it needs clarification. You can answer “I don’t know” or finish when ready."
+        "Start with what you remember. You do not need legal terms or exact dates. The assistant may ask a few questions; it is okay to answer “I don’t know.”"
     )
 
     # Voice Input Feature (English priority with offline Whisper)
@@ -1306,7 +1301,6 @@ def render_step1():
                             elif not res.get("ok"):
                                 st.error(f"Failed to transcribe audio file: {res.get('error')}")
 
-        st.markdown(f"**{req('What happened?')}**")
     else:
         with st.expander("Prefer to speak? Voice transcription is not set up", expanded=True):
             st.warning(
@@ -1319,8 +1313,7 @@ def render_step1():
                 "The first transcription may download the local model."
             )
 
-    section_header("Chat with the intake assistant")
-    st.caption("Your first message starts the conversation. After that, the assistant asks one question at a time and uses your answers to prepare the draft.")
+    st.caption("The assistant will ask one question at a time if it needs more detail.")
     if not intake.get("started"):
         language = st.selectbox(
             "Conversation language",
@@ -1347,7 +1340,7 @@ def render_step1():
     submitted = False
     with st.form("guided_intake_message_form", clear_on_submit=True):
         typed_message = st.text_area(
-            "Describe what happened" if not intake.get("started") else (
+            "What happened?" if not intake.get("started") else (
                 "Add details or correct an answer" if intake.get("complete") else "Your answer"
             ),
             height=130,
@@ -1359,7 +1352,7 @@ def render_step1():
             ),
         )
         submitted = st.form_submit_button(
-            "Start conversation" if not intake.get("started") else (
+            "Continue" if not intake.get("started") else (
                 "Update intake" if intake.get("complete") else "Send answer"
             ),
             type="primary",
@@ -1756,7 +1749,7 @@ def _render_delete_table(rows, list_name, fields, headers):
 def render_step2():
     wiz = st.session_state["wiz"]
     triage = wiz.get("triage", {})
-    section_header("Step 2 · Confirm the information")
+    section_header("Review and add details")
 
     ocr_prefill = wiz.get("ocr_prefill_summary") or {}
     if ocr_prefill:
@@ -1817,15 +1810,15 @@ def render_step2():
             for item in missing_items:
                 st.markdown(f"- **{item.get('label')}**: {item.get('hint')}")
 
-    section_header("Your contact details")
-    st.caption("Your name and phone number are required for this complaint record. Other details are optional.")
-    wiz["relationship_with_victim"] = st.radio(req("Are you the person affected?"), ["Self", "Other"], horizontal=True,
+    section_header("Your details (optional in this prototype)")
+    st.caption("Use fictional details for the project demonstration. You do not need to upload an identity document.")
+    wiz["relationship_with_victim"] = st.radio("Are you the person affected?", ["Self", "Other"], horizontal=True,
                                                 index=["Self", "Other"].index(wiz.get("relationship_with_victim", "Self")))
     c1, c2 = st.columns(2)
     with c1:
-        wiz["name"] = st.text_input(req("Your full name"), value=wiz.get("name", ""))
+        wiz["name"] = st.text_input("Name or preferred name (optional)", value=wiz.get("name", ""))
         wiz["age"] = st.number_input("Your age (optional; leave 0 if unsure)", min_value=0, max_value=120, value=int(wiz.get("age") or 0), step=1)
-        wiz["phone"] = st.text_input(req("Phone number"), value=wiz.get("phone", ""))
+        wiz["phone"] = st.text_input("Phone number (optional)", value=wiz.get("phone", ""))
     with c2:
         wiz["city"] = st.text_input("City or district (optional)", value=wiz.get("city", ""))
         wiz["state"] = st.text_input("State or union territory (optional)", value=wiz.get("state", ""))
@@ -1834,8 +1827,8 @@ def render_step2():
         id_idx = COMPLAINANT_ID_TYPES.index(wiz["id_type"]) if wiz.get("id_type") in COMPLAINANT_ID_TYPES else 0
         wiz["id_type"] = st.selectbox("Choose only if useful for this record", COMPLAINANT_ID_TYPES, index=id_idx)
 
-    section_header("Suggested type of incident")
-    st.caption("The system suggests a category from your description. This is not a legal decision; choose a better match if you see one.")
+    section_header("Incident type")
+    st.caption("The suggested type is only an estimate. Keep it or choose a closer match if one is clear.")
     c1, c2 = st.columns(2)
     with c1:
         cat_idx = MAIN_CATEGORIES.index(wiz["category"]) if wiz.get("category") in MAIN_CATEGORIES else len(MAIN_CATEGORIES) - 1
@@ -1967,12 +1960,6 @@ def render_step2():
     _render_delete_table(wiz["suspects"], "suspects", ["name", "id_type", "id_number"],
                          ["Suspect Name", "Identifier Type", "Identifier Number / Handle"])
 
-    section_header("Before you continue")
-    wiz["consent"] = st.checkbox(
-        req("I have reviewed this information and agree to save it on this computer and make it visible in this app's local investigator workspace."),
-        value=wiz.get("consent", False),
-    )
-
     st.divider()
     c1, c2 = st.columns(2)
     with c1:
@@ -1982,14 +1969,8 @@ def render_step2():
     with c2:
         if st.button("Review complaint record →", type="primary", width="stretch"):
             errors = []
-            if not wiz["name"].strip():
-                errors.append("Enter your name to continue.")
-            if not wiz["phone"].strip():
-                errors.append("Enter a phone number to continue.")
             if not wiz["sub_category"]:
-                errors.append("Choose the incident type that best matches your experience.")
-            if not wiz["consent"]:
-                errors.append("Confirm that you want to save this record and make it visible in the local investigator workspace.")
+                errors.append("Choose the closest incident type, or keep the suggested type.")
             if errors:
                 for e in errors:
                     st.error(e)
@@ -2005,7 +1986,7 @@ def render_step3():
         _render_submission_success(st.session_state["last_submitted_case"])
         return
 
-    section_header("Step 3 · Review the complaint record")
+    section_header("Review the draft")
     st.markdown(f"**What you told us:**\n\n{wiz['incident_text']}")
     
     triage = wiz.get("triage", {})
@@ -2035,16 +2016,16 @@ def render_step3():
                f"Relationship: {wiz.get('relationship_with_victim')}")
 
     if wiz.get("transactions"):
-        section_header("Complainant Financial Debit Records")
+        section_header("Payment details")
         st.dataframe(pd.DataFrame(wiz["transactions"]), hide_index=True, width="stretch")
     if wiz.get("suspect_transactions"):
-        section_header("Suspect Beneficiary Destination Trail")
+        section_header("Possible recipient details")
         st.dataframe(pd.DataFrame(wiz["suspect_transactions"]), hide_index=True, width="stretch")
     if wiz.get("suspects"):
-        section_header("Suspect Identity Data")
+        section_header("Details about the person or account (if known)")
         st.dataframe(pd.DataFrame(wiz["suspects"]), hide_index=True, width="stretch")
     if wiz.get("evidence"):
-        section_header("Submitted Digital Evidence Files")
+        section_header("Evidence files")
         st.dataframe(pd.DataFrame([{"Description": e.get("description", ""), "Filename": e["filename"]} for e in wiz["evidence"]]),
                     hide_index=True, width="stretch")
 
@@ -2061,8 +2042,18 @@ def render_step3():
     except Exception as e:
         st.caption(f"Statutory mapping lookup notice: {e}")
 
-    section_header("Save complaint record and prepare PDF")
-    st.warning("Saving makes this complaint and its uploaded evidence available in this app's local investigator workspace. This computer has no investigator sign-in or access controls. Nothing is sent to NCRP, police, or a bank.")
+    section_header("Before you save")
+    st.warning(
+        "This is a project draft, not an official complaint or police acknowledgement. Saving stores the draft and attached evidence in this computer's project workspace, where anyone with access to this app may view them. Depending on configuration, text may also be processed by an external AI provider."
+    )
+    st.markdown(
+        "Please check the details and any assistant or OCR suggestions. Do not include passwords, PINs, one-time codes, or full card details. "
+        "For a real incident, use the official cybercrime portal or call the appropriate helpline."
+    )
+    wiz["consent"] = st.checkbox(
+        "I have reviewed this draft, confirm the details are accurate to the best of my knowledge, and understand that saving creates a local project record only.",
+        key="local_record_consent",
+    )
 
     st.divider()
     c1, c2 = st.columns(2)
@@ -2072,10 +2063,17 @@ def render_step3():
             st.rerun()
     with c2:
         if st.button("Save complaint record", type="primary", width="stretch"):
-            _submit_complaint(wiz)
+            if not wiz["consent"]:
+                st.error("Please confirm the declaration before saving this local draft.")
+            else:
+                _submit_complaint(wiz)
 
 
 def _submit_complaint(wiz):
+    if not wiz.get("consent"):
+        st.error("Please confirm the declaration before saving this local draft.")
+        return
+
     complainant = {
         "name": wiz["name"].strip() or None, "age": int(wiz["age"]) if wiz.get("age") else None,
         "phone": wiz["phone"].strip() or None, "email": wiz["email"].strip() or None,
