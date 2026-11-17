@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1240" viewBox="0 0 1600 1240" role="img" aria-labelledby="title desc">
+  <title id="title">Traditional Layered Architecture — Intelligent Cybercrime Complaint Analysis and Complaint Category Classification using NLP</title>
+  <desc id="desc">A four-tier architecture showing citizen and investigator interfaces, FastAPI routes, intake and NLP services, optional external language models, and local model, SQLite, and file storage.</desc>
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#557184"/></marker>
+    <marker id="arrow-teal" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#087f77"/></marker>
+    <marker id="arrow-gold" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#ae7620"/></marker>
+    <style>
+      .title { font: 700 28px 'Arial', sans-serif; fill: #17384b; }
+      .subtitle { font: 14px 'Arial', sans-serif; fill: #526d7c; }
+      .tier { font: 700 15px 'Arial', sans-serif; letter-spacing: 1.1px; fill: #17384b; }
+      .tiernum { font: 700 13px 'Arial', sans-serif; fill: #fff; }
+      .actor { font: 700 15px 'Arial', sans-serif; fill: #17384b; }
+      .actor-sub { font: 12px 'Arial', sans-serif; fill: #5c7482; }
+      .card-title { font: 700 15px 'Arial', sans-serif; fill: #17384b; }
+      .card-body { font: 12px 'Arial', sans-serif; fill: #486373; }
+      .route { font: 700 12px 'Courier New', monospace; fill: #215a75; }
+      .service-title { font: 700 14px 'Arial', sans-serif; fill: #17384b; }
+      .storage-title { font: 700 13px 'Arial', sans-serif; fill: #17384b; }
+      .storage-body { font: 11.5px 'Arial', sans-serif; fill: #526d7c; }
+      .flow-label { font: 11px 'Arial', sans-serif; fill: #557184; }
+      .note { font: 12px 'Arial', sans-serif; fill: #465f6d; }
+      .band { stroke-width: 1.5; rx: 18; }
+      .card { fill: #fff; stroke: #9cb2bf; stroke-width: 1.4; rx: 10; }
+      .flow { fill: none; stroke: #557184; stroke-width: 2; marker-end: url(#arrow); }
+      .flow-teal { fill: none; stroke: #087f77; stroke-width: 2; marker-end: url(#arrow-teal); }
+      .flow-gold { fill: none; stroke: #ae7620; stroke-width: 1.8; stroke-dasharray: 7 6; marker-end: url(#arrow-gold); }
+    </style>
+  </defs>
+
+  <rect width="1600" height="1240" fill="#ffffff"/>
+  <text x="800" y="46" text-anchor="middle" class="title">Intelligent Cybercrime Complaint Analysis and</text>
+  <text x="800" y="80" text-anchor="middle" class="title">Complaint Category Classification using NLP</text>
+  <text x="800" y="108" text-anchor="middle" class="subtitle">Traditional layered architecture · HTML5 / CSS3 / JavaScript · FastAPI · SQLite and local files</text>
+
+  <!-- Actors -->
+  <g>
+    <rect x="300" y="130" width="380" height="58" rx="29" fill="#f4f8fa" stroke="#b7c7d0"/>
+    <circle cx="333" cy="159" r="13" fill="#d5ebe8"/><path d="M326 162a7 7 0 0 1 14 0M333 151a4 4 0 1 0 0 .1" fill="none" stroke="#087f77" stroke-width="1.7"/>
+    <text x="360" y="155" class="actor">Citizen / complainant</text><text x="360" y="174" class="actor-sub">Describes an incident and provides optional evidence</text>
+    <rect x="920" y="130" width="380" height="58" rx="29" fill="#f4f8fa" stroke="#b7c7d0"/>
+    <circle cx="953" cy="159" r="13" fill="#dce9f3"/><path d="M948 153h10v12h-10zM950 156h6M950 159h6M950 162h4" fill="none" stroke="#315e78" stroke-width="1.5"/>
+    <text x="980" y="155" class="actor">Investigator / reviewer</text><text x="980" y="174" class="actor-sub">Reviews locally stored cases and records workflow decisions</text>
+  </g>
+
+  <!-- Tier 1 -->
+  <rect x="48" y="210" width="1504" height="145" class="band" fill="#f1f7fb" stroke="#a6c3d5"/>
+  <circle cx="82" cy="238" r="16" fill="#315e78"/><text x="82" y="243" text-anchor="middle" class="tiernum">1</text>
+  <text x="112" y="243" class="tier">PRESENTATION TIER · BROWSER INTERFACES</text>
+  <rect x="250" y="263" width="500" height="67" class="card"/>
+  <text x="500" y="288" text-anchor="middle" class="card-title">Citizen complaint portal</text>
+  <text x="500" y="310" text-anchor="middle" class="card-body">Guided text / voice intake · consent · evidence upload · review · status lookup</text>
+  <rect x="850" y="263" width="500" height="67" class="card"/>
+  <text x="1100" y="288" text-anchor="middle" class="card-title">Investigator dashboard</text>
+  <text x="1100" y="310" text-anchor="middle" class="card-body">Queue · triage · case detail · evidence review · status workflow · PDF draft</text>
+  <text x="1519" y="306" text-anchor="end" class="card-body">HTML5 · CSS3 · JavaScript</text>
+  <path d="M490 188V258" class="flow"/><path d="M1110 188V258" class="flow"/>
+
+  <!-- Tier 2 -->
+  <rect x="48" y="380" width="1504" height="150" class="band" fill="#f6f4fb" stroke="#c1b5d9"/>
+  <circle cx="82" cy="408" r="16" fill="#66528d"/><text x="82" y="413" text-anchor="middle" class="tiernum">2</text>
+  <text x="112" y="413" class="tier">APPLICATION TIER · FASTAPI ROUTES AND REQUEST CONTROL</text>
+  <path d="M500 330V374" class="flow-teal"/><path d="M1100 330V374" class="flow-teal"/>
+  <rect x="114" y="432" width="310" height="75" class="card"/><text x="269" y="458" text-anchor="middle" class="route">/agent/session/{id}/message</text><text x="269" y="481" text-anchor="middle" class="card-body">Conversational intake session</text>
+  <rect x="458" y="432" width="310" height="75" class="card"/><text x="613" y="458" text-anchor="middle" class="route">/api/intake/analyze · /api/confirm</text><text x="613" y="481" text-anchor="middle" class="card-body">Gap analysis · classification · review</text>
+  <rect x="802" y="432" width="310" height="75" class="card"/><text x="957" y="458" text-anchor="middle" class="route">/api/upload_evidence · /api/transcribe_audio</text><text x="957" y="481" text-anchor="middle" class="card-body">Evidence and audio processing endpoints</text>
+  <rect x="1146" y="432" width="310" height="75" class="card"/><text x="1301" y="458" text-anchor="middle" class="route">/api/cases · /api/cases/{ref}</text><text x="1301" y="481" text-anchor="middle" class="card-body">Case submission, review and workflow</text>
+
+  <!-- Tier 3 -->
+  <rect x="48" y="555" width="1504" height="370" class="band" fill="#fff8ee" stroke="#dfc59b"/>
+  <circle cx="82" cy="583" r="16" fill="#a8752b"/><text x="82" y="588" text-anchor="middle" class="tiernum">3</text>
+  <text x="112" y="588" class="tier">BUSINESS LOGIC TIER · INTAKE, ANALYSIS AND INVESTIGATOR SERVICES</text>
+  <path d="M269 507V545" class="flow"/><path d="M613 507V545" class="flow"/>
+  <path d="M957 507V542H614V545" class="flow"/><path d="M1301 507V542H981V545" class="flow"/>
+
+  <rect x="80" y="615" width="335" height="265" rx="12" fill="#fff" stroke="#d5b984" stroke-width="1.4"/>
+  <text x="247" y="644" text-anchor="middle" class="service-title">Intake and safety</text>
+  <rect x="99" y="663" width="297" height="53" class="card"/><text x="247" y="685" text-anchor="middle" class="card-title">Conversational slot filling</text><text x="247" y="703" text-anchor="middle" class="card-body">One missing detail at a time · deterministic fallback</text>
+  <rect x="99" y="728" width="297" height="53" class="card"/><text x="247" y="750" text-anchor="middle" class="card-title">Speech and urgency</text><text x="247" y="768" text-anchor="middle" class="card-body">Optional local Whisper · rules · victim guidance</text>
+  <rect x="99" y="793" width="297" height="53" class="card"/><text x="247" y="815" text-anchor="middle" class="card-title">Entity and draft preparation</text><text x="247" y="833" text-anchor="middle" class="card-body">Rule-based extraction · missing-field checklist</text>
+
+  <rect x="447" y="615" width="335" height="265" rx="12" fill="#fff" stroke="#d5b984" stroke-width="1.4"/>
+  <text x="614" y="644" text-anchor="middle" class="service-title">Classification and evidence</text>
+  <rect x="466" y="663" width="297" height="53" class="card"/><text x="614" y="685" text-anchor="middle" class="card-title">TF-IDF + LinearSVC</text><text x="614" y="703" text-anchor="middle" class="card-body">21 category suggestions · decision margin</text>
+  <rect x="466" y="728" width="297" height="53" class="card"/><text x="614" y="750" text-anchor="middle" class="card-title">OCR and entity extraction</text><text x="614" y="768" text-anchor="middle" class="card-body">Tesseract when available · identifiers and amounts</text>
+  <rect x="466" y="793" width="297" height="53" class="card"/><text x="614" y="815" text-anchor="middle" class="card-title">Evidence reconciliation</text><text x="614" y="833" text-anchor="middle" class="card-body">Compare narrative and extracted values</text>
+
+  <rect x="814" y="615" width="335" height="265" rx="12" fill="#fff" stroke="#d5b984" stroke-width="1.4"/>
+  <text x="981" y="644" text-anchor="middle" class="service-title">Case review and outputs</text>
+  <rect x="833" y="663" width="297" height="53" class="card"/><text x="981" y="685" text-anchor="middle" class="card-title">Legal reference mapping</text><text x="981" y="703" text-anchor="middle" class="card-body">BNS / IT Act suggestions for officer review</text>
+  <rect x="833" y="728" width="297" height="53" class="card"/><text x="981" y="750" text-anchor="middle" class="card-title">Triage and case workflow</text><text x="981" y="768" text-anchor="middle" class="card-body">Priority · status · assignment · review notes</text>
+  <rect x="833" y="793" width="297" height="53" class="card"/><text x="981" y="815" text-anchor="middle" class="card-title">Pattern review and case files</text><text x="981" y="833" text-anchor="middle" class="card-body">Possible links · JSON record · ReportLab PDF</text>
+
+  <rect x="1181" y="615" width="335" height="265" rx="12" fill="#f4f8fb" stroke="#9fb9c7" stroke-width="1.4"/>
+  <text x="1348" y="644" text-anchor="middle" class="service-title">Optional model integration</text>
+  <rect x="1200" y="680" width="297" height="72" rx="10" fill="#fff" stroke="#9fb9c7"/>
+  <text x="1348" y="708" text-anchor="middle" class="card-title">Gemini / Ollama · optional</text>
+  <text x="1348" y="730" text-anchor="middle" class="card-body">Conversation text may be sent when configured</text>
+  <text x="1348" y="806" text-anchor="middle" class="card-body">Provides reply wording only</text>
+  <text x="1348" y="826" text-anchor="middle" class="card-body">Rules validate details and provide fallback</text>
+
+  <!-- Tier 4 -->
+  <rect x="48" y="950" width="1504" height="210" class="band" fill="#f0f7f3" stroke="#a8c7b4"/>
+  <circle cx="82" cy="978" r="16" fill="#397354"/><text x="82" y="983" text-anchor="middle" class="tiernum">4</text>
+  <text x="112" y="983" class="tier">DATA TIER · LOCAL MODEL ARTIFACTS, SQLITE AND FILE STORAGE</text>
+  <path d="M247 880V940" class="flow"/><path d="M614 880V940" class="flow"/><path d="M981 880V940" class="flow"/>
+  <path d="M1090 880V936H1335V1008" class="flow"/>
+  <rect x="90" y="1015" width="310" height="95" rx="12" fill="#fff" stroke="#8fb39d" stroke-width="1.4"/>
+  <path d="M112 1040h34v34h-34zM118 1034h34v34" fill="none" stroke="#397354" stroke-width="1.7"/>
+  <text x="265" y="1052" text-anchor="middle" class="storage-title">Model artifacts</text><text x="265" y="1075" text-anchor="middle" class="storage-body">classifier · vectorizer · label encoder</text><text x="265" y="1093" text-anchor="middle" class="storage-body">models/*.joblib</text>
+  <rect x="450" y="1015" width="310" height="95" rx="12" fill="#fff" stroke="#8fb39d" stroke-width="1.4"/>
+  <ellipse cx="482" cy="1037" rx="17" ry="7" fill="#e7f1ea" stroke="#397354"/><path d="M465 1037v35c0 9 34 9 34 0v-35M465 1054c0 9 34 9 34 0" fill="#e7f1ea" stroke="#397354"/>
+  <text x="620" y="1052" text-anchor="middle" class="storage-title">complaints.db</text><text x="620" y="1075" text-anchor="middle" class="storage-body">SQLite intake sessions and dialogue</text><text x="620" y="1093" text-anchor="middle" class="storage-body">local project workspace</text>
+  <rect x="810" y="1015" width="310" height="95" rx="12" fill="#fff" stroke="#8fb39d" stroke-width="1.4"/>
+  <ellipse cx="842" cy="1037" rx="17" ry="7" fill="#e7f1ea" stroke="#397354"/><path d="M825 1037v35c0 9 34 9 34 0v-35M825 1054c0 9 34 9 34 0" fill="#e7f1ea" stroke="#397354"/>
+  <text x="980" y="1052" text-anchor="middle" class="storage-title">case_index.db</text><text x="980" y="1075" text-anchor="middle" class="storage-body">SQLite matching index for possible links</text><text x="980" y="1093" text-anchor="middle" class="storage-body">not an identity or syndicate finding</text>
+  <rect x="1170" y="1015" width="330" height="95" rx="12" fill="#fff" stroke="#8fb39d" stroke-width="1.4"/>
+  <path d="M1192 1035h28l8 8h28v34h-64z" fill="#e7f1ea" stroke="#397354" stroke-width="1.6"/>
+  <text x="1370" y="1052" text-anchor="middle" class="storage-title">Local case and evidence files</text><text x="1370" y="1075" text-anchor="middle" class="storage-body">case_files · investigator_inbox · uploads</text><text x="1370" y="1093" text-anchor="middle" class="storage-body">JSON records · PDFs · uploaded originals</text>
+
+  <!-- Footer -->
+  <line x1="70" y1="1184" x2="1530" y2="1184" stroke="#d4dfe5"/>
+  <text x="800" y="1207" text-anchor="middle" class="note">Prototype boundary: records stay in the local project workspace; this app has no sign-in/access control and is not connected to police or government systems.</text>
+</svg>
