@@ -24,6 +24,7 @@ const state = {
   ocrDateTimeValues: { date: '', time: '' },
   evidenceReview: null,
   savedCaseReference: null,
+  intakeConsentAccepted: false,
   draft: {
     category: '',
     subcategory: '',
@@ -346,6 +347,7 @@ function startNewComplaintIfPreviousWasSaved() {
   state.ocrDateTimeValues = { date: '', time: '' };
   state.evidenceReview = null;
   state.savedCaseReference = null;
+  state.intakeConsentAccepted = false;
   state.classificationResult = null;
   state.intakeAnalysis = null;
   state.draft = {
@@ -1604,10 +1606,7 @@ function initEventListeners() {
     showScreen('page-choose-mode', false);
     requestAnimationFrame(() => document.getElementById('how-to-report')?.scrollIntoView({ behavior: 'smooth', block: 'start' }));
   });
-  document.getElementById('top-nav-prepare')?.addEventListener('click', () => {
-    startNewComplaintIfPreviousWasSaved();
-    showScreen('page-voice');
-  });
+  document.getElementById('top-nav-prepare')?.addEventListener('click', () => requestComplaintStart('page-voice'));
   document.getElementById('top-nav-track')?.addEventListener('click', () => showScreen('page-track'));
   const openOfficerDashboard = () => {
     showScreen('page-dashboard');
@@ -1616,7 +1615,10 @@ function initEventListeners() {
   document.getElementById('top-nav-officer')?.addEventListener('click', openOfficerDashboard);
   document.getElementById('home-open-officer')?.addEventListener('click', openOfficerDashboard);
   document.getElementById('btn-reviewer-workspace')?.addEventListener('click', openOfficerDashboard);
-  document.getElementById('home-start-report')?.addEventListener('click', () => { startNewComplaintIfPreviousWasSaved(); showScreen('page-voice'); });
+  document.getElementById('home-start-report')?.addEventListener('click', () => requestComplaintStart('page-voice'));
+  document.getElementById('home-open-track')?.addEventListener('click', () => showScreen('page-track'));
+  document.getElementById('home-open-privacy')?.addEventListener('click', () => openConsentDialog('info'));
+  document.getElementById('btn-officer-home')?.addEventListener('click', () => showScreen('page-choose-mode'));
   navReport.addEventListener('click', (e) => { e.preventDefault(); startNewComplaintIfPreviousWasSaved(); showScreen('page-choose-mode'); });
   navDashboard.addEventListener('click', (e) => {
     e.preventDefault();
@@ -1674,14 +1676,14 @@ function initEventListeners() {
   });
 
   // SCREEN 3 BUTTONS:
-  btnStartVoice.addEventListener('click', () => { startNewComplaintIfPreviousWasSaved(); showScreen('page-voice'); });
+  btnStartVoice.addEventListener('click', () => requestComplaintStart('page-voice'));
   cardChooseVoice.addEventListener('click', (e) => {
-    if (e.target !== btnStartVoice) { startNewComplaintIfPreviousWasSaved(); showScreen('page-voice'); }
+    if (e.target !== btnStartVoice) requestComplaintStart('page-voice');
   });
 
-  btnStartManual.addEventListener('click', () => { startNewComplaintIfPreviousWasSaved(); showScreen('page-manual'); });
+  btnStartManual.addEventListener('click', () => requestComplaintStart('page-manual'));
   cardChooseManual.addEventListener('click', (e) => {
-    if (e.target !== btnStartManual) { startNewComplaintIfPreviousWasSaved(); showScreen('page-manual'); }
+    if (e.target !== btnStartManual) requestComplaintStart('page-manual');
   });
 
   // SCREEN 4 (VOICE) BUTTONS:
@@ -2012,19 +2014,23 @@ function initEventListeners() {
   document.getElementById('btn-consent-decline')?.addEventListener('click', () => {
     closeConsentDialog();
     if (consentPurpose === 'save') showToast('Consent was declined. Your draft has not been saved.');
+    if (consentPurpose === 'intake') showToast('Consent was declined. The complaint form was not opened.');
   });
   chkConsentModal?.addEventListener('change', () => {
     const accept = document.getElementById('btn-consent-accept');
     if (accept) accept.disabled = !chkConsentModal.checked;
   });
   document.getElementById('btn-consent-accept')?.addEventListener('click', () => {
-    if (consentPurpose === 'save') {
+    if (consentPurpose === 'save' || consentPurpose === 'intake') {
       if (!chkConsentModal?.checked) return;
       chkLocalConsent.checked = true;
       chkLocalConsent.dispatchEvent(new Event('change', { bubbles: true }));
-      try { localStorage.setItem('complaintConsent', JSON.stringify({ accepted: true, acceptedAt: new Date().toISOString(), version: '2026-11-17' })); } catch (_) {}
+      const consentRecord = { accepted: true, acceptedAt: new Date().toISOString(), version: '2026-11-17' };
+      try { localStorage.setItem('complaintConsent', JSON.stringify(consentRecord)); } catch (_) {}
+      if (consentPurpose === 'intake') state.intakeConsentAccepted = true;
       closeConsentDialog();
-      saveCaseRecord();
+      if (consentPurpose === 'save') saveCaseRecord();
+      if (consentPurpose === 'intake') pendingConsentAction?.();
       return;
     }
     closeConsentDialog();
@@ -2032,18 +2038,35 @@ function initEventListeners() {
   consentModal?.addEventListener('click', event => { if (event.target === consentModal) closeConsentDialog(); });
 }
 
-function openConsentDialog(purpose = 'info') {
+let pendingConsentAction = null;
+
+function requestComplaintStart(screenId) {
+  const isStartingNewRecord = Boolean(state.savedCaseReference);
+  if (isStartingNewRecord) startNewComplaintIfPreviousWasSaved();
+  if (state.intakeConsentAccepted) {
+    showScreen(screenId);
+    return;
+  }
+  openConsentDialog('intake', () => showScreen(screenId));
+}
+
+function openConsentDialog(purpose = 'info', onAccept = null) {
   consentPurpose = purpose;
+  pendingConsentAction = onAccept;
   if (!consentModal) return;
   if (chkConsentModal) chkConsentModal.checked = false;
   const title = document.getElementById('consent-title');
-  if (title) title.textContent = purpose === 'save' ? 'Before you save this complaint' : 'Privacy and data use';
+  if (title) title.textContent = purpose === 'save' ? 'Before you save this complaint' : purpose === 'intake' ? 'Before you start a complaint' : 'Privacy and data use';
   const acceptance = consentModal.querySelector('.consent-accept');
-  if (acceptance) acceptance.hidden = purpose !== 'save';
+  if (acceptance) acceptance.hidden = !['save', 'intake'].includes(purpose);
+  const acceptanceTitle = acceptance?.querySelector('strong');
+  const acceptanceDetail = acceptance?.querySelector('small');
+  if (acceptanceTitle) acceptanceTitle.textContent = purpose === 'intake' ? 'I understand and consent to begin' : 'I understand and consent';
+  if (acceptanceDetail) acceptanceDetail.textContent = purpose === 'intake' ? 'Allow my complaint details and evidence to be analyzed and saved to this project’s local review workspace.' : 'Allow this complaint and its attached evidence to be saved to this project’s local review workspace.';
   const accept = document.getElementById('btn-consent-accept');
-  if (accept) { accept.disabled = purpose === 'save'; accept.textContent = purpose === 'save' ? 'Accept and save complaint' : 'Close information'; }
+  if (accept) { accept.disabled = ['save', 'intake'].includes(purpose); accept.textContent = purpose === 'save' ? 'Accept and save complaint' : purpose === 'intake' ? 'Accept and continue' : 'Close information'; }
   const decline = document.getElementById('btn-consent-decline');
-  if (decline) decline.textContent = purpose === 'save' ? 'Decline' : 'Close';
+  if (decline) decline.textContent = ['save', 'intake'].includes(purpose) ? 'Decline' : 'Close';
   consentModal.hidden = false;
   document.body.classList.add('dialog-open');
   document.getElementById('btn-consent-close')?.focus();

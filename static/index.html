@@ -11,7 +11,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/style.css?v=20261115-citizen-experience">
   <link rel="stylesheet" href="/static/citizen-refresh.css?v=20261115">
-  <link rel="stylesheet" href="/static/redesign.css?v=20261117b">
+  <link rel="stylesheet" href="/static/redesign.css?v=20261117e">
 </head>
 <body>
 
@@ -29,6 +29,7 @@
       <div class="investigator-header-context">
         <span class="investigator-context-mark">OD</span>
         <span><strong>Officer dashboard</strong><small>Local case review workspace</small></span>
+        <button type="button" class="officer-return-btn" id="btn-officer-home">Back to home</button>
       </div>
 
       <nav class="citizen-nav" aria-label="Main navigation">
@@ -159,6 +160,7 @@
           <article class="next-panel citizen-panel"><div class="panel-kicker">FOR COMPLAINANTS</div><h2>Prepare a complaint draft</h2><p>Tell us what happened, add any relevant evidence, and review the details before saving.</p><ol class="process-list"><li><span>1</span><div><strong>Describe</strong><small>Speak or type in English, Hindi, or Marathi.</small></div></li><li><span>2</span><div><strong>Review</strong><small>Check the extracted details and suggested category.</small></div></li><li><span>3</span><div><strong>Save</strong><small>Get a local reference to track your saved record.</small></div></li></ol><button type="button" class="panel-link-button" id="home-start-report">Start complaint draft <span aria-hidden="true">→</span></button></article>
           <article class="next-panel officer-panel"><div class="panel-kicker">FOR OFFICERS &amp; REVIEWERS</div><div class="officer-panel-icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M4 26V6m0 20h25M9 21l5-6 5 3 8-10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="27" cy="8" r="2" fill="currentColor"/></svg></div><h2>Officer dashboard</h2><p>Open the local complaint queue to review classification results, evidence checks, status, and workload statistics.</p><div class="officer-feature-list"><span>Complaint register</span><span>Priority &amp; status</span><span>Queue statistics</span></div><button type="button" class="panel-link-button" id="home-open-officer">Open officer dashboard <span aria-hidden="true">→</span></button><small class="officer-local-note">Local review workspace · not connected to police systems</small></article>
         </section>
+        <div class="home-utility-links"><span>Need to find a record or review the data information?</span><button type="button" id="home-open-track">Track a saved record</button><button type="button" id="home-open-privacy">Privacy and consent details</button></div>
 
         <footer class="home-disclaimer home-disclaimer-redesigned">
           <p><strong>About this project</strong> This independent prototype stores records in the local project workspace and has no sign-in or access controls. Depending on configuration, complaint text may be processed by an external AI provider. Use fictional details only.</p>
@@ -994,12 +996,11 @@
     <section class="consent-dialog">
       <header class="consent-header"><span class="consent-symbol" aria-hidden="true">⌑</span><div><p class="consent-eyebrow">Privacy &amp; data use</p><h2 id="consent-title">Before you save this complaint</h2></div><button type="button" class="btn-modal-close" id="btn-consent-close" aria-label="Close consent information">&times;</button></header>
       <div class="consent-content" id="consent-summary">
-        <p>Saving sends this record to the local investigator review workspace on the computer running this application. Please use fictional details only.</p>
+        <p>Before the form opens, review how the complaint details and evidence you provide will be processed and stored. Starting a draft does not submit an official complaint. Please use fictional details only.</p>
         <div class="consent-facts"><article><strong>Information collected</strong><p>Your incident description, contact and incident details, classification results, and any evidence you choose to upload.</p></article><article><strong>How it is processed</strong><p>The app uses its NLP classifier and evidence extraction tools to prepare a draft. Depending on configuration, complaint text may be sent to an external AI provider.</p></article><article><strong>Storage and access</strong><p>Records and evidence are stored in this project workspace. This prototype has no sign-in or access controls and is not connected to police or government systems.</p></article></div>
         <p class="consent-note">This does not submit an official complaint. For an official report in India, visit <a href="https://www.cybercrime.gov.in/" target="_blank" rel="noopener noreferrer">cybercrime.gov.in</a>. You can decline and keep editing your draft.</p>
-        <label class="consent-accept"><input type="checkbox" id="chk-consent-modal"><span><strong>I understand and consent</strong><small>Allow this complaint and its attached evidence to be saved to this project’s local review workspace.</small></span></label>
       </div>
-      <footer class="consent-actions"><button type="button" class="btn-consent-decline" id="btn-consent-decline">Decline</button><button type="button" class="btn-consent-accept" id="btn-consent-accept" disabled>Accept and save complaint</button></footer>
+      <footer class="consent-actions"><label class="consent-accept"><input type="checkbox" id="chk-consent-modal"><span><strong>I understand and consent</strong><small>Allow this complaint and its attached evidence to be saved to this project’s local review workspace.</small></span></label><button type="button" class="btn-consent-decline" id="btn-consent-decline">Decline</button><button type="button" class="btn-consent-accept" id="btn-consent-accept" disabled>Accept and save complaint</button></footer>
     </section>
   </div>
 
@@ -1027,6 +1028,6 @@
     <span id="toast-text">Notification message</span>
   </div>
 
-  <script src="/static/app.js?v=20261115-citizen-experience"></script>
+  <script src="/static/app.js?v=20261117-consent-start"></script>
 </body>
 </html>
