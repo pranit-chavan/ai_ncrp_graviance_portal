@@ -6,18 +6,18 @@ Screenshots were captured from the local application at `http://127.0.0.1:8501/`
 |---|---|---|
 | `01-home-dashboard.jpg` | Citizen portal home page and reporting workflow | User interface / Home screen |
 | `02-consent-before-reporting.jpg` | Privacy and data-use consent shown before complaint intake | Consent and privacy |
-| `03-guided-complaint-intake.jpg` | Guided voice and multilingual complaint intake | Complaint registration |
+| `03-narrative-voice-intake.jpg` | Citizen narrative intake with voice and language controls; no completed transcription is shown | Complaint registration |
 | `04-officer-dashboard-overview.jpg` | Officer dashboard with queue and workload statistics | Officer dashboard |
-| `05-manual-intake-fictional-example.jpg` | Manual complaint form with fictional incident details | Complaint registration |
+| `05-evidence-upload-intake-form.jpg` | Fictional complaint form showing the evidence upload control; no attached-file preview is shown | Complaint registration |
 | `06-review-before-classification.jpg` | Complaint narrative and extracted fields presented for user review | NLP analysis and user review |
 | `07-manual-intake-upi-sample.jpg` | Fictional UPI complaint details entered in the manual form | Complaint registration |
 | `08-review-complaint-details.jpg` | Review step before the classifier runs | User confirmation |
-| `09-classification-results.jpg` | Suggested category, estimated match, and next steps | NLP classification results |
+| `09-classification-results-next-steps.jpg` | Classification result and category guidance before saving the draft | NLP classification results |
 | `10-status-tracking.jpg` | Local complaint reference lookup screen | Status tracking |
-| `11-officer-case-triage.jpg` | Officer queue, saved-record statistics, and a queue filtered to the fictional Example Complainant record | Investigator dashboard / case triage |
-| `12-investigator-case-detail.jpg` | Fictional case details, summary, reported transaction, and possible legal references for officer verification | Investigator case review |
-| `13-case-evidence-links-reconciliation.jpg` | Evidence and cross-check state plus possible related records; this sample has no attached evidence | Evidence review / repeat-pattern leads |
-| `14-case-review-workflow-actions.jpg` | Review decision, category correction, assignment/status workflow, request-draft actions, and complaint PDF link | Case management / report actions |
+| `11-officer-case-triage-statistics.jpg` | Officer queue, saved-record statistics, and a queue filtered to the fictional Example Complainant record | Investigator dashboard / case triage |
+| `12-case-detail-legal-review.jpg` | Fictional case details, narrative, transaction summary, and suggested legal references for officer verification | Investigator case review |
+| `13-evidence-cross-check-related-records.jpg` | Evidence cross-check and similar-record review panels; the sample has no attached evidence or recorded conflict | Evidence review / repeat-pattern leads |
+| `14-case-review-report-actions.jpg` | Review decision, category correction, workflow controls, request drafts, and complaint PDF link | Case management / report actions |
 | `15-officer-priority-status-queue.jpg` | Filtered queue view focused on urgency, status, assignment, and evidence-check indicators | Investigator dashboard / prioritization |
 
 Suggested report sequence: 01 home, 02 consent, 03 guided intake, 05 or 07 manual intake, 06 or 08 user review, 09 classification results, 10 status tracking, 04 officer overview, then 11–14 investigator review. The narrative and `Example Complainant` records shown in the screenshots are fictional demonstration data. The investigator screenshots are filtered to those example records; do not use unfiltered queue rows in a report.
@@ -34,4 +34,4 @@ Suggested report sequence: 01 home, 02 consent, 03 guided intake, 05 or 07 manua
 
 `report-section-with-figures.tex` is the supplied LaTeX passage with figures inserted under the home page and each described intake/investigator screen. Its image paths are relative to the repository root, so compile the report from that root or adjust the paths for your report project. The same updated passage was written back to the provided `Pasted text.txt` attachment.
 
-The passage uses the existing verified screenshots. It includes notes where a capture does not demonstrate a completed flow: successful voice transcription, a follow-up answer, evidence preview/progress, saved-submission confirmation, OCR mismatch, a confirmed repeat-offender link, or BNSS/BSA notice generation.
+The passage uses the existing verified screenshots. It includes notes where a capture does not demonstrate a completed flow: successful voice transcription, a follow-up answer, evidence preview/progress, saved-submission confirmation, OCR mismatch, a confirmed repeat-offender link, or BNSS/BSA notice generation. The report passage references only captures that exist in this folder; it does not invent images for unshown states.
