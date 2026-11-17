@@ -1,5 +1,5 @@
 /**
- * CyberAssist — AI-Powered Cybercrime Complaint Assistant
+ * Intelligent Cybercrime Complaint Analysis and Complaint Category Classification using NLP
  * Client Controller: Multi-Screen Flow (Screens 3, 4, 5, 6, 7)
  * Implements: Dual-Mode Voice Input, Devanagari TTS, Live Information Extraction,
  * Draft Review/Editing, and Scikit-Learn Classification.
@@ -665,7 +665,7 @@ function handleTestVoice() {
   const phrases = {
     hi: "नमस्ते, यह साइबर असिस्ट का वॉइस सहायक है। आपकी आवाज स्पष्ट रूप से सुनी जा रही है।",
     mr: "नमस्कार, हे सायबर असिस्टचे व्हॉइस असिस्टंट आहे. आपला आवाज व्यवस्थित ऐकू येत आहे.",
-    en: "Hello, this is CyberAssist AI. The voice system is online and ready."
+    en: "Hello. The complaint assistant is ready. You can describe what happened in your own words."
   };
   const text = phrases[state.currentLang] || phrases.hi;
   showToast("Testing voice output...");
@@ -1609,10 +1609,14 @@ function initEventListeners() {
     showScreen('page-voice');
   });
   document.getElementById('top-nav-track')?.addEventListener('click', () => showScreen('page-track'));
-  document.getElementById('btn-reviewer-workspace')?.addEventListener('click', () => {
+  const openOfficerDashboard = () => {
     showScreen('page-dashboard');
     loadDashboardCases(false);
-  });
+  };
+  document.getElementById('top-nav-officer')?.addEventListener('click', openOfficerDashboard);
+  document.getElementById('home-open-officer')?.addEventListener('click', openOfficerDashboard);
+  document.getElementById('btn-reviewer-workspace')?.addEventListener('click', openOfficerDashboard);
+  document.getElementById('home-start-report')?.addEventListener('click', () => { startNewComplaintIfPreviousWasSaved(); showScreen('page-voice'); });
   navReport.addEventListener('click', (e) => { e.preventDefault(); startNewComplaintIfPreviousWasSaved(); showScreen('page-choose-mode'); });
   navDashboard.addEventListener('click', (e) => {
     e.preventDefault();

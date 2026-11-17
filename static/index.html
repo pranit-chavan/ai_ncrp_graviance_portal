@@ -4,14 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Intelligent Cybercrime Complaint Analysis and Complaint Category Classification using NLP</title>
-  <meta name="description" content="An independent prototype for preparing and reviewing cybercrime complaint drafts.">
-  <link rel="icon" type="image/svg+xml" href="/static/cyberassist-mark.svg">
+  <meta name="description" content="Intelligent Cybercrime Complaint Analysis and Complaint Category Classification using NLP. Prepare complaint drafts, review NLP category suggestions, and manage local case records.">
+  <link rel="icon" type="image/svg+xml" href="/static/project-mark.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/style.css?v=20261115-citizen-experience">
   <link rel="stylesheet" href="/static/citizen-refresh.css?v=20261115">
-  <link rel="stylesheet" href="/static/redesign.css?v=20261117">
+  <link rel="stylesheet" href="/static/redesign.css?v=20261117b">
 </head>
 <body>
 
@@ -21,14 +21,14 @@
       <div class="navbar-brand" id="brand-logo-btn" role="button" tabindex="0" aria-label="Go to home">
         <span class="brand-shield" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M16 3 27 7v8c0 7-4.6 11.6-11 14-6.4-2.4-11-7-11-14V7l11-4Z" stroke="currentColor" stroke-width="2"/><path d="m11 16 3.2 3.2L21 12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         <div class="brand-text">
-          <span class="brand-title">Cybercrime Analysis</span>
-          <span class="brand-prototype-tag">Independent cybercrime complaint support</span>
+          <span class="brand-title">Intelligent Cybercrime Complaint Analysis</span>
+          <span class="brand-prototype-tag">Complaint Category Classification using NLP</span>
         </div>
       </div>
 
       <div class="investigator-header-context">
-        <span class="investigator-context-mark">IR</span>
-        <span><strong>Investigator workspace</strong><small>Case review environment</small></span>
+        <span class="investigator-context-mark">OD</span>
+        <span><strong>Officer dashboard</strong><small>Local case review workspace</small></span>
       </div>
 
       <nav class="citizen-nav" aria-label="Main navigation">
@@ -36,6 +36,7 @@
         <button type="button" class="citizen-nav-link" id="top-nav-help">How to report</button>
         <button type="button" class="citizen-nav-link" id="top-nav-prepare">Prepare a draft</button>
         <button type="button" class="citizen-nav-link" id="top-nav-track">Track a saved record</button>
+        <button type="button" class="citizen-nav-link officer-nav-link" id="top-nav-officer">Officer dashboard</button>
         <button type="button" class="citizen-nav-link" id="top-nav-privacy">Privacy &amp; consent</button>
       </nav>
 
@@ -113,7 +114,7 @@
       </nav>
 
       <div class="sidebar-footer">
-        <div class="investigator-sidebar-note"><span class="workspace-status-dot"></span><span><strong>Investigator workspace</strong><small>Local review records</small></span></div>
+        <div class="investigator-sidebar-note"><span class="workspace-status-dot"></span><span><strong>Officer dashboard</strong><small>Local review records</small></span></div>
         <div class="session-box">
           <div class="session-lbl">Session Reference</div>
           <div class="session-val" id="lbl-session-id">CYB-2026-LIVE</div>
@@ -131,58 +132,37 @@
       <!-- SCREEN 3: REPORT CYBERCRIME (CHOOSE MODE)                        -->
       <!-- ================================================================= -->
       <section class="screen-view active" id="page-choose-mode">
-        <section class="home-hero" aria-labelledby="home-title">
-          <div class="home-copy">
-            <h1 id="home-title">Get help preparing a cybercrime report</h1>
-            <p>This independent project helps you organize what happened and prepare a draft to review. It does not file an official complaint.</p>
-            <div class="home-actions">
-              <div id="card-choose-voice">
-                <button type="button" class="home-primary-action" id="btn-start-voice">Prepare a complaint draft <span aria-hidden="true">→</span></button>
+        <section class="home-hero home-hero-redesigned" aria-labelledby="home-title">
+          <div class="hero-main">
+            <div class="home-copy">
+              <p class="hero-eyebrow"><span class="hero-eyebrow-mark" aria-hidden="true">●</span> INTAKE · NLP CLASSIFICATION · CASE REVIEW</p>
+              <h1 id="home-title">Intelligent Cybercrime Complaint Analysis and Complaint Category Classification using NLP</h1>
+              <p class="hero-description">Prepare a clear complaint draft, review an NLP suggested category, and organize supporting evidence in one guided workspace.</p>
+              <div class="home-actions">
+                <div id="card-choose-voice"><button type="button" class="home-primary-action" id="btn-start-voice">Start a complaint draft <span aria-hidden="true">→</span></button></div>
+                <div id="card-choose-manual"><button type="button" class="home-secondary-action" id="btn-start-manual">Enter details manually</button></div>
               </div>
-              <div id="card-choose-manual">
-                <button type="button" class="home-secondary-action" id="btn-start-manual">Enter details yourself</button>
-              </div>
+              <a class="official-portal-link" href="https://www.cybercrime.gov.in/" target="_blank" rel="noopener noreferrer">For official reporting, visit cybercrime.gov.in <span aria-hidden="true">↗</span></a>
             </div>
-            <a class="official-portal-link" href="https://www.cybercrime.gov.in/" target="_blank" rel="noopener noreferrer">Report on the official portal <span aria-hidden="true">↗</span></a>
+            <aside class="analysis-preview" aria-label="How complaint analysis works">
+              <div class="preview-topline"><span class="preview-icon" aria-hidden="true"><svg viewBox="0 0 40 40" fill="none"><path d="M20 4 33 9v9c0 8-5.4 13.5-13 17-7.6-3.5-13-9-13-17V9l13-5Z" stroke="currentColor" stroke-width="2"/><path d="M13 20h14M20 13v14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span><span><small>WORKFLOW</small><strong>Complaint analysis</strong></span><span class="preview-status">3 steps</span></div>
+              <div class="preview-step"><span class="preview-step-number">01</span><span><strong>Describe the incident</strong><small>Speak or write in your preferred language</small></span><span class="preview-step-arrow">›</span></div>
+              <div class="preview-step"><span class="preview-step-number">02</span><span><strong>Review the analysis</strong><small>Check category suggestions and evidence details</small></span><span class="preview-step-arrow">›</span></div>
+              <div class="preview-step"><span class="preview-step-number">03</span><span><strong>Save a local record</strong><small>Keep the reference for status tracking</small></span><span class="preview-step-arrow">✓</span></div>
+              <p class="preview-disclaimer">This workspace prepares local records; it does not file an official complaint.</p>
+            </aside>
           </div>
-          <figure class="home-photo">
-            <img src="/static/assets/cyberassist-home.png" alt="A woman documenting an online incident at home" fetchpriority="high">
-            <figcaption>For real incidents, report through the official portal or contact the appropriate helpline.</figcaption>
-          </figure>
+          <div class="home-help-strip"><div><strong>Financial cyber fraud?</strong><span>Call India’s helpline as soon as possible.</span></div><a href="tel:1930"><small>CALL HELPLINE</small><strong>1930 <span aria-hidden="true">↗</span></strong></a><span class="help-strip-divider"></span><a href="tel:112"><small>IMMEDIATE DANGER</small><strong>Emergency services · 112</strong></a></div>
         </section>
 
-        <section class="home-helplines" aria-label="Important helplines">
-          <h2>Need help now?</h2>
-          <a href="tel:1930"><strong>1930</strong><span>Cyber financial fraud</span></a>
-          <a href="tel:112"><strong>112</strong><span>Police, fire or medical emergency</span></a>
-          <a href="tel:181"><strong>181</strong><span>Women’s helpline</span></a>
+        <section class="home-next-grid" id="how-to-report" aria-label="Choose a workspace">
+          <article class="next-panel citizen-panel"><div class="panel-kicker">FOR COMPLAINANTS</div><h2>Prepare a complaint draft</h2><p>Tell us what happened, add any relevant evidence, and review the details before saving.</p><ol class="process-list"><li><span>1</span><div><strong>Describe</strong><small>Speak or type in English, Hindi, or Marathi.</small></div></li><li><span>2</span><div><strong>Review</strong><small>Check the extracted details and suggested category.</small></div></li><li><span>3</span><div><strong>Save</strong><small>Get a local reference to track your saved record.</small></div></li></ol><button type="button" class="panel-link-button" id="home-start-report">Start complaint draft <span aria-hidden="true">→</span></button></article>
+          <article class="next-panel officer-panel"><div class="panel-kicker">FOR OFFICERS &amp; REVIEWERS</div><div class="officer-panel-icon" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M4 26V6m0 20h25M9 21l5-6 5 3 8-10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="27" cy="8" r="2" fill="currentColor"/></svg></div><h2>Officer dashboard</h2><p>Open the local complaint queue to review classification results, evidence checks, status, and workload statistics.</p><div class="officer-feature-list"><span>Complaint register</span><span>Priority &amp; status</span><span>Queue statistics</span></div><button type="button" class="panel-link-button" id="home-open-officer">Open officer dashboard <span aria-hidden="true">→</span></button><small class="officer-local-note">Local review workspace · not connected to police systems</small></article>
         </section>
 
-        <section class="home-guidance" id="how-to-report" aria-label="Cybercrime reporting information">
-          <div>
-            <h2>Examples of cybercrime in India</h2>
-            <ul>
-              <li><strong>Payment fraud</strong><span>Money taken through a deceptive link, UPI request, or bank transaction.</span></li>
-              <li><strong>Impersonation</strong><span>Someone pretends to be a trusted person, company, or public service.</span></li>
-              <li><strong>Account access</strong><span>Someone gets into your email, social media, or other account without permission.</span></li>
-              <li><strong>Online harassment</strong><span>Threats, stalking, blackmail, or repeated abusive messages online.</span></li>
-            </ul>
-          </div>
-          <div>
-            <h2>What may help when reporting</h2>
-            <ul>
-              <li><strong>When it happened</strong><span>An approximate date and time are useful if you are unsure.</span></li>
-              <li><strong>Transaction details</strong><span>Amount and reference number, if money was involved.</span></li>
-              <li><strong>Relevant evidence</strong><span>Screenshots, messages, emails, payment alerts, or links.</span></li>
-              <li><strong>Where it happened</strong><span>The bank, payment app, website, or social platform involved.</span></li>
-            </ul>
-            <p class="home-safety-note">Never share passwords, PINs, one-time codes, or full card details here.</p>
-          </div>
-        </section>
-
-        <footer class="home-disclaimer">
-          <p><strong>About this project</strong> CyberAssist is the Intelligent Cybercrime Complaint Analysis and Category Classification System using NLP, an independent academic prototype, not a government service. It stores records in this project workspace and has no sign-in or access controls. Depending on configuration, complaint text may be processed by an external AI provider. Use fictional details only.</p>
-          <button type="button" id="btn-reviewer-workspace" class="reviewer-link">Project reviewer workspace</button>
+        <footer class="home-disclaimer home-disclaimer-redesigned">
+          <p><strong>About this project</strong> This independent prototype stores records in the local project workspace and has no sign-in or access controls. Depending on configuration, complaint text may be processed by an external AI provider. Use fictional details only.</p>
+          <button type="button" id="btn-reviewer-workspace" class="reviewer-link">Open officer dashboard</button>
         </footer>
       </section>
 
@@ -884,11 +864,11 @@
         <div class="dashboard-header-banner">
           <div>
             <div class="dash-badges-row">
-              <span class="badge-police-portal">Investigator workspace</span>
+              <span class="badge-police-portal">Officer dashboard</span>
               <span class="badge-live-stream">Local records only</span>
             </div>
-            <h1 class="dash-main-title">Case review</h1>
-            <p class="dash-main-sub">Review submitted complaints, check evidence, and record the next action. This workspace is not connected to police or NCRP systems.</p>
+            <h1 class="dash-main-title">Complaint overview</h1>
+            <p class="dash-main-sub">Review saved complaints, classification suggestions, priority, evidence checks, and workload statistics. This local workspace is not connected to police or NCRP systems.</p>
           </div>
           <div class="dash-actions">
             <button type="button" class="btn-refresh-cases" id="btn-refresh-cases">Refresh records</button>

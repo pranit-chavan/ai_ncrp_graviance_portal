@@ -69,7 +69,7 @@ from modules.pattern_engine import find_linked_cases, build_suspect_dossier, syn
 from modules.doc_generator import generate_investigation_document, list_available_templates
 from modules import investigator_store
 
-app = FastAPI(title="CyberAssist | Independent Cybercrime Complaint Analysis Prototype", version="3.5.0")
+app = FastAPI(title="Intelligent Cybercrime Complaint Analysis and Complaint Category Classification using NLP", version="3.5.0")
 
 DEFAULT_CORS_ORIGINS = (
     "http://localhost:8000,http://127.0.0.1:8000,"
@@ -255,7 +255,7 @@ async def serve_index():
     if os.path.exists(index_file):
         with open(index_file, "r", encoding="utf-8") as f:
             return f.read()
-    return HTMLResponse("<h2>AI Cybercrime Complaint Assistant is starting up...</h2>")
+    return HTMLResponse("<h2>Intelligent Cybercrime Complaint Analysis and Complaint Category Classification using NLP is starting up...</h2>")
 
 
 @app.get("/health")
@@ -264,7 +264,7 @@ async def health_check():
     cases_count = len(glob.glob(os.path.join(CASE_DIR, "*.json")))
     return JSONResponse({
         "status": "healthy",
-        "service": "CyberAssist Independent Prototype API",
+        "service": "Intelligent Cybercrime Complaint Analysis and Complaint Category Classification using NLP",
         "version": "3.5.0",
         "classifier_loaded": clf_ok,
         "database": "SQLite (complaints.db, case_index.db)",
