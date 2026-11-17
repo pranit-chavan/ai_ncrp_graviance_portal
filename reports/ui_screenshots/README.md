@@ -30,3 +30,8 @@ Suggested report sequence: 01 home, 02 consent, 03 guided intake, 05 or 07 manua
 - Screenshot 12 includes a warning for an NPCI guideline entry whose section is undefined. Treat the BNS and IT Act entries as suggestions requiring officer verification; correct or remove the undefined NPCI entry before presenting it as a legal reference.
 - Screenshot 14 demonstrates the available local workflow controls and complaint PDF link. The visible actions prepare bank and phone-record request drafts; they are not evidence of BNSS/BSA statutory notice generation. The HTML officer dashboard has no login/access control and is not connected to police systems.
 - A saved-record confirmation screen, successful local Whisper transcription, successful OCR extraction, populated evidence mismatch review, and BNSS/BSA notice output were not captured in this session. The report should only claim these where a verified implementation screen or backend result is available.
+## Report section with figure references
+
+`report-section-with-figures.tex` is the supplied LaTeX passage with figures inserted under the home page and each described intake/investigator screen. Its image paths are relative to the repository root, so compile the report from that root or adjust the paths for your report project. The same updated passage was written back to the provided `Pasted text.txt` attachment.
+
+The passage uses the existing verified screenshots. It includes notes where a capture does not demonstrate a completed flow: successful voice transcription, a follow-up answer, evidence preview/progress, saved-submission confirmation, OCR mismatch, a confirmed repeat-offender link, or BNSS/BSA notice generation.
