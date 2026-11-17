@@ -18,6 +18,7 @@ Screenshots were captured from the local application at `http://127.0.0.1:8501/`
 | `12-investigator-case-detail.jpg` | Fictional case details, summary, reported transaction, and possible legal references for officer verification | Investigator case review |
 | `13-case-evidence-links-reconciliation.jpg` | Evidence and cross-check state plus possible related records; this sample has no attached evidence | Evidence review / repeat-pattern leads |
 | `14-case-review-workflow-actions.jpg` | Review decision, category correction, assignment/status workflow, request-draft actions, and complaint PDF link | Case management / report actions |
+| `15-officer-priority-status-queue.jpg` | Filtered queue view focused on urgency, status, assignment, and evidence-check indicators | Investigator dashboard / prioritization |
 
 Suggested report sequence: 01 home, 02 consent, 03 guided intake, 05 or 07 manual intake, 06 or 08 user review, 09 classification results, 10 status tracking, 04 officer overview, then 11–14 investigator review. The narrative and `Example Complainant` records shown in the screenshots are fictional demonstration data. The investigator screenshots are filtered to those example records; do not use unfiltered queue rows in a report.
 
