@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>CyberAssist | Intelligent Cybercrime Complaint Analysis and Category Classification System using NLP</title>
+  <title>Intelligent Cybercrime Complaint Analysis and Complaint Category Classification using NLP</title>
   <meta name="description" content="An independent prototype for preparing and reviewing cybercrime complaint drafts.">
   <link rel="icon" type="image/svg+xml" href="/static/cyberassist-mark.svg">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,16 +11,18 @@
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/static/style.css?v=20261115-citizen-experience">
   <link rel="stylesheet" href="/static/citizen-refresh.css?v=20261115">
+  <link rel="stylesheet" href="/static/redesign.css?v=20261117">
 </head>
 <body>
 
   <!-- Top Navigation Bar -->
   <header class="app-navbar">
     <div class="navbar-inner">
-      <div class="navbar-brand" id="brand-logo-btn">
+      <div class="navbar-brand" id="brand-logo-btn" role="button" tabindex="0" aria-label="Go to home">
+        <span class="brand-shield" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none"><path d="M16 3 27 7v8c0 7-4.6 11.6-11 14-6.4-2.4-11-7-11-14V7l11-4Z" stroke="currentColor" stroke-width="2"/><path d="m11 16 3.2 3.2L21 12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
         <div class="brand-text">
-          <span class="brand-title">CyberAssist</span>
-          <span class="brand-prototype-tag">Cybercrime complaint support</span>
+          <span class="brand-title">Cybercrime Analysis</span>
+          <span class="brand-prototype-tag">Independent cybercrime complaint support</span>
         </div>
       </div>
 
@@ -33,7 +35,8 @@
         <button type="button" class="citizen-nav-link active" id="top-nav-home">Home</button>
         <button type="button" class="citizen-nav-link" id="top-nav-help">How to report</button>
         <button type="button" class="citizen-nav-link" id="top-nav-prepare">Prepare a draft</button>
-        <button type="button" class="citizen-nav-link" id="top-nav-track">Find a draft</button>
+        <button type="button" class="citizen-nav-link" id="top-nav-track">Track a saved record</button>
+        <button type="button" class="citizen-nav-link" id="top-nav-privacy">Privacy &amp; consent</button>
       </nav>
 
       <a class="header-hotline" href="tel:1930" aria-label="Call cybercrime helpline 1930">
@@ -858,7 +861,7 @@
             <div class="result-action-buttons">
               <label class="agreement-checkbox-label local-consent-label">
                 <input type="checkbox" id="chk-local-consent" class="styled-checkbox">
-                <span>I understand this saves a draft in the project workspace, which has no sign-in or access controls. This is not an official complaint. Complaint text may be processed by an external AI provider depending on configuration. I will use fictional details only.</span>
+                <span>Review privacy and consent information before saving. This independent prototype is not an official complaint service.</span>
               </label>
               <button type="button" class="btn-download-pdf-clean" id="btn-download-pdf-result">
                 📄 Download Draft (PDF)
@@ -1004,6 +1007,20 @@
 
     </main>
 
+  </div>
+
+  <!-- Case Inspector Modal (Module F) -->
+  <div class="consent-overlay" id="consent-modal" hidden role="dialog" aria-modal="true" aria-labelledby="consent-title" aria-describedby="consent-summary">
+    <section class="consent-dialog">
+      <header class="consent-header"><span class="consent-symbol" aria-hidden="true">⌑</span><div><p class="consent-eyebrow">Privacy &amp; data use</p><h2 id="consent-title">Before you save this complaint</h2></div><button type="button" class="btn-modal-close" id="btn-consent-close" aria-label="Close consent information">&times;</button></header>
+      <div class="consent-content" id="consent-summary">
+        <p>Saving sends this record to the local investigator review workspace on the computer running this application. Please use fictional details only.</p>
+        <div class="consent-facts"><article><strong>Information collected</strong><p>Your incident description, contact and incident details, classification results, and any evidence you choose to upload.</p></article><article><strong>How it is processed</strong><p>The app uses its NLP classifier and evidence extraction tools to prepare a draft. Depending on configuration, complaint text may be sent to an external AI provider.</p></article><article><strong>Storage and access</strong><p>Records and evidence are stored in this project workspace. This prototype has no sign-in or access controls and is not connected to police or government systems.</p></article></div>
+        <p class="consent-note">This does not submit an official complaint. For an official report in India, visit <a href="https://www.cybercrime.gov.in/" target="_blank" rel="noopener noreferrer">cybercrime.gov.in</a>. You can decline and keep editing your draft.</p>
+        <label class="consent-accept"><input type="checkbox" id="chk-consent-modal"><span><strong>I understand and consent</strong><small>Allow this complaint and its attached evidence to be saved to this project’s local review workspace.</small></span></label>
+      </div>
+      <footer class="consent-actions"><button type="button" class="btn-consent-decline" id="btn-consent-decline">Decline</button><button type="button" class="btn-consent-accept" id="btn-consent-accept" disabled>Accept and save complaint</button></footer>
+    </section>
   </div>
 
   <!-- Case Inspector Modal (Module F) -->

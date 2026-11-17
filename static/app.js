@@ -233,6 +233,9 @@ const revUtr = document.getElementById('rev-utr');
 const revSuspect = document.getElementById('rev-suspect');
 const chkReviewVerify = document.getElementById('chk-review-verify');
 const chkLocalConsent = document.getElementById('chk-local-consent');
+const consentModal = document.getElementById('consent-modal');
+const chkConsentModal = document.getElementById('chk-consent-modal');
+let consentPurpose = 'save';
 const btnBackToVoice = document.getElementById('btn-back-to-voice');
 const btnConfirmAndClassify = document.getElementById('btn-confirm-and-classify');
 
@@ -259,6 +262,7 @@ const toastText = document.getElementById('toast-text');
 
 document.addEventListener('DOMContentLoaded', () => {
   lblSessionId.textContent = state.sessionId;
+  if (btnSaveContinue) btnSaveContinue.disabled = false;
   manDatetime.value = state.draft.datetime;
   initVoices();
   initSpeechRecognition();
@@ -383,7 +387,7 @@ function startNewComplaintIfPreviousWasSaved() {
     btnConfirmAndClassify.textContent = 'Confirm & Classify →';
   }
   if (btnSaveContinue) {
-    btnSaveContinue.disabled = true;
+    btnSaveContinue.disabled = false;
     btnSaveContinue.textContent = 'Save and Continue →';
   }
   if (savedReference) savedReference.hidden = true;
@@ -1557,6 +1561,7 @@ async function saveCaseRecord() {
       suspects: [d.suspect ? { phone: d.suspect, details: d.suspect } : null, ...additionalRowValues('recipient-transaction-rows').filter(row => row.identifier).map(row => ({ name: row.name || 'Unknown', id_type: row.method || 'Account / payment identifier', id_number: row.identifier, details: row.bank || '' }))].filter(Boolean),
       evidence: state.evidenceFiles.map(file => ({ filename: file.filename, description: file.description || '', chars_read: file.chars_read, raw_ocr_text: file.raw_snippet || '', ocr_errors: file.ocr_errors || [], ocr_entities: file.entities || {} })),
       investigator_consent: true,
+      consent_details: { accepted: true, version: '2026-11-17', accepted_at: (() => { try { return JSON.parse(localStorage.getItem('complaintConsent') || '{}').acceptedAt || new Date().toISOString(); } catch (_) { return new Date().toISOString(); } })() },
       reconciliation: state.evidenceReview?.result || {},
       reviewed_evidence_entities: state.evidenceReview?.reviewedEntities || state.ocrEntities
     };
@@ -1593,6 +1598,7 @@ function initEventListeners() {
 
   // Brand logo & Dashboard links
   brandLogoBtn.addEventListener('click', () => showScreen('page-choose-mode'));
+  brandLogoBtn.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); showScreen('page-choose-mode'); } });
   document.getElementById('top-nav-home')?.addEventListener('click', () => showScreen('page-choose-mode'));
   document.getElementById('top-nav-help')?.addEventListener('click', () => {
     showScreen('page-choose-mode', false);
@@ -1984,14 +1990,64 @@ function initEventListeners() {
   // SCREEN 7 (RESULT) BUTTONS:
   btnDownloadPdfResult.addEventListener('click', handleDownloadPdf);
   btnViewFullDraft.addEventListener('click', () => showScreen('page-review'));
-  chkLocalConsent?.addEventListener('change', () => { btnSaveContinue.disabled = !chkLocalConsent.checked; });
+  chkLocalConsent?.addEventListener('change', () => { btnSaveContinue.disabled = false; });
+  chkLocalConsent?.addEventListener('click', event => { event.preventDefault(); openConsentDialog('save'); });
   btnSaveContinue.addEventListener('click', () => {
     if (state.savedCaseReference) {
       showScreen('page-choose-mode');
       return;
     }
+    if (!chkLocalConsent?.checked) {
+      openConsentDialog('save');
+      return;
+    }
     saveCaseRecord();
   });
+  document.getElementById('top-nav-privacy')?.addEventListener('click', () => openConsentDialog('info'));
+  document.getElementById('btn-consent-close')?.addEventListener('click', closeConsentDialog);
+  document.getElementById('btn-consent-decline')?.addEventListener('click', () => {
+    closeConsentDialog();
+    if (consentPurpose === 'save') showToast('Consent was declined. Your draft has not been saved.');
+  });
+  chkConsentModal?.addEventListener('change', () => {
+    const accept = document.getElementById('btn-consent-accept');
+    if (accept) accept.disabled = !chkConsentModal.checked;
+  });
+  document.getElementById('btn-consent-accept')?.addEventListener('click', () => {
+    if (consentPurpose === 'save') {
+      if (!chkConsentModal?.checked) return;
+      chkLocalConsent.checked = true;
+      chkLocalConsent.dispatchEvent(new Event('change', { bubbles: true }));
+      try { localStorage.setItem('complaintConsent', JSON.stringify({ accepted: true, acceptedAt: new Date().toISOString(), version: '2026-11-17' })); } catch (_) {}
+      closeConsentDialog();
+      saveCaseRecord();
+      return;
+    }
+    closeConsentDialog();
+  });
+  consentModal?.addEventListener('click', event => { if (event.target === consentModal) closeConsentDialog(); });
+}
+
+function openConsentDialog(purpose = 'info') {
+  consentPurpose = purpose;
+  if (!consentModal) return;
+  if (chkConsentModal) chkConsentModal.checked = false;
+  const title = document.getElementById('consent-title');
+  if (title) title.textContent = purpose === 'save' ? 'Before you save this complaint' : 'Privacy and data use';
+  const acceptance = consentModal.querySelector('.consent-accept');
+  if (acceptance) acceptance.hidden = purpose !== 'save';
+  const accept = document.getElementById('btn-consent-accept');
+  if (accept) { accept.disabled = purpose === 'save'; accept.textContent = purpose === 'save' ? 'Accept and save complaint' : 'Close information'; }
+  const decline = document.getElementById('btn-consent-decline');
+  if (decline) decline.textContent = purpose === 'save' ? 'Decline' : 'Close';
+  consentModal.hidden = false;
+  document.body.classList.add('dialog-open');
+  document.getElementById('btn-consent-close')?.focus();
+}
+
+function closeConsentDialog() {
+  if (consentModal) consentModal.hidden = true;
+  document.body.classList.remove('dialog-open');
 }
 
 function switchLanguage(lang) {

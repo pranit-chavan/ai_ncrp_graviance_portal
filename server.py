@@ -534,6 +534,8 @@ async def submit_case_endpoint(payload: Dict[str, Any]):
             "confirmed": True,
             "recorded_at": datetime.now().astimezone().isoformat(timespec="seconds"),
             "purpose": "Local investigator workspace review",
+            "version": str((payload.get("consent_details") or {}).get("version") or "legacy"),
+            "accepted_at": str((payload.get("consent_details") or {}).get("accepted_at") or ""),
         }
         # Keep this submission tied to the one intake session that produced it.
         # Both typed turns and speech transcripts are saved as the complaint's raw text;
