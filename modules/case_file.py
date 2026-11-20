@@ -411,6 +411,13 @@ def write_json(case, path=None):
 
 
 def write_pdf(case, path=None):
+    from modules.complaint_pdf import write_complaint_pdf
+    os.makedirs(OUT_DIR, exist_ok=True)
+    path = path or os.path.join(OUT_DIR, case["reference"].replace("/", "-") + ".pdf")
+    return write_complaint_pdf(case, path)
+
+
+def write_detailed_pdf(case, path=None):
     """Render an AI-assisted complaint record for victim review. Requires reportlab."""
     try:
         from reportlab.lib.pagesizes import A4

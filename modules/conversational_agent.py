@@ -81,6 +81,13 @@ def verify_hallucination_guard(field_name: str, value: Any, raw_utterance: str, 
 
     # Numeric amount verification: ensure the integer digits exist
     if field_name == "financial_loss_amount":
+        from modules.loss_amount import extract_loss
+        for source in [raw_utterance] + [t.get("content", "") for t in history if t.get("role") == "user"]:
+            grounded = extract_loss(source)
+            if grounded is not None and grounded == float(value):
+                return True
+            if _parse_pending_amount_answer(source) == float(value):
+                return True
         try:
             amt_int = int(float(value))
             digits = str(amt_int)
@@ -172,23 +179,11 @@ def extract_structured_docket(message: str, current_docket: Dict[str, Any]) -> D
     docket = dict(current_docket or {})
 
     # 1. Financial Loss Amount
-    amt = docket.get("financial_loss_amount") or docket.get("lost_amount")
-    if not amt:
-        patterns = [
-            r"(?:rs\.?|inr|rupees|₹|रुपये|रूपए|रुपया)\s*(\d[\d,]*)",
-            r"(\d[\d,]*)\s*(?:rs\.?|inr|rupees|₹|रुपये|रूपए|रुपया|रु|हजार|लाख)"
-        ]
-        for pat in patterns:
-            amt_match = re.search(pat, msg_lower)
-            if amt_match:
-                try:
-                    val = float(amt_match.group(1).replace(",", ""))
-                    if 10 <= val <= 100000000:
-                        amt = val
-                        break
-                except Exception:
-                    pass
-    if not amt:
+    from modules.loss_amount import extract_loss
+    amt = extract_loss(message)
+    if amt is None:
+        amt = docket.get("financial_loss_amount")
+    if amt is None and re.search(r"[\u0900-\u097f]", message):
         try:
             from modules.entity_extractor import parse_spoken_hindi_amount
             spoken = parse_spoken_hindi_amount(message)
@@ -442,15 +437,15 @@ def _parse_pending_amount_answer(message: str) -> Optional[float]:
     normalized = message.lower().strip().translate(str.maketrans("०१२३४५६७८९", "0123456789"))
     if re.fullmatch(r"(?:no|none|nothing|zero|0|कोई नहीं|कुछ नहीं|नहीं|काही नाही|नाही)[.! ]*", normalized):
         return 0.0
-    matches = re.findall(r"(?<!\d)(\d[\d,]*(?:\.\d{1,2})?)\s*([kK])?", normalized)
-    if len(matches) != 1:
+    from modules.loss_amount import extract_loss, value
+    grounded = extract_loss(normalized)
+    if grounded is not None:
+        return grounded
+    direct = re.fullmatch(r"(?:about |around |approximately )?(?:rs\.?\s*|inr\s*|₹\s*)?(\d[\d,]*(?:\.\d{1,2})?(?:\s*(?:k|thousand|lakh|lac|crore))?)\s*(?:rupees?|rs\.?)?[.! ]*", normalized, re.I)
+    if not direct:
         return None
-    raw, suffix = matches[0]
-    try:
-        amount = float(raw.replace(",", "")) * (1000 if suffix else 1)
-    except ValueError:
-        return None
-    return amount if 0 < amount <= 100_000_000 else None
+    amount = float(value(direct[1]))
+    return amount if 0 <= amount <= 100_000_000 else None
 
 
 def _previous_question_field(docket: Dict[str, Any], history: List[Dict[str, str]]) -> Optional[str]:
