@@ -281,10 +281,6 @@ def transcribe_audio(audio_source, language=None, model_name="base", initial_pro
         if not valid:
             return _error_result(msg, t0)
 
-        # Load model
-        log(f"[G] Loading Whisper model '{model_name}'...")
-        model = _load_model(model_name)
-
         # Reject digital silence before neural decoding. Whisper's domain prompt can
         # otherwise be echoed as hallucinated speech, and CPU inference is costly.
         import numpy as np
@@ -293,6 +289,11 @@ def transcribe_audio(audio_source, language=None, model_name="base", initial_pro
         if audio.size == 0 or (float(np.sqrt(np.mean(np.square(audio, dtype=np.float64)))) < 0.001
                                and float(np.max(np.abs(audio))) < 0.005):
             return _error_result("No clear speech detected. Please record again in a quiet place.", t0)
+
+        # Load Whisper only after silence has been rejected. A first model load is
+        # noticeable on CPU and should not delay a user who uploaded a blank clip.
+        log(f"[G] Loading Whisper model '{model_name}'...")
+        model = _load_model(model_name)
 
         # Optimize CPU threads for PyTorch inference
         try:

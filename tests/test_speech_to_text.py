@@ -242,10 +242,11 @@ class TestTranscribeAudioMocked(unittest.TestCase):
         from modules.speech_to_text import transcribe_audio
 
         # This will fail at model loading (which is fine for testing the bytes → file path conversion)
-        with patch("modules.speech_to_text._load_model", side_effect=ImportError("test")):
-            result = transcribe_audio(b"fake audio bytes", model_name="base")
-            self.assertFalse(result["ok"])
-            self.assertIn("test", result["error"])
+        with patch("whisper.load_audio", return_value=__import__("numpy").ones(1600, dtype="float32")):
+            with patch("modules.speech_to_text._load_model", side_effect=ImportError("test")):
+                result = transcribe_audio(b"fake audio bytes", model_name="base")
+                self.assertFalse(result["ok"])
+                self.assertIn("test", result["error"])
 
     def test_invalid_source_type_rejected(self):
         from modules.speech_to_text import transcribe_audio

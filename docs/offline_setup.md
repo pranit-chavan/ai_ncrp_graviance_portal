@@ -22,7 +22,14 @@ The citizen site and stylesheets contain no remote font or script dependencies. 
 
 ## Speech notes
 
-The first run downloads Whisper if it is not already installed in the user cache. An optional isolated environment can enable the RTX 2050 for Whisper while keeping the system Python environment untouched. It requires several GB of disk space for CUDA-enabled PyTorch. The launcher chooses `.venv-gpu` automatically once it is installed. Review the transcript before adding it to the complaint. The intake now preserves Whisper's original words instead of silently replacing uncertain speech with bank names or transaction terms. High no-speech segments are filtered so silence cannot become copied prompt text.
+The first run downloads Whisper if it is not already installed in the user cache. To enable the RTX 2050 for Whisper without replacing system Python packages, install CUDA-enabled PyTorch in an optional environment (the wheel is several GB):
+
+```powershell
+py -3.13 -m venv --system-site-packages .venv-gpu
+.venv-gpu\Scripts\python.exe -m pip install torch==2.7.1 --index-url https://download.pytorch.org/whl/cu118
+```
+
+The launcher chooses `.venv-gpu` automatically once it is installed. Review the transcript before adding it to the complaint. The intake preserves Whisper's original words instead of silently replacing uncertain speech with bank names or transaction terms. Digital silence is rejected before model loading, and high no-speech segments are filtered so silence cannot become copied prompt text.
 
 ## Model limitations
 
