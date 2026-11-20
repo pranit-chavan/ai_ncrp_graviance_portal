@@ -25,10 +25,10 @@ Those are separate products. The free tiers above are what you want.
 
 USAGE
 -----
-    python paraphrase.py --demo
-    python paraphrase.py --provider ollama --per-category 2
-    python paraphrase.py --provider ollama --per-category 100
-    python paraphrase.py --provider gemini --per-category 100 --sleep 4 --resume
+    python scripts/data_preparation/paraphrase.py --demo
+    python scripts/data_preparation/paraphrase.py --provider ollama --per-category 2
+    python scripts/data_preparation/paraphrase.py --provider ollama --per-category 100
+    python scripts/data_preparation/paraphrase.py --provider gemini --per-category 100 --sleep 4 --resume
 
 Every rewrite is fact-checked: if an amount or year went missing it is rejected
 rather than saved. Free-tier models need this; frontier models rarely trip it.
@@ -307,8 +307,8 @@ def main():
     print(f"Output           : {DST}/")
     print("=" * 72)
     print("\nNext:")
-    print("  python make_para_split.py       # build template-disjoint splits from this")
-    print("  python train_baseline_para.py   # the honest score")
+    print("  python scripts/data_preparation/make_para_split.py       # build template-disjoint splits from this")
+    print("  python scripts/training/train_baseline_para.py   # the honest score")
 
 
 if __name__ == "__main__":

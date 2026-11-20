@@ -10,7 +10,7 @@ val or test. No template appears in more than one split, so every test complaint
 uses a sentence structure the model has never seen.
 
 Run from the classifier_project/ folder:
-    python make_template_split.py
+    python scripts/data_preparation/make_template_split.py
 
 Reads : dataset/generated/*_all.jsonl   (the 500-sample master copies)
 Writes: dataset/splits_template/{train,val,test}/
@@ -106,7 +106,7 @@ def main():
         print(f"  OK: all {len(seen)} templates are confined to a single split")
 
     print(f"\nWritten to {DST}/")
-    print("Point train_baseline.py at this folder to get an honest score:")
+    print("Point scripts/training/train_baseline.py at this folder to get an honest score:")
     print('    SPLITS_DIR = os.path.join("dataset", "splits_template")')
 
 

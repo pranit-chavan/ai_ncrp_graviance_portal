@@ -36,7 +36,7 @@ Finish intake, review the generated narrative for accuracy, and continue to evid
 
 ## Evidence/OCR check
 
-Use the included fictional [UPI receipt screenshot](test_evidence_upi_receipt.png), which displays only the amount, date, UPI handle, and test transaction reference above. Do not upload a genuine receipt, account number, UPI PIN, OTP, phone number, or other personal data.
+Use the included fictional [UPI receipt screenshot](../test_evidence_upi_receipt.png), which displays only the amount, date, UPI handle, and test transaction reference above. Do not upload a genuine receipt, account number, UPI PIN, OTP, phone number, or other personal data.
 
 1. Upload the sample evidence.
 2. Select **Extract text and review evidence**.

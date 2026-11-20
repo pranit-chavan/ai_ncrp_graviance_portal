@@ -11,7 +11,7 @@ TWO RULES, both needed for an honest score:
    test, which is leakage wearing a disguise.
 
 Run from the classifier_project folder:
-    python make_para_split.py
+    python scripts/data_preparation/make_para_split.py
 
 Reads : dataset/paraphrased/*_para.jsonl
 Writes: dataset/splits_para/{train,val,test}/
@@ -31,7 +31,7 @@ VAL_FRAC, TEST_FRAC = 0.15, 0.15
 def main():
     files = sorted(glob.glob(os.path.join(SRC, "*_para.jsonl")))
     if not files:
-        raise SystemExit(f"No files in {SRC}/ - run paraphrase.py first.")
+        raise SystemExit(f"No files in {SRC}/ - run scripts/data_preparation/paraphrase.py first.")
 
     for s in ("train", "val", "test"):
         os.makedirs(os.path.join(DST, s), exist_ok=True)
@@ -104,7 +104,7 @@ def main():
     print(f"  templates in >1 split : {len(bad_t)}  {'OK' if not bad_t else 'FAIL'}")
     print(f"  families  in >1 split : {len(bad_f)}  {'OK' if not bad_f else 'FAIL'}")
     print(f"\nWritten to {DST}/")
-    print("Next:  python train_baseline_para.py")
+    print("Next:  python scripts/training/train_baseline_para.py")
 
 
 if __name__ == "__main__":

@@ -18,7 +18,7 @@ Only `dataset/splits_para/train/1_02_cyber_bullying_stalking_sexting_train.jsonl
 
 ## Split-checker results
 
-The checker embedded in the copied `make_para_split.py` was run during scratch regeneration; an independent ID/group check was then run against the corrected saved split. Pairwise group overlap counts:
+The checker embedded in the copied `scripts/data_preparation/make_para_split.py` was run during scratch regeneration; an independent ID/group check was then run against the corrected saved split. Pairwise group overlap counts:
 
 | Group key | Train–test | Train–validation | Validation–test |
 |---|---:|---:|---:|
@@ -49,12 +49,12 @@ LinearSVC, Logistic Regression (L2), and Complement Naive Bayes were trainable f
 - scikit-learn: `1.8.0`
 - OS/platform: Windows 11, 64-bit Python/AMD64; exact runtime platform: `Windows-11-10.0.26300-SP0`
 - Hardware: HP Victus by HP Gaming Laptop 15-fa1xxx; Intel Core i5-12450H (8 cores, 12 logical processors); 8,212,975,616 bytes installed RAM; NVIDIA GeForce RTX 2050 4,096 MiB, driver 592.82. GPU was not used.
-- Seeds: split assignment uses `SEED=20260825` in `make_para_split.py`; LinearSVC `random_state=42`; Logistic Regression `random_state=42`; ComplementNB has no random seed parameter; TF-IDF vectorisation is deterministic.
+- Seeds: split assignment uses `SEED=20260825` in `scripts/data_preparation/make_para_split.py`; LinearSVC `random_state=42`; Logistic Regression `random_state=42`; ComplementNB has no random seed parameter; TF-IDF vectorisation is deterministic.
 - Exact installed environment: `pip freeze` output follows.
 
 ### Commands and actions
 
-1. `python scratch\make_para_split_repro.py` — temporary copy of the repository `make_para_split.py`, with only the destination constant changed to `scratch/s3_regenerated`; no split algorithm edits. Its built-in template/family checker completed with 0 overlaps.
+1. `python scratch\make_para_split_repro.py` — temporary copy of the repository `scripts/data_preparation/make_para_split.py`, with only the destination constant changed to `scratch/s3_regenerated`; no split algorithm edits. Its built-in template/family checker completed with 0 overlaps.
 2. Compare regenerated outputs with saved split outputs by ID and file bytes; copy only files that differed. This changed only the Cyber Bullying / Stalking / Sexting train JSONL and added the two missing records.
 3. Independent split integrity check: loaded all JSONL files under `dataset/splits_para/{train,val,test}`, counted rows/unique IDs, and measured pairwise intersections for template and paraphrase-family group keys.
 4. `python scripts\run_s3_evaluation.py` — fitted TF-IDF and trained LinearSVC, Logistic Regression, ComplementNB on the corrected train split; evaluated on corrected test split; wrote JSON, CSV, confusion matrix, and all LinearSVC errors.

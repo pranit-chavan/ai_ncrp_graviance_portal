@@ -2,7 +2,7 @@
 TF-IDF + LinearSVC baseline for cybercrime complaint classification.
 
 Run from the classifier_project/ folder:
-    python train_baseline.py
+    python scripts/training/train_baseline.py
 
 Requires: pip install scikit-learn
 """

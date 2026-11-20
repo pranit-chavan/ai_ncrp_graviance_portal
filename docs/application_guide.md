@@ -17,13 +17,13 @@ classifier_project/
 │   ├── case_file.py             MODULE E  case file as JSON + PDF
 │   └── README.md                per-module documentation
 │
-├── train_baseline.py            MODULE B  baseline on random splits
-├── train_baseline_template.py   MODULE B  baseline on template-disjoint splits
-├── train_baseline_para.py       MODULE B  baseline on paraphrased splits (honest)
+├── scripts/training/train_baseline.py            MODULE B  baseline on random splits
+├── scripts/training/train_baseline_template.py   MODULE B  baseline on template-disjoint splits
+├── scripts/training/train_baseline_para.py       MODULE B  baseline on paraphrased splits (honest)
 │
-├── paraphrase.py                dataset  LLM paraphrasing, 3 providers
-├── make_template_split.py       dataset  template-disjoint splits
-├── make_para_split.py           dataset  splits from paraphrased data
+├── scripts/data_preparation/paraphrase.py                dataset  LLM paraphrasing, 3 providers
+├── scripts/data_preparation/make_template_split.py       dataset  template-disjoint splits
+├── scripts/data_preparation/make_para_split.py           dataset  splits from paraphrased data
 │
 ├── case_files/                  generated case files (JSON + PDF)
 ├── models/                      label_map.json
@@ -32,8 +32,8 @@ classifier_project/
     ├── generators/              vocab / templates / config per sub-category
     ├── splits/                  random splits
     ├── splits_template/         template-disjoint splits
-    ├── paraphrased/             created by paraphrase.py  (on your machine)
-    └── splits_para/             created by make_para_split.py  (on your machine)
+    ├── paraphrased/             created by scripts/data_preparation/paraphrase.py  (on your machine)
+    └── splits_para/             created by scripts/data_preparation/make_para_split.py  (on your machine)
 ```
 
 Note: `dataset/paraphrased/` and `dataset/splits_para/` are generated on your
@@ -78,8 +78,8 @@ For component demos and training:
     python modules/case_file.py                  Module E, builds 3 demo case files
     python pipeline.py --demo                    end to end (needs Ollama running)
 
-    python train_baseline_template.py            classifier, template-disjoint
-    python train_baseline_para.py                classifier, paraphrased (honest)
+    python scripts/training/train_baseline_template.py            classifier, template-disjoint
+    python scripts/training/train_baseline_para.py                classifier, paraphrased (honest)
 
 Module A uses Gemma 4 12B through Ollama by default. Install/run it locally:
 

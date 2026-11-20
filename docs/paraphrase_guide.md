@@ -32,10 +32,10 @@ Get a key from console.anthropic.com, then:
 
 ## Run — three steps
 
-    python paraphrase.py --demo                # preview, no key needed
-    python paraphrase.py --per-category 100    # ~6,300 rewrites, start here
-    python make_para_split.py                  # build honest splits
-    python train_baseline_para.py              # the real score
+    python scripts/data_preparation/paraphrase.py --demo                # preview, no key needed
+    python scripts/data_preparation/paraphrase.py --per-category 100    # ~6,300 rewrites, start here
+    python scripts/data_preparation/make_para_split.py                  # build honest splits
+    python scripts/training/train_baseline_para.py              # the real score
 
 If it stops partway, add --resume to continue where it left off.
 
@@ -65,12 +65,12 @@ AND the AI Assistant at the same time.
 
 ## Files
 
-    paraphrase.py            calls the LLM, writes dataset/paraphrased/
-    make_para_split.py       splits it (template-disjoint AND family-intact)
-    train_baseline_para.py   scores it, with the per-style breakdown
+    scripts/data_preparation/paraphrase.py            calls the LLM, writes dataset/paraphrased/
+    scripts/data_preparation/make_para_split.py       splits it (template-disjoint AND family-intact)
+    scripts/training/train_baseline_para.py   scores it, with the per-style breakdown
 
 ## One safeguard worth knowing
 
-make_para_split.py keeps an original and all its rewrites in the SAME split.
+scripts/data_preparation/make_para_split.py keeps an original and all its rewrites in the SAME split.
 Without that rule the model would see a complaint in training and its reworded
 twin in test — leakage in disguise. The script verifies this and prints OK/FAIL.

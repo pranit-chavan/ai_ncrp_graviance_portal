@@ -212,7 +212,7 @@ Here is what happens behind the scenes from the moment a citizen types a complai
 
 ### Engine 8: Module F — The National Cyber Crime Portal (UI)
 
-The system provides a unified web portal ([dashboard.py](file:///c:/Users/acer/OneDrive/Desktop/classifier_project/dashboard.py)) with dedicated workflows for both citizens and police officers:
+The system provides a unified web portal ([dashboard.py](../dashboard.py)) with dedicated workflows for both citizens and police officers:
 
 #### 1. The Citizen Experience: 3-Step Guided Filing Wizard
 - **Step 1: Incident Description & Evidence**:

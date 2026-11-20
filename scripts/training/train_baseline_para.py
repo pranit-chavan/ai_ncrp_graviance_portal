@@ -2,7 +2,7 @@
 TF-IDF + LinearSVC baseline for cybercrime complaint classification.
 
 Run from the classifier_project/ folder:
-    python train_baseline.py
+    python scripts/training/train_baseline.py
 
 Requires: pip install scikit-learn
 """
@@ -15,7 +15,7 @@ from sklearn.svm import LinearSVC
 from sklearn.preprocessing import LabelEncoder
 from sklearn.metrics import classification_report, f1_score
 
-SPLITS_DIR = os.path.join("dataset", "splits_template")
+SPLITS_DIR = os.path.join("dataset", "splits_para")
 
 # ── 1. Load data ──────────────────────────────────────────────
 # Only complaint_text reaches the model. id / scenario / template_id are kept
@@ -37,6 +37,7 @@ def load_split(split):
                 "scenario":    r.get("scenario"),
                 "template_id": r.get("template_id"),
                 "category":    r.get("category"),
+                "style":       r.get("style", "original"),
             })
     return texts, labels, meta
 
@@ -141,6 +142,20 @@ else:
         print(f"  {n:3}x  {cls}  [{scen}]")
 
 # ── 9. Headline number ────────────────────────────────────────
+
+# accuracy split by writing style - the key diagnostic
+print("\n" + "=" * 70)
+print("ACCURACY BY WRITING STYLE")
+print("=" * 70)
+by_style = Counter(); ok_style = Counter()
+for m, true, pred in zip(meta_test, y_test_enc, test_preds):
+    s = m["style"]; by_style[s] += 1
+    if true == pred: ok_style[s] += 1
+for s in sorted(by_style):
+    n, ok = by_style[s], ok_style[s]
+    print(f"  {s:<12} {ok:>5}/{n:<5}  {ok/n:.1%}")
+print("\n  'original' = generator wording (easy).")
+print("  others     = rewritten in natural language (the real test).")
 
 macro = f1_score(y_test_enc, test_preds, average="macro")
 errors = int(sum(confusions.values()))
