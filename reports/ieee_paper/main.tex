@@ -56,7 +56,7 @@ The implemented baseline is a linear support vector classifier with regularizati
 The classifier is one decision-support component in the larger intake flow. It does not verify allegations. OCR-derived text may be included as context in some pipeline paths, while the reported benchmark evaluates complaint text under the dedicated data loader. Thus, the benchmark should not be interpreted as an end-to-end multimodal evaluation.
 
 \section{Experimental Setup}
-The available evaluation artifact records a test partition of 1,960 generated examples across 21 categories, with 8,487 training and 1,917 validation examples. The recorded vocabulary size is 35,342. The classifier uses the TF--IDF settings described in Section III, and the evaluation artifact records a fixed seed for the split and LinearSVC. No human-annotated real-world corpus, external test set, or deployment cohort is included in the repository evidence reviewed for this paper.
+The project source and evaluation artifacts record a test partition of 1,960 generated examples across 21 categories, with 8,487 training and 1,917 validation examples~\cite{projectArtifacts}. The recorded vocabulary size is 35,342. The classifier uses the TF--IDF settings described in Section III, and the evaluation artifact records a fixed seed for the split and LinearSVC. No human-annotated real-world corpus, external test set, or deployment cohort is included in the repository evidence reviewed for this paper.
 
 The project documentation states that the generated categories contain category-specific vocabulary. This construction can make the classification task easier than natural complaint classification, where categories may overlap in wording, contain misspellings and code-switching, or omit distinctive keywords. Therefore, results are reported as performance on the available generated test split only.
 
@@ -80,7 +80,7 @@ Misclassified examples & 6 \\
 \end{tabular}
 \end{table}
 
-The recorded accuracy is 0.99694 and macro-F1 is 0.99700. The evaluation artifact reports six errors, with the largest confusion involving Internet Banking Related Fraud predicted as Email Phishing. Although these values are high, they do not demonstrate equivalent performance on real complaints. Synthetic generation and category-specific lexical cues limit external validity. The project README explicitly treats the scores as a separability check rather than a real-world accuracy estimate.
+The recorded accuracy is 0.99694 and macro-F1 is 0.99700~\cite{projectArtifacts}. The evaluation artifact reports six errors, with the largest confusion involving Internet Banking Related Fraud predicted as Email Phishing. Synthetic generation and category-specific lexical cues limit external validity. The project README treats the scores as a separability check rather than a real-world accuracy estimate.
 
 The results support a narrow conclusion: the configured linear model separates the labels in the available generated corpus. They do not establish robustness to unseen terminology, imbalanced field data, adversarial inputs, multilingual or code-mixed narratives, or evolving scam patterns. The stored margin-derived score is also not calibrated and should not be presented as a probability of correctness.
 
