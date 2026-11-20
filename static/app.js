@@ -1600,8 +1600,10 @@ function initEventListeners() {
   });
 
   // Brand logo & Dashboard links
-  brandLogoBtn.addEventListener('click', () => showScreen('page-choose-mode'));
-  brandLogoBtn.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); showScreen('page-choose-mode'); } });
+  // The logo always returns to the current citizen portal. The officer workspace
+  // is a separate legacy document, so its in-page home screen is not the portal.
+  brandLogoBtn.addEventListener('click', () => { window.location.href = '/'; });
+  brandLogoBtn.addEventListener('keydown', event => { if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); window.location.href = '/'; } });
   document.getElementById('top-nav-home')?.addEventListener('click', () => showScreen('page-choose-mode'));
   document.getElementById('top-nav-help')?.addEventListener('click', () => {
     showScreen('page-choose-mode', false);
