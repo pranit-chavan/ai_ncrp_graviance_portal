@@ -1,0 +1,100 @@
+\documentclass[conference]{IEEEtran}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{cite}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage{array}
+\usepackage{balance}
+\title{An Intelligent Cybercrime Complaint Intake and Investigator Review System: A Prototype for Structured Evidence-Aware Reporting}
+\author{\IEEEauthorblockN{Pranit Chavan, Harshal Dahiphalkar, Yash Kanhe, and Chaitanya Mali}\IEEEauthorblockA{Department of Computer Engineering\\K. K. Wagh Institute of Engineering Education \& Research, Nashik, India}}
+\begin{document}
+\maketitle
+
+\begin{abstract}
+Cybercrime complaint intake involves collecting a narrative, identifying missing details, examining supporting documents, and preparing a record that can be reviewed by an investigator. This paper presents an academic prototype that connects these activities in a local workflow. A complainant can provide typed or spoken information, upload image or PDF evidence, inspect candidate facts extracted through optical character recognition (OCR), resolve discrepancies between the narrative and evidence, and review a structured draft. A TF--IDF and Linear Support Vector Classifier (LinearSVC) module supplies a category suggestion over 21 cybercrime labels. The submitted record can then be stored locally and displayed in an investigator review interface. On a generated test set of 1,960 examples, the stored evaluation reports 99.69\% accuracy and 99.70\% macro-F1. These results indicate separability within the generated corpus; category-specific vocabulary and synthetic data prevent interpreting them as real-world performance. The contribution is an integrated, human-reviewed prototype workflow. It does not file complaints with government systems, establish evidentiary authenticity, or replace investigator or legal judgment.
+\end{abstract}
+
+\begin{IEEEkeywords}
+cybercrime complaint intake, text classification, TF--IDF, LinearSVC, optical character recognition, evidence reconciliation, human-in-the-loop systems
+\end{IEEEkeywords}
+
+\section{Introduction}
+Cybercrime reporting can require a person to explain an incident while identifying facts such as dates, amounts, account references, and communication channels. Some of these facts may appear in a receipt, message, or screenshot rather than in the initial narrative. A complaint-processing tool therefore needs to organize multiple sources of information and make uncertainty visible. India's National Cyber Crime Reporting Portal (NCRP) provides a public channel for reporting cybercrime; the prototype described here is a local academic project and is not connected to that service \cite{mhaNcrp}.
+
+The project began as a complaint-category classifier and developed into a broader intake and review application. It combines a conversational intake path, manual editing, OCR-based candidate extraction, source reconciliation, category suggestion, case drafting, and local investigator review. This paper describes the implemented system and the repository's classifier evaluation. It makes no claim that the prototype has been evaluated with real complainant cases or deployed in a law-enforcement setting.
+
+The paper makes three contributions. First, it describes an integrated prototype that preserves the distinction between complainant statements and evidence-derived candidate fields. Second, it reports the available held-out classifier results with dataset and evaluation limitations. Third, it identifies the validation and governance work required before operational use.
+
+\section{Related Work}
+Statistical term weighting is a long-standing approach to representing documents for retrieval and categorization \cite{saltonBuckley}. Support vector machines have also been studied for text categorization, including settings with many sparse lexical features \cite{joachims}. These methods motivate the project's lightweight TF--IDF and linear classifier baseline. The present study does not claim a new classification algorithm.
+
+OCR converts text in images into a machine-readable form. Tesseract is an established open-source OCR engine \cite{smith2007}. Speech recognition may also reduce the need for typed input; Whisper is an optional local transcription path in the project, when dependencies and model assets are available \cite{radford2023}. OCR and speech recognition are fallible, so their outputs are presented as candidates for user review rather than as verified facts.
+
+\section{System Overview}
+The prototype uses a FastAPI service and a browser-based interface; a separate Streamlit interface remains in the repository. The principal workflow is shown below.
+\begin{figure}[t]
+\centering
+\fbox{\parbox{0.94\columnwidth}{\centering Narrative, manual fields, or speech transcript\\$\downarrow$\\Optional image/PDF upload and OCR\\$\downarrow$\\Candidate extraction and narrative--evidence comparison\\$\downarrow$\\Follow-up questions and complainant correction\\$\downarrow$\\Category suggestion and editable draft\\$\downarrow$\\Local case record and investigator review}}
+\caption{Prototype intake and review workflow.}
+\label{fig:workflow}
+\end{figure}
+
+The complainant-facing flow accepts free text and structured fields. Depending on the available browser and local dependencies, it can also accept speech input. Optional evidence is processed by OCR and deterministic patterns to identify candidate values, including amounts, dates, transaction references, phone numbers, and payment identifiers. The system compares these values with the narrative and represents agreements, evidence-only candidates, missing details, and conflicts separately. A conflict is retained for review; OCR output does not establish which source is correct.
+
+The conversational component asks for information that appears to be missing and supports preparation of a structured draft. Optional generative-model providers depend on configuration and connectivity; manual entry and editing provide an alternative path. After user confirmation, the application stores a local case record and associated evidence. The investigator interface provides a local queue, case detail view, evidence inspection, and workflow updates. The prototype does not authenticate official users, submit records to the NCRP, contact banks, or perform legal adjudication.
+
+\section{Classifier Method}
+\subsection{Input and Features}
+The classifier uses only the complaint text field as its model input. Identifiers and scenario metadata are retained for analysis and are not model features. Text is represented by word unigrams and bigrams using TF--IDF. The repository configuration sets a maximum vocabulary of 50,000 features, applies sublinear term frequency, and removes terms occurring in fewer than two documents. Feature extraction is fit on the training partition and applied to validation and test data.
+
+\subsection{Learning Algorithm}
+The implemented baseline is a linear support vector classifier with regularization parameter $C=1.0$ and a maximum of 10,000 iterations. The implementation uses scikit-learn's LinearSVC. For an input vector $x$, the multiclass classifier returns the class with the highest decision score. The application may expose a score derived from the difference between the top two margins; this is a heuristic and is not a calibrated probability.
+
+\subsection{System Integration}
+The classifier is one decision-support component in the larger intake flow. It does not verify allegations. OCR-derived text may be included as context in some pipeline paths, while the reported benchmark evaluates complaint text under the dedicated data loader. Thus, the benchmark should not be interpreted as an end-to-end multimodal evaluation.
+
+\section{Experimental Setup}
+The available evaluation artifact records a test partition of 1,960 generated examples across 21 categories, with 8,487 training and 1,917 validation examples. The recorded vocabulary size is 35,342. The classifier uses the TF--IDF settings described in Section III, and the evaluation artifact records a fixed seed for the split and LinearSVC. No human-annotated real-world corpus, external test set, or deployment cohort is included in the repository evidence reviewed for this paper.
+
+The project documentation states that the generated categories contain category-specific vocabulary. This construction can make the classification task easier than natural complaint classification, where categories may overlap in wording, contain misspellings and code-switching, or omit distinctive keywords. Therefore, results are reported as performance on the available generated test split only.
+
+\section{Results and Discussion}
+\begin{table}[t]
+\caption{Recorded LinearSVC Results on the Generated Test Split}
+\label{tab:results}
+\centering
+\begin{tabular}{lr}
+\toprule
+Metric & Value \\
+\midrule
+Number of test examples & 1,960 \\
+Number of categories & 21 \\
+Accuracy & 99.69\% \\
+Macro precision & 99.70\% \\
+Macro recall & 99.70\% \\
+Macro-F1 & 99.70\% \\
+Misclassified examples & 6 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The recorded accuracy is 0.99694 and macro-F1 is 0.99700. The evaluation artifact reports six errors, with the largest confusion involving Internet Banking Related Fraud predicted as Email Phishing. Although these values are high, they do not demonstrate equivalent performance on real complaints. Synthetic generation and category-specific lexical cues limit external validity. The project README explicitly treats the scores as a separability check rather than a real-world accuracy estimate.
+
+The results support a narrow conclusion: the configured linear model separates the labels in the available generated corpus. They do not establish robustness to unseen terminology, imbalanced field data, adversarial inputs, multilingual or code-mixed narratives, or evolving scam patterns. The stored margin-derived score is also not calibrated and should not be presented as a probability of correctness.
+
+\section{Limitations and Ethical Considerations}
+The system is an academic prototype that stores records locally. It has no established production authentication or role-based access controls, and its OCR, optional speech recognition, and language-model paths depend on the execution environment. OCR extraction does not establish that a document is authentic or that an event occurred. Likewise, a classifier label, urgency cue, or legal reference is a suggestion for review rather than an authoritative determination.
+
+Complaint data can contain sensitive personal and financial information. Any future evaluation or deployment should use consented, de-identified data, apply access controls and retention limits, and document audit practices. Human review should remain central, particularly where extracted identifiers, category suggestions, urgency indicators, or legal references may influence subsequent action.
+
+\section{Conclusion and Future Work}
+This paper presented a local prototype for cybercrime complaint intake and investigator review. It connects free-text and structured intake, optional OCR and speech paths, discrepancy presentation, category suggestion, editable drafting, and local case persistence. The LinearSVC classifier achieved 99.69\% accuracy and 99.70\% macro-F1 on the repository's generated test split, but the synthetic and lexically separable corpus limits the meaning of those metrics.
+
+Future work should prioritize a carefully governed, human-reviewed test corpus with realistic lexical overlap; evaluation by category and input style; calibration and abstention analysis; usability testing; and security and privacy review. The application should be assessed end to end only after these components and evaluation protocols are defined. No deployment readiness is claimed by the present work.
+
+\balance
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+\end{document}
