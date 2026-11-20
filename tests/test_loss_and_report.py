@@ -32,15 +32,32 @@ class LossAndReportTests(unittest.TestCase):
         self.assertEqual(_parse_pending_amount_answer('1.5 lakh'),150000)
         self.assertEqual(_parse_pending_amount_answer('none'),0)
 
-    def test_plain_report_total_score_and_escaped_text(self):
+    def test_complete_report_without_score_and_escaped_text(self):
         case = sample_case()
         with tempfile.TemporaryDirectory() as folder:
             path=write_pdf(case,str(Path(folder)/'report.pdf'))
             text='\n'.join(page.extract_text() for page in PdfReader(path).pages)
-        for expected in ['INR 2,499.00','Category match score','82 / 100','What happened','Evidence attached','Test <Citizen>']:
+        for expected in ['INR 2,499.00','Online Job Fraud','Your original complaint','Structured complaint prepared by the system','Evidence attached','Test <Citizen>']:
             self.assertIn(expected,text)
-        for jargon in ['Module A','LinearSVC','Statutory Offence','Forensic Reconciliation']:
+        for jargon in ['Category match score','82 / 100','Module A','LinearSVC','Statutory Offence','Forensic Reconciliation']:
             self.assertNotIn(jargon,text)
+
+    def test_download_timestamp_legal_sections_and_all_evidence(self):
+        import io
+        from datetime import datetime, timezone
+        from modules.complaint_pdf import write_complaint_pdf
+        case=sample_case()
+        case['legal_sections']={'it_act':[{'section':'TEST-A','description':'Test IT provision'}], 'bns':[{'section':'TEST-B','description':'Test BNS provision'}], 'other':[{'act':'Test Act','section':'TEST-C'}], 'conditional_applied':[{'status':'Needs age review'}]}
+        case['evidence']['table']=[{'filename':'another.txt','description':'Additional attachment'}]
+        stream=io.BytesIO()
+        write_complaint_pdf(case,stream,datetime(2026,11,21,9,0,tzinfo=timezone.utc))
+        pages=PdfReader(stream).pages
+        text='\n'.join(page.extract_text() for page in pages)
+        for expected in ['02:30:00 PM IST','TEST-A','TEST-B','TEST-C','Needs age review','sample-payment.png','another.txt']:
+            self.assertIn(expected,text)
+        for page in pages:
+            self.assertIn('System using NLP',page.extract_text())
+            self.assertIn('Downloaded:',page.extract_text())
 
 
 def sample_case():

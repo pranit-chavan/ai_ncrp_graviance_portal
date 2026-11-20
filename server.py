@@ -558,6 +558,14 @@ async def submit_case_endpoint(payload: Dict[str, Any]):
             reconciliation=payload.get("reconciliation") or {},
             sentiment=payload.get("sentiment") or {}
         )
+        if (payload.get("consent_details") or {}).get("version") == "guided-1":
+            from modules.complaint_pdf import structured_summary
+            case_record["complaint"]["original_text"] = str(payload.get("original_complaint") or raw_text)
+            reviewed = payload.get("reviewed_fields") or {}
+            case_record["reviewed_fields"] = {key: reviewed[key] for key in (
+                "date_time_of_incident", "platform_involved", "financial_loss_amount",
+                "bank_name", "utr_number", "suspect_details") if key in reviewed}
+            case_record["complaint"]["standardised_narrative"] = structured_summary(case_record)
         if submission_token:
             case_record["submission_token"] = submission_token
         case_record["local_investigator_consent"] = {
@@ -1001,12 +1009,31 @@ async def get_benchmark_endpoint():
 
 @app.get("/api/pdf/{filename}")
 async def serve_pdf(filename: str):
-    """Serve court-admissible PDF file."""
+    """Render a download copy with the current IST timestamp from the saved case."""
+    import io
+    from urllib.parse import quote
+    from datetime import timezone, timedelta
+    from fastapi.responses import Response
+    from modules.complaint_pdf import write_complaint_pdf
     safe_name = os.path.basename(filename)
+    if not safe_name.lower().endswith(".pdf"):
+        raise HTTPException(status_code=404, detail="Report not found.")
+    record_path = os.path.join(CASE_DIR, safe_name[:-4] + ".json")
+    if os.path.isfile(record_path):
+        with open(record_path, encoding="utf-8") as source:
+            case = json.load(source)
+        stream = io.BytesIO()
+        stamp = datetime.now(timezone(timedelta(hours=5, minutes=30)))
+        write_complaint_pdf(case, stream, downloaded_at=stamp)
+        return Response(stream.getvalue(), media_type="application/pdf", headers={
+            "Content-Disposition": "attachment; filename*=UTF-8''" + quote(safe_name),
+            "Cache-Control": "no-store",
+        })
     path = os.path.join(CASE_DIR, safe_name)
-    if os.path.exists(path):
+    if os.path.isfile(path):
         return FileResponse(path, media_type="application/pdf", filename=safe_name)
     raise HTTPException(status_code=404, detail="Requested PDF case file not found on disk.")
+
 
 
 # =============================================================================
