@@ -114,42 +114,14 @@ LANGUAGE_PROMPTS = {
         "SBI, HDFC, ICICI, PhonePe, Google Pay, Paytm, WhatsApp, Telegram."
     ),
     "en": (
-        "National Cyber Crime Reporting Portal (NCRP) 1930 helpline. "
-        "Cyber fraud report, unauthorized transaction, money debited from account, fake call, OTP, UPI PIN, UTR reference. "
-        "SBI, HDFC Bank, ICICI Bank, Axis Bank, PhonePe, Google Pay, GPay, Paytm, WhatsApp, Telegram task fraud."
+        "NCRP, cyber fraud, unauthorized transaction, OTP, UPI, UTR, SBI, HDFC, ICICI, PhonePe, Google Pay, Paytm."
     ),
 }
 
 
 def _post_process_cyber_transcription(text: str) -> str:
-    """Correct frequent acoustic misrecognitions for Indian banking terms."""
-    if not text:
-        return text
-
-    rules = [
-        # Common phonetic confusions in Indian English audio
-        (r"\bdeputated\b", "debited"),
-        (r"\bdeputed\b", "debited"),
-        (r"\bdepitate\b", "debited"),
-        (r"\b(my\s+)?agency\s+bank\b", "HDFC Bank"),
-        (r"\bfrom\s+my\s+agency\b", "from my HDFC"),
-        (r"\breceived\s+no\s+TP\b", "received no OTP"),
-        (r"\bno\s+TP\b", "no OTP"),
-        (r"\bwithout\s+TP\b", "without OTP"),
-        (r"\bany\s+TP\b", "any OTP"),
-        (r"\ban\s+TP\b", "an OTP"),
-        (r"\bmy\s+UPI\b", "via UPI"),
-        (r"\bU\.?\s*P\.?\s*I\.?\b", "UPI"),
-        (r"\bO\.?\s*T\.?\s*P\.?\b", "OTP"),
-        (r"\bU\.?\s*T\.?\s*R\.?\b", "UTR"),
-        (r"\bH\.?\s*D\.?\s*F\.?\s*C\.?\b", "HDFC"),
-        (r"\bS\.?\s*B\.?\s*I\.?\b", "SBI"),
-        (r"\bI\.?\s*C\.?\s*I\.?\s*C\.?\s*I\.?\b", "ICICI"),
-    ]
-    cleaned = text
-    for pattern, repl in rules:
-        cleaned = re.sub(pattern, repl, cleaned, flags=re.IGNORECASE)
-    return cleaned
+    """Keep the words Whisper heard; the user can correct them in the transcript."""
+    return text.strip() if text else text
 
 # ---------------------------------------------------------------------------
 # Language metadata for Indian languages supported by Whisper
@@ -215,7 +187,7 @@ def _load_model(model_name="base"):
         )
 
     logger.info(f"Loading Whisper model '{model_name}' (first load downloads ~1 GB)...")
-    model = whisper.load_model(model_name)
+    model = whisper.load_model(model_name, device=os.getenv("WHISPER_DEVICE", "cpu"))
     _whisper_model["instance"] = model
     _whisper_model["model_name"] = model_name
     logger.info(f"Whisper model '{model_name}' loaded successfully.")
@@ -313,6 +285,15 @@ def transcribe_audio(audio_source, language=None, model_name="base", initial_pro
         log(f"[G] Loading Whisper model '{model_name}'...")
         model = _load_model(model_name)
 
+        # Reject digital silence before neural decoding. Whisper's domain prompt can
+        # otherwise be echoed as hallucinated speech, and CPU inference is costly.
+        import numpy as np
+        import whisper
+        audio = whisper.load_audio(audio_path, sr=16000)
+        if audio.size == 0 or (float(np.sqrt(np.mean(np.square(audio, dtype=np.float64)))) < 0.001
+                               and float(np.max(np.abs(audio))) < 0.005):
+            return _error_result("No clear speech detected. Please record again in a quiet place.", t0)
+
         # Optimize CPU threads for PyTorch inference
         try:
             import torch
@@ -339,7 +320,7 @@ def transcribe_audio(audio_source, language=None, model_name="base", initial_pro
 
         # Build transcription options - single-pass greedy decode for real-time responsiveness
         options = {
-            "fp16": False,  # CPU-safe: disable FP16 to avoid CUDA requirement
+            "fp16": str(getattr(model, "device", "cpu")).startswith("cuda"),  # Use GPU acceleration when available
             "verbose": verbose,
             "task": task or "transcribe",
             "initial_prompt": prompt_to_use,
@@ -355,17 +336,22 @@ def transcribe_audio(audio_source, language=None, model_name="base", initial_pro
 
         # Transcribe
         log(f"[G] Transcribing audio: {os.path.basename(audio_path)}...")
-        result = model.transcribe(audio_path, **options)
+        result = model.transcribe(audio, **options)
 
         elapsed = time.time() - t0
-        raw_text = (result.get("text") or "").strip()
+        detected_segments = result.get("segments", [])
+        # A domain prompt can make Whisper repeat its prompt over silence. Do not
+        # turn a high no-speech score into facts in a citizen's account.
+        speech_segments = [seg for seg in detected_segments
+                           if float(seg.get("no_speech_prob", 0.0)) < 0.70]
+        raw_text = " ".join(str(seg.get("text", "")).strip() for seg in speech_segments).strip()
         text = _post_process_cyber_transcription(raw_text)
         detected_lang = result.get("language", "unknown")
         lang_name = SUPPORTED_LANGUAGES.get(detected_lang, detected_lang.capitalize())
 
         # Extract segments with timestamps
         segments = []
-        for seg in result.get("segments", []):
+        for seg in speech_segments:
             segments.append({
                 "start": round(seg["start"], 2),
                 "end": round(seg["end"], 2),

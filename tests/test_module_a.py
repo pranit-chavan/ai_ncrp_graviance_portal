@@ -519,9 +519,9 @@ class TestConversationalIntakeUnknownAnswers(unittest.TestCase):
         self.assertEqual(third["bank_name"], "State Bank of India")
         self.assertNotEqual(third["pending_field"], "bank")
 
-    def test_gemini_reply_is_used_when_it_passes_guards(self):
+    def test_local_model_reply_is_used_when_it_passes_guards(self):
         with patch(
-            "modules.conversational_agent.gemini_generate_content",
+            "modules.conversational_agent.ollama_chat",
             return_value='{"reply": "I can help with that."}',
         ):
             result = conduct_counselor_turn(

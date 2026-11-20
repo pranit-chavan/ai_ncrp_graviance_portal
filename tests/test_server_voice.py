@@ -206,14 +206,14 @@ class TestServerVoiceEndpoint(unittest.TestCase):
         from pathlib import Path
 
         page = asyncio.run(self.server.serve_index())
-        app_script = Path(self.server.STATIC_DIR, "app.js").read_text(encoding="utf-8")
-        stylesheet = Path(self.server.STATIC_DIR, "style.css").read_text(encoding="utf-8")
+        app_script = Path(self.server.STATIC_DIR, "citizen.js").read_text(encoding="utf-8")
+        stylesheet = Path(self.server.STATIC_DIR, "citizen.css").read_text(encoding="utf-8")
 
-        self.assertIn('/static/app.js', page)
+        self.assertIn('/static/citizen.js', page)
         self.assertIn("/api/upload_evidence", app_script)
         self.assertIn("/api/cases/submit", app_script)
         self.assertIn("/api/evidence/", app_script)
-        self.assertIn(".evidence-ocr-status", stylesheet)
+        self.assertIn(".reading", stylesheet)
 
 
 if __name__ == "__main__":

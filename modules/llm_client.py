@@ -5,7 +5,7 @@ import os
 from urllib.request import Request, urlopen
 
 
-DEFAULT_MODEL = "gemma4:12b"
+DEFAULT_MODEL = "qwen2.5:3b"
 
 
 class OllamaError(RuntimeError):
@@ -24,10 +24,10 @@ def ollama_chat(messages, model=None, temperature=0.2, json_mode=False, think=No
         "model": model_name,
         "messages": messages,
         "stream": False,
-        "keep_alive": "10m",
+        "keep_alive": os.environ.get("OLLAMA_KEEP_ALIVE", "30m"),
         "options": {
             "temperature": temperature,
-            "num_ctx": int(os.environ.get("OLLAMA_NUM_CTX", "4096")),
+            "num_ctx": int(os.environ.get("OLLAMA_NUM_CTX", "2048")),
         },
     }
     if num_predict is not None:

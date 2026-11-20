@@ -47,6 +47,7 @@ Databases stay at the root because the application uses those paths. Report proj
 - [Evaluation run record](docs/evaluation_run_record.md)
 - [UPI fraud testing](docs/testing_upi_fraud.md)
 - [Module documentation](modules/README.md)
+- [Offline setup and model notes](docs/offline_setup.md)
 - [Organization inventory and cleanup candidates](docs/organization_and_cleanup.md)
 
 ## Development

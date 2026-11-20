@@ -158,8 +158,9 @@ class TestErrorResult(unittest.TestCase):
 class TestTranscribeAudioMocked(unittest.TestCase):
     """Test transcribe_audio with a mocked Whisper model."""
 
+    @patch("whisper.load_audio", return_value=__import__("numpy").ones(1600, dtype="float32"))
     @patch("modules.speech_to_text._load_model")
-    def test_successful_transcription(self, mock_load):
+    def test_successful_transcription(self, mock_load, _mock_audio):
         from modules.speech_to_text import transcribe_audio
 
         # Create a dummy audio file
@@ -193,8 +194,9 @@ class TestTranscribeAudioMocked(unittest.TestCase):
         finally:
             os.unlink(path)
 
+    @patch("whisper.load_audio", return_value=__import__("numpy").ones(1600, dtype="float32"))
     @patch("modules.speech_to_text._load_model")
-    def test_language_hint_forwarded(self, mock_load):
+    def test_language_hint_forwarded(self, mock_load, _mock_audio):
         from modules.speech_to_text import transcribe_audio
 
         fd, path = tempfile.mkstemp(suffix=".wav")
@@ -215,6 +217,24 @@ class TestTranscribeAudioMocked(unittest.TestCase):
             call_kwargs = mock_model.transcribe.call_args[1]
             self.assertEqual(call_kwargs["language"], "ta")
             self.assertTrue(result["ok"])
+        finally:
+            os.unlink(path)
+
+    @patch("whisper.load_audio", return_value=__import__("numpy").zeros(1600, dtype="float32"))
+    @patch("modules.speech_to_text._load_model")
+    def test_silence_is_rejected_without_decoding(self, mock_load, _mock_audio):
+        from modules.speech_to_text import transcribe_audio
+
+        fd, path = tempfile.mkstemp(suffix=".wav")
+        os.write(fd, b"RIFF" + b"\x00" * 100)
+        os.close(fd)
+        try:
+            model = MagicMock()
+            mock_load.return_value = model
+            result = transcribe_audio(path, model_name="base")
+            self.assertFalse(result["ok"])
+            self.assertIn("No clear speech", result["error"])
+            model.transcribe.assert_not_called()
         finally:
             os.unlink(path)
 

@@ -74,3 +74,6 @@ real_ncrp_portal_ss/
 *.log
 test_evidence*
 images.zip
+
+# Optional isolated CUDA-enabled Whisper runtime
+.venv-gpu/

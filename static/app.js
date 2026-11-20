@@ -274,7 +274,8 @@ document.addEventListener('DOMContentLoaded', () => {
   syncToReviewDisplay();
 
   // Show Initial Screen (Screen 3: Choose Mode)
-  showScreen('page-choose-mode');
+  showScreen(location.pathname === '/officer' ? 'page-dashboard' : 'page-choose-mode');
+  if (location.pathname === '/officer') loadDashboardCases();
 
   // Load initial greeting into voice chat
   initInitialGreeting();

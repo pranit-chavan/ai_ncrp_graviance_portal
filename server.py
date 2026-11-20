@@ -27,10 +27,16 @@ from fastapi import FastAPI, Request, UploadFile, File, Form, HTTPException
 from fastapi.responses import HTMLResponse, JSONResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.concurrency import run_in_threadpool
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 if BASE_DIR not in sys.path:
     sys.path.insert(0, BASE_DIR)
+
+# Offline is the default runtime policy. Downloads are separate setup operations.
+if os.getenv("CYBERASSIST_OFFLINE", "1") == "1":
+    os.environ["INTAKE_LLM_PROVIDER"] = "ollama"
+    os.environ["LLM_PROVIDER"] = "ollama"
 
 # Core AI & Law Enforcement Modules
 from modules.speech_to_text import transcribe_audio_bytes
@@ -251,7 +257,7 @@ def _write_case_record(case: Dict[str, Any]) -> None:
 
 @app.get("/", response_class=HTMLResponse)
 async def serve_index():
-    index_file = os.path.join(STATIC_DIR, "index.html")
+    index_file = os.path.join(STATIC_DIR, "citizen.html")
     if os.path.exists(index_file):
         with open(index_file, "r", encoding="utf-8") as f:
             return f.read()
@@ -269,7 +275,9 @@ async def health_check():
         "classifier_loaded": clf_ok,
         "database": "SQLite (complaints.db, case_index.db)",
         "total_cases_indexed": cases_count,
-        "supported_languages": ["en", "hi", "mr", "ta", "te", "bn", "gu", "pa", "ur"],
+        "citizen_language": "English",
+        "speech_model": os.getenv("WHISPER_MODEL", "small.en"),
+        "llm_model": os.getenv("OLLAMA_MODEL", "qwen2.5:3b"),
         "statutes": ["BNS 2023", "IT Act 2000", "BNSS 2023", "BSA 2023"]
     })
 
@@ -486,6 +494,14 @@ async def submit_case_endpoint(payload: Dict[str, Any]):
             detail="Confirm that this record may be saved and shown in this app's local investigator workspace.",
         )
 
+    # A retry after a dropped response must not create a duplicate complaint.
+    submission_token = str(payload.get("submission_token") or "")[:100]
+    if submission_token:
+        for existing in _load_all_cases():
+            if existing.get("submission_token") == submission_token:
+                filename = existing["reference"].replace("/", "-")
+                return JSONResponse({"ok": True, "reference": existing["reference"],
+                                     "pdf_url": f"/api/pdf/{filename}.pdf"})
     try:
         comp = payload.get("complainant") or {}
         inc = payload.get("incident") or {}
@@ -501,7 +517,9 @@ async def submit_case_endpoint(payload: Dict[str, Any]):
 
         # Classify
         clf_res = classify_complaint_text(narrative)
-        assigned_sub = payload.get("sub_category") or clf_res["predicted_category"]
+        predicted_sub = clf_res["predicted_category"]
+        requested_sub = payload.get("sub_category")
+        assigned_sub = requested_sub if requested_sub in KNOWN_CATEGORIES else predicted_sub
         confidence = clf_res["confidence"]
 
         # Parse transactions
@@ -514,7 +532,8 @@ async def submit_case_endpoint(payload: Dict[str, Any]):
         case_record = build_case_file(
             complainant=comp,
             narrative=narrative,
-            sub_category=assigned_sub,
+            # Keep the measured prediction distinct from the citizen's selected category.
+            sub_category=predicted_sub,
             confidence=confidence,
             raw_complaint=raw_text,
             incident_datetime=inc.get("datetime") or str(inc.get("incident_date", "")),
@@ -530,6 +549,8 @@ async def submit_case_endpoint(payload: Dict[str, Any]):
             reconciliation=payload.get("reconciliation") or {},
             sentiment=payload.get("sentiment") or {}
         )
+        if submission_token:
+            case_record["submission_token"] = submission_token
         case_record["local_investigator_consent"] = {
             "confirmed": True,
             "recorded_at": datetime.now().astimezone().isoformat(timespec="seconds"),
@@ -547,6 +568,13 @@ async def submit_case_endpoint(payload: Dict[str, Any]):
                 "source": "web voice/text intake",
                 "evidence_count": len(evidence_list),
             }
+
+        case_record["incident"]["category"] = get_main_category(assigned_sub)
+        case_record["incident"]["sub_category_reported"] = assigned_sub
+        case_record["legal_sections"] = map_sections(assigned_sub, complainant_age=comp.get("age"))
+        if assigned_sub != predicted_sub:
+            case_record["classification"]["citizen_selected_category"] = assigned_sub
+            case_record["classification"]["source"] = "Classifier suggestion; citizen selected a different category"
 
         ref_str = case_record["reference"]
         safe_filename = ref_str.replace("/", "-")
@@ -1246,3 +1274,50 @@ async def reset_endpoint(req: ResetRequest):
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run("server:app", host=os.getenv("HOST", "127.0.0.1"), port=8000, reload=True)
+
+
+# Guided citizen APIs run blocking inference in worker threads.
+from modules.guided_intake import GuidedTurn, GuidedReview, guided_turn, guided_review
+
+@app.get("/officer", response_class=HTMLResponse)
+def officer_workspace():
+    with open(os.path.join(STATIC_DIR, "index.html"), encoding="utf-8") as source:
+        return source.read()
+
+@app.post("/api/guided/turn")
+def guided_turn_endpoint(req: GuidedTurn):
+    return guided_turn(req)
+
+@app.post("/api/guided/review")
+def guided_review_endpoint(req: GuidedReview):
+    return guided_review(req)
+
+@app.post("/api/guided/transcribe")
+async def guided_transcribe(audio: UploadFile = File(...)):
+    content = await audio.read(25 * 1024 * 1024 + 1)
+    if not content or len(content) > 25 * 1024 * 1024:
+        raise HTTPException(422, "Choose a recording smaller than 25 MB.")
+    from pathlib import Path
+    model_name = os.getenv("WHISPER_MODEL", "small.en")
+    if not (Path.home() / ".cache" / "whisper" / f"{model_name}.pt").is_file():
+        raise HTTPException(503, "The English speech model is not ready yet. You can type your description while setup finishes.")
+    result = await run_in_threadpool(
+        transcribe_audio_bytes, content, filename=audio.filename or "recording.webm",
+        language="en", model_name=os.getenv("WHISPER_MODEL", "small.en"),
+    )
+    return result
+
+
+@app.post("/api/guided/warmup")
+def guided_model_warmup():
+    """Warm the local dialogue model while the user reads the first screen."""
+    from modules.llm_client import configured_model, ollama_chat
+    try:
+        ollama_chat(
+            [{"role": "user", "content": "Reply with a short JSON greeting."}],
+            model=configured_model(), temperature=0, json_mode=True,
+            think=False, num_predict=1, timeout=25,
+        )
+        return JSONResponse({"ok": True, "model": configured_model()})
+    except Exception:
+        return JSONResponse({"ok": False, "message": "The local assistant will use the guided questions."})
