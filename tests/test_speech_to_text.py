@@ -234,6 +234,7 @@ class TestTranscribeAudioMocked(unittest.TestCase):
             result = transcribe_audio(path, model_name="base")
             self.assertFalse(result["ok"])
             self.assertIn("No clear speech", result["error"])
+            mock_load.assert_not_called()
             model.transcribe.assert_not_called()
         finally:
             os.unlink(path)
