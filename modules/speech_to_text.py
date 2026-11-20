@@ -57,10 +57,10 @@ USAGE
 """
 
 import os
-import re
 import time
 import tempfile
 import logging
+import threading
 
 logger = logging.getLogger(__name__)
 
@@ -158,6 +158,7 @@ MAX_DURATION_SECONDS = 600
 # ---------------------------------------------------------------------------
 
 _whisper_model = {"instance": None, "model_name": None}
+_whisper_lock = threading.Lock()
 
 
 def _load_model(model_name="base"):
@@ -173,25 +174,35 @@ def _load_model(model_name="base"):
 
     For CPU-only deployment (typical government hardware), 'base' is recommended.
     """
-    if _whisper_model["instance"] is not None and _whisper_model["model_name"] == model_name:
-        return _whisper_model["instance"]
+    with _whisper_lock:
+        if _whisper_model["instance"] is not None and _whisper_model["model_name"] == model_name:
+            return _whisper_model["instance"]
 
-    try:
-        import whisper
-    except ImportError:
-        raise ImportError(
-            "OpenAI Whisper is not installed. Install it with:\n"
-            "    pip install openai-whisper\n"
-            "On Windows, you may also need ffmpeg:\n"
-            "    choco install ffmpeg   OR   winget install ffmpeg"
-        )
+        try:
+            import whisper
+        except ImportError:
+            raise ImportError(
+                "OpenAI Whisper is not installed. Install it with:\n"
+                "    pip install openai-whisper\n"
+                "On Windows, you may also need ffmpeg:\n"
+                "    choco install ffmpeg   OR   winget install ffmpeg"
+            )
 
-    logger.info(f"Loading Whisper model '{model_name}' (first load downloads ~1 GB)...")
-    model = whisper.load_model(model_name, device=os.getenv("WHISPER_DEVICE", "cpu"))
-    _whisper_model["instance"] = model
-    _whisper_model["model_name"] = model_name
-    logger.info(f"Whisper model '{model_name}' loaded successfully.")
-    return model
+        logger.info(f"Loading Whisper model '{model_name}' (first run downloads the model)...")
+        model = whisper.load_model(model_name, device=os.getenv("WHISPER_DEVICE", "cpu"))
+        _whisper_model["instance"] = model
+        _whisper_model["model_name"] = model_name
+        logger.info(f"Whisper model '{model_name}' loaded successfully.")
+        return model
+
+
+def warmup_speech_model(model_name="base"):
+    """Load the cached model before the user records; this never downloads weights."""
+    model_path = os.path.join(os.path.expanduser("~"), ".cache", "whisper", f"{model_name}.pt")
+    if not os.path.isfile(model_path):
+        return False
+    _load_model(model_name)
+    return True
 
 
 def _validate_audio_file(file_path):
@@ -393,6 +404,14 @@ def transcribe_audio(audio_source, language=None, model_name="base", initial_pro
                 os.unlink(temp_path)
             except OSError:
                 pass
+        # Keep the cached model weights resident, but return unused inference
+        # buffers to the GPU so Ollama and the next audio request have headroom.
+        try:
+            import torch
+            if torch.cuda.is_available():
+                torch.cuda.empty_cache()
+        except Exception:
+            pass
 
 
 def transcribe_audio_bytes(audio_bytes, filename="recording.wav", **kwargs):

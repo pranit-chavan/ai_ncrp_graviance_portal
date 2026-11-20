@@ -1,4 +1,4 @@
-# CyberAssist — Cybercrime Complaint Classifier
+# Intelligent Cybercrime Complaint Analysis and Category Classification System using NLP
 
 Local complaint intake, classification, evidence review, and investigator workflows.
 

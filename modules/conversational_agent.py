@@ -359,7 +359,8 @@ def extract_structured_docket(message: str, current_docket: Dict[str, Any]) -> D
         "debit", "debited", "credit card", "bank account", "bank", "khata", "wallet",
         "paytm", "phonepe", "gpay", "google pay", "upi", "atm card", "atm pin",
         "lottery", "investment fraud", "cut gaye", "kata", "chori", "loot", "transfer",
-        "financial fraud", "nuksan", "lost money", "stole money", "refund fraud"
+        "financial fraud", "nuksan", "lost money", "stole money", "refund fraud",
+        "asked me to pay", "asked to pay", "pay a fee", "payment request", "job fee", "deposit"
     ]
     social_signals = [
         "instagram", "facebook", "whatsapp", "telegram", "profile", "photo", "photos",
@@ -803,11 +804,29 @@ def _reply_with_model(user_message, conversation_history, docket, language,
         reply = re.split(
             r"\b(?:please tell me|tell me which|which (?:bank|wallet|app|platform|date|amount)|"
             r"what (?:bank|wallet|app|platform|date|amount)|could you|can you|do you know|"
-            r"provide (?:the|your)|share (?:the|your))\b",
+            r"do you (?:have|know|remember|recall)|provide (?:the|your)|share (?:the|your))\b",
             reply,
             maxsplit=1,
             flags=re.IGNORECASE,
         )[0].strip(" .,!\n")
+        # If a small model still appends a question in a form we did not
+        # anticipate above, retain only the complete acknowledgment sentence.
+        if "?" in reply or "？" in reply:
+            question_mark = min(index for index in (reply.find("?"), reply.find("？")) if index >= 0)
+            before_question = reply[:question_mark]
+            sentence_end = max(before_question.rfind("."), before_question.rfind("!"))
+            reply = before_question[:sentence_end + 1].strip() if sentence_end >= 0 else ""
+        # Keep one acknowledgment sentence. Extra reassurance or unrelated
+        # emotional language from a small model can feel confusing in intake.
+        sentences = re.split(r"(?<=[.!])\s+", reply)
+        acknowledgments = [
+            sentence.strip() for sentence in sentences
+            if re.search(r"\b(?:thank you|thanks|sorry|understand|hear you)\b", sentence, re.I)
+        ]
+        if acknowledgments:
+            reply = acknowledgments[0]
+        elif sentences:
+            reply = "Thanks for sharing that with me."
         question_count = reply.count("?") + reply.count("？")
         if reply and len(reply) <= 700 and question_count == 0:
             break
@@ -1025,7 +1044,10 @@ def conduct_counselor_turn(
             )
             if model_acknowledgement and model_acknowledgement[-1] not in ".!?":
                 model_acknowledgement += "."
-            final_spoken = prefix + model_acknowledgement.strip()
+            # The model acknowledgment replaces the ordinary opening greeting;
+            # retain only urgent guidance as a prefix.
+            opening = prefix if is_urgent else ""
+            final_spoken = opening + model_acknowledgement.strip()
             if unknown_reply and pending_field and pending_field in unknown_fields:
                 if lang == "mr":
                     final_spoken += " ही माहिती अज्ञात म्हणून नोंदवून पुढे जाऊ."

@@ -337,7 +337,7 @@ HELPLINES = [
 ]
 
 st.set_page_config(
-    page_title="CyberAssist | Intelligent Cybercrime Complaint Analysis and Category Classification System using NLP",
+    page_title="Intelligent Cybercrime Complaint Analysis and Category Classification System using NLP",
     layout="wide",
     initial_sidebar_state="auto",
 )
@@ -499,8 +499,8 @@ def header_bar():
         <div class="ca-masthead" style="margin:-1.1rem -2rem 1.5rem -2rem;padding:14px 32px;">
           <div style="max-width:1180px;margin:auto;display:flex;justify-content:space-between;align-items:center;gap:16px;">
             <div>
-              <div style="color:{GOV_BLUE_DARK};font-size:1.35em;font-weight:800;line-height:1.2;">CyberAssist</div>
-              <div style="color:#53665f;font-size:.82em;margin-top:3px;">Cybercrime complaint support · Independent academic prototype</div>
+              <div style="color:{GOV_BLUE_DARK};font-size:1.1em;font-weight:800;line-height:1.2;">Cybercrime complaint support</div>
+              <div style="color:#53665f;font-size:.82em;margin-top:3px;">Intelligent Cybercrime Complaint Analysis and Category Classification System using NLP</div>
             </div>
             <a href="tel:1930" style="color:{GOV_BLUE_HEADER};font-size:.95em;font-weight:750;text-decoration:none;white-space:nowrap;">Urgent financial fraud? Call 1930</a>
           </div>
@@ -643,11 +643,11 @@ current_route = st.query_params.get("route", "")
 
 if current_route == "user":
     st.info(
-        "**Independent student prototype:** This creates a local project record, not an official complaint. Depending on configuration, text may be processed by an external AI provider. Use fictional details only; never enter passwords, PINs, one-time codes, or identity documents."
+        "Your complaint details are used to prepare a record for review. Never enter passwords, PINs, one-time codes, or full card details."
     )
 elif current_route == "investigator":
     st.warning(
-        "**MVP limitation:** The inbox is stored on this computer and has no login, role controls, or tamper-proof audit. Do not use it for live investigations or real victim data."
+        "The officer workspace has no login or role controls. Anyone with access to this computer can view saved case information."
     )
 
 if current_route == "user":
@@ -663,7 +663,7 @@ if nav_pages is not None:
             f"""
             <div style="padding:10px 0 8px 0;border-bottom:1px solid #e2e8f0;margin-bottom:12px;">
               <div style="font-weight:800;color:{GOV_BLUE};font-size:1.05em;letter-spacing:0.02em;">
-                CyberAssist
+                Cybercrime complaint support
               </div>
               <div style="font-size:0.78em;color:#64748b;font-weight:600;margin-top:2px;">
                 {'For people reporting an incident' if current_route == 'user' else 'For complaint review'}
@@ -726,8 +726,7 @@ if nav_pages is not None:
 def page_landing():
     st.title("Get help preparing a cybercrime report")
     st.markdown(
-        "CyberAssist helps you organize what happened and prepare a draft to review. "
-        "It is an independent academic prototype. It does **not** submit a complaint to the police, your bank, or the National Cyber Crime Reporting Portal."
+        "Describe what happened, add any supporting evidence, and prepare a complaint for review."
     )
     action_col, portal_col = st.columns([1, 1.25], vertical_alignment="center")
     with action_col:
@@ -741,7 +740,7 @@ def page_landing():
 
     image_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "static", "assets", "cyberassist-home.png")
     if os.path.isfile(image_path):
-        st.image(image_path, width="stretch", caption="Use the official portal or helpline for real incidents. This project is for demonstration only.")
+        st.image(image_path, width="stretch", caption="Keep your evidence and transaction details ready when making a report.")
 
     helpline_items = "".join(
         f'<div class="ca-help-item"><a href="tel:{html.escape(number)}"><strong>{html.escape(number)}</strong></a>'
@@ -771,23 +770,19 @@ def page_landing():
             "- Relevant screenshots, messages, emails, or links.\n"
             "- The bank, payment app, website, or social platform involved."
         )
-        st.caption("Do not share passwords, PINs, one-time codes, or full card details in this prototype.")
+        st.caption("Do not share passwords, PINs, one-time codes, or full card details.")
 
     st.markdown(
-        "**For real incidents:** report through the official portal or contact the appropriate helpline. "
-        "For a recent cyber financial fraud, call 1930 promptly and contact your bank using its official number."
+        "For cyber financial fraud, call 1930 promptly and contact your bank using its official number."
     )
     st.caption(
-        "CyberAssist is an academic prototype. It is not affiliated with the Government of India. "
-        "Records are stored in this project workspace; the app has no sign-in or access controls. "
-        "Depending on configuration, complaint text may be processed by an external AI provider. Use fictional details only. "
         "Project: Intelligent Cybercrime Complaint Analysis and Category Classification System using NLP."
     )
 
     if not st.query_params.get("route"):
-        with st.expander("Project demonstration workspace"):
-            st.warning("The local review workspace is for demonstration only and has no login or access controls.")
-            if st.button("Open local review workspace"):
+        with st.expander("Officer workspace"):
+            st.warning("The officer workspace currently has no login.")
+            if st.button("Open officer workspace"):
                 st.query_params["route"] = "investigator"
                 st.session_state["nav_page"] = "Case Queue"
                 st.rerun()
@@ -809,7 +804,7 @@ def pre_filing_checklist():
     with st.expander("Before you start (optional)", expanded=False):
         st.markdown(
             "Describe events in your own words. If available, keep the approximate date, transaction reference, and relevant screenshots nearby. "
-            "You can skip details you do not know. Never share a password, PIN, one-time code, or full card details. Use fictional information in this academic prototype."
+            "You can skip details you do not know. Never share a password, PIN, one-time code, or full card details. "
         )
 
 
@@ -1810,8 +1805,8 @@ def render_step2():
             for item in missing_items:
                 st.markdown(f"- **{item.get('label')}**: {item.get('hint')}")
 
-    section_header("Your details (optional in this prototype)")
-    st.caption("Use fictional details for the project demonstration. You do not need to upload an identity document.")
+    section_header("Your details (optional)")
+    st.caption("You do not need to upload an identity document.")
     wiz["relationship_with_victim"] = st.radio("Are you the person affected?", ["Self", "Other"], horizontal=True,
                                                 index=["Self", "Other"].index(wiz.get("relationship_with_victim", "Self")))
     c1, c2 = st.columns(2)
@@ -2044,14 +2039,14 @@ def render_step3():
 
     section_header("Before you save")
     st.warning(
-        "This is a project draft, not an official complaint or police acknowledgement. Saving stores the draft and attached evidence in this computer's project workspace, where anyone with access to this app may view them. Depending on configuration, text may also be processed by an external AI provider."
+        "Saving stores the complaint and attached evidence in this computer's case workspace, where anyone with access to this app may view them. In offline mode, AI processing runs on this device."
     )
     st.markdown(
         "Please check the details and any assistant or OCR suggestions. Do not include passwords, PINs, one-time codes, or full card details. "
-        "For a real incident, use the official cybercrime portal or call the appropriate helpline."
+        "For recent financial fraud, call 1930 promptly and contact your bank."
     )
     wiz["consent"] = st.checkbox(
-        "I have reviewed this draft, confirm the details are accurate to the best of my knowledge, and understand that saving creates a local project record only.",
+        "I have reviewed these details and agree to save this complaint and its attachments for investigator review.",
         key="local_record_consent",
     )
 
@@ -2187,8 +2182,8 @@ def _render_submission_success(case):
                 type="primary",
             )
 
-    st.success("This record is now available in the local investigator case queue, along with the evidence files you attached.")
-    st.warning("This is not an official complaint filing or acknowledgement. The investigator workspace has no login or access controls; anyone who can open this app on this computer may view the record.")
+    st.success("This record is now available in the investigator case queue, along with the evidence files you attached.")
+    st.warning("The investigator workspace has no login or access controls; anyone who can open this app on this computer may view the record.")
 
     if st.button("Open investigator case queue"):
         st.query_params["route"] = "investigator"

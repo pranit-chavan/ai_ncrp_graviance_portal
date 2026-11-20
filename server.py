@@ -19,7 +19,9 @@ import tempfile
 import json
 import glob
 import re
+from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime, date
+from pathlib import Path
 from typing import Dict, Any, List, Optional
 from pydantic import BaseModel
 
@@ -39,7 +41,7 @@ if os.getenv("CYBERASSIST_OFFLINE", "1") == "1":
     os.environ["LLM_PROVIDER"] = "ollama"
 
 # Core AI & Law Enforcement Modules
-from modules.speech_to_text import transcribe_audio_bytes
+from modules.speech_to_text import transcribe_audio_bytes, warmup_speech_model
 from modules.conversational_agent import conduct_counselor_turn
 from modules.classifier_service import classify_complaint_text, load_model
 from modules.database import (
@@ -75,7 +77,8 @@ from modules.pattern_engine import find_linked_cases, build_suspect_dossier, syn
 from modules.doc_generator import generate_investigation_document, list_available_templates
 from modules import investigator_store
 
-app = FastAPI(title="Intelligent Cybercrime Complaint Analysis and Complaint Category Classification using NLP", version="3.5.0")
+app = FastAPI(title="Intelligent Cybercrime Complaint Analysis and Category Classification System using NLP", version="3.5.0")
+_SPEECH_WARMUP_POOL = ThreadPoolExecutor(max_workers=1, thread_name_prefix="speech-model-warmup")
 
 DEFAULT_CORS_ORIGINS = (
     "http://localhost:8000,http://127.0.0.1:8000,"
@@ -261,7 +264,7 @@ async def serve_index():
     if os.path.exists(index_file):
         with open(index_file, "r", encoding="utf-8") as f:
             return f.read()
-    return HTMLResponse("<h2>Intelligent Cybercrime Complaint Analysis and Complaint Category Classification using NLP is starting up...</h2>")
+    return HTMLResponse("<h2>Intelligent Cybercrime Complaint Analysis and Category Classification System using NLP is starting up...</h2>")
 
 
 @app.get("/health")
@@ -270,7 +273,7 @@ async def health_check():
     cases_count = len(glob.glob(os.path.join(CASE_DIR, "*.json")))
     return JSONResponse({
         "status": "healthy",
-        "service": "Intelligent Cybercrime Complaint Analysis and Complaint Category Classification using NLP",
+        "service": "Intelligent Cybercrime Complaint Analysis and Category Classification System using NLP",
         "version": "3.5.0",
         "classifier_loaded": clf_ok,
         "database": "SQLite (complaints.db, case_index.db)",
@@ -1297,7 +1300,6 @@ async def guided_transcribe(audio: UploadFile = File(...)):
     content = await audio.read(25 * 1024 * 1024 + 1)
     if not content or len(content) > 25 * 1024 * 1024:
         raise HTTPException(422, "Choose a recording smaller than 25 MB.")
-    from pathlib import Path
     model_name = os.getenv("WHISPER_MODEL", "small.en")
     if not (Path.home() / ".cache" / "whisper" / f"{model_name}.pt").is_file():
         raise HTTPException(503, "The English speech model is not ready yet. You can type your description while setup finishes.")
@@ -1310,14 +1312,28 @@ async def guided_transcribe(audio: UploadFile = File(...)):
 
 @app.post("/api/guided/warmup")
 def guided_model_warmup():
-    """Warm the local dialogue model while the user reads the first screen."""
+    """Warm local dialogue and speech models while the user reads the first screen."""
     from modules.llm_client import configured_model, ollama_chat
+    speech_model = os.getenv("WHISPER_MODEL", "small.en")
+    speech_model_path = Path.home() / ".cache" / "whisper" / f"{speech_model}.pt"
+    model_ready = False
     try:
         ollama_chat(
             [{"role": "user", "content": "Reply with a short JSON greeting."}],
             model=configured_model(), temperature=0, json_mode=True,
             think=False, num_predict=1, timeout=25,
         )
-        return JSONResponse({"ok": True, "model": configured_model()})
+        model_ready = True
     except Exception:
-        return JSONResponse({"ok": False, "message": "The local assistant will use the guided questions."})
+        pass
+    # The RTX 2050 has 4 GB of VRAM. Load the dialogue model first and only
+    # begin Whisper warm-up after Ollama releases its prompt-evaluation peak.
+    speech_warmup_started = False
+    if speech_model_path.is_file():
+        _SPEECH_WARMUP_POOL.submit(warmup_speech_model, speech_model)
+        speech_warmup_started = True
+    if model_ready:
+        return JSONResponse({"ok": True, "model": configured_model(),
+                             "speech_warmup_started": speech_warmup_started})
+    return JSONResponse({"ok": False, "speech_warmup_started": speech_warmup_started,
+                         "message": "The local assistant will use the guided questions."})
