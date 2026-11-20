@@ -5,27 +5,86 @@ const KEY = 'cyberassist.guided.v1';
 const titles = ['Tell us what happened', 'Add missing details', 'Check incident details', 'Add personal details', 'Review your complaint', 'Download your report'];
 const labels = ['Describe', 'Questions', 'Incident', 'About you', 'Review', 'Report'];
 const incident = {date_time_of_incident:'When did it happen?',platform_involved:'App, website, or platform',financial_loss_amount:'Money lost (₹)',bank_name:'Bank or wallet',utr_number:'Transaction reference',suspect_details:'Suspect account, phone, or profile'};
-const personal = {name:'Full name',phone:'Phone number',email:'Email address (optional)',age:'Age (optional)',state:'State',district:'District',city:'City or town (optional)',address:'Address (optional)'};
+const personal = {name:'Full name',phone:'Phone number',email:'Email address (optional)',age:'Age',state:'State / Union territory',district:'District',pincode:'PIN code',city:'City or town (optional)',address:'Address (optional)'};
 const fresh = () => ({version:1,id:crypto.randomUUID(),step:0,furthest:0,story:'',storyAnalyzed:'',history:[],docket:{},fields:{},edited:[],person:{},evidence:[],readings:{},identity:null,idKind:'',suspect:'',analysis:null,category:'',categoryManual:false,submission:null,confirmed:false});
 let draft = fresh(), busy=false, recorder=null, stream=null;
+let locationData=null;
 let voiceCapturing=false, pendingRecording=null, recordingUrl=null, recordingTimer=null, recordingLimit=null;
 try {const saved=JSON.parse(localStorage.getItem(KEY)); if(saved?.version===1) draft={...fresh(),...saved};} catch(_) {}
 function save(){try{localStorage.setItem(KEY,JSON.stringify(draft));$('save-state').textContent='Saved in this browser';$('resume').hidden=false;}catch(_){$('save-state').textContent='Could not save — keep this page open';}}
 function notice(message=''){ $('notice').textContent=message; $('notice').hidden=!message; }
 function invalidate(){draft.submissionToken=null;if(!draft.categoryManual)draft.category='';draft.analysis=null;draft.submission=null;draft.confirmed=false;$('confirm').checked=false;draft.furthest=Math.min(draft.furthest,4);}
 async function api(url, data, multipart=false){const response=await fetch(url,{method:'POST',headers:multipart?{}:{'Content-Type':'application/json'},body:multipart?data:JSON.stringify(data)});let result;try{result=await response.json();}catch(_){throw Error('The service could not respond. Please try again.');}if(!response.ok||result.ok===false)throw Error(typeof result.detail==='string'?result.detail:result.error||'Please check your details and try again.');return result;}
-async function task(message, work){if(busy)return;if(voiceCapturing){notice('Stop your recording before continuing.');return;}busy=true;document.body.classList.add('busy');notice(message);const controls=[...document.querySelectorAll('button,input,textarea,select')];const old=controls.map(x=>x.disabled);controls.forEach(x=>x.disabled=true);try{await work();notice();}catch(error){notice(error.message||'Something went wrong. Your answers are still here.');}finally{controls.forEach((x,i)=>x.disabled=old[i]);busy=false;document.body.classList.remove('busy');renderNavigation();updateVoiceControls();save();}}
+async function task(message, work){if(busy)return;if(voiceCapturing){notice('Stop your recording before continuing.');return;}busy=true;document.body.classList.add('busy');notice(message);const controls=[...document.querySelectorAll('button,input,textarea,select')];const old=controls.map(x=>x.disabled);controls.forEach(x=>x.disabled=true);try{await work();notice();}catch(error){notice(error.message||'Something went wrong. Your answers are still here.');}finally{controls.forEach((x,i)=>x.disabled=old[i]);busy=false;document.body.classList.remove('busy');renderNavigation();updateVoiceControls();$('person-state').disabled=!locationData;populateDistricts();save();}}
 function show(step,focus=true){draft.step=step;draft.furthest=Math.max(draft.furthest,step);$('landing').hidden=true;$('workspace').hidden=false;document.querySelectorAll('[data-step]').forEach(x=>x.hidden=Number(x.dataset.step)!==step);$('step-title').textContent=titles[step];renderNavigation();if(step===1)renderConversation();if(step===4)renderReview();if(step===5&&draft.submission){$('reference').textContent='Complaint reference: '+draft.submission.reference;$('download').href=draft.submission.pdf_url;}save();if(focus)$('step-title').focus();}
 function renderNavigation(){ $('steps').replaceChildren();labels.forEach((name,i)=>{const b=document.createElement('button');b.type='button';const n=document.createElement('span');n.className='number';n.textContent=i+1;b.append(n,document.createTextNode(name));if(i===draft.step)b.setAttribute('aria-current','step');b.disabled=busy||voiceCapturing||i>draft.furthest||i===5&&!draft.submission;b.onclick=()=>navigate(i);$('steps').append(b);});$('back').hidden=draft.step===0;$('next').hidden=draft.step===5;$('next').textContent=draft.step===4?'Confirm and create report':draft.step===0?'Continue':'Continue';$('step-counter').textContent=`Step ${draft.step+1} of 6`;}
-function fields(container,definitions,prefix,values){for(const [key,label] of Object.entries(definitions)){const wrap=document.createElement('div'),l=document.createElement('label'),input=document.createElement('input');l.htmlFor=prefix+key;l.textContent=label;input.id=prefix+key;input.value=values[key]??'';if(key==='financial_loss_amount'||key==='age'){input.type='number';input.min=key==='age'?1:0;input.step=key==='age'?1:'0.01';if(key==='age')input.max=120;}if(key==='phone')input.type='tel';if(key==='email')input.type='email';if(['name','phone','state','district'].includes(key)&&prefix==='person-'){input.required=true;l.textContent+=' *';}input.oninput=()=>{values[key]=input.value;if(prefix==='field-'&&!draft.edited.includes(key))draft.edited.push(key);invalidate();save();};wrap.append(l,input);$(container).append(wrap);}}
+function fields(container,definitions,prefix,values){
+ for(const [key,label] of Object.entries(definitions)){
+  const isPerson=prefix==='person-',isLocation=isPerson&&['state','district'].includes(key);
+  const wrap=document.createElement('div'),l=document.createElement('label'),input=document.createElement(isLocation?'select':'input');
+  l.htmlFor=prefix+key;l.textContent=label;input.id=prefix+key;
+  input.value=isPerson&&key==='phone'?IndianDetails.nationalPhone(values[key]):values[key]??'';
+  if(key==='financial_loss_amount'||key==='age'){input.type='number';input.min=key==='age'?1:0;input.step=key==='age'?1:'0.01';if(key==='age')input.max=120;}
+  if(key==='phone'){input.type='tel';input.inputMode='tel';input.autocomplete='tel-national';input.placeholder='10-digit phone number';input.setAttribute('aria-describedby','phone-country');}
+  if(key==='email'){input.type='email';input.autocomplete='email';}
+  if(isPerson&&key==='name')input.autocomplete='name';
+  if(isPerson&&key==='address')input.autocomplete='street-address';
+  if(isPerson&&key==='pincode'){input.type='text';input.inputMode='numeric';input.maxLength=6;input.pattern='[1-9][0-9]{5}';input.autocomplete='postal-code';input.placeholder='e.g. 411001';}
+  if(isLocation){input.autocomplete=key==='state'?'address-level1':'address-level2';input.disabled=true;setLocationOptions(input,[],key==='state'?'Loading states…':'Choose a state first',values[key]);}
+  if(isPerson&&['name','phone','age','state','district','pincode'].includes(key)){input.required=true;l.textContent+=' *';}
+  const changed=()=>{
+   values[key]=isPerson&&key==='phone'?IndianDetails.storedPhone(input.value):input.value;
+   if(isPerson&&key==='state'){values.district='';populateDistricts();}
+   if(prefix==='field-'&&!draft.edited.includes(key))draft.edited.push(key);
+   invalidate();save();
+  };
+  if(isLocation)input.onchange=changed;else input.oninput=changed;
+  wrap.append(l);
+  if(isPerson&&key==='phone'){
+   const group=document.createElement('div'),country=document.createElement('span');group.className='phone-field';country.id='phone-country';country.textContent='+91';country.setAttribute('aria-label','India country code plus 91');group.append(country,input);wrap.append(group);
+  }else wrap.append(input);
+  $(container).append(wrap);
+ }
+}
+function setLocationOptions(select,items,placeholder,previous=''){
+ select.replaceChildren();const empty=document.createElement('option');empty.value='';empty.textContent=placeholder;select.append(empty);
+ for(const item of items){const option=document.createElement('option');option.value=item.name;option.textContent=item.name;select.append(option);}
+ const match=items.find(item=>item.name.toLowerCase()===String(previous).trim().toLowerCase());
+ if(previous&&!match){const old=document.createElement('option');old.value=previous;old.textContent=previous+' — please select from the updated list';old.disabled=true;select.append(old);}
+ select.value=match?match.name:previous||'';
+}
+function populateDistricts(){
+ const selected=IndianDetails.state(locationData,draft.person.state);
+ setLocationOptions($('person-district'),selected?.districts||[],selected?'Choose your district':'Choose a state first',draft.person.district);
+ $('person-district').disabled=busy||!selected;
+ if(selected&&selected.districts.some(item=>item.name===$('person-district').value))draft.person.district=$('person-district').value;
+}
+async function loadLocations(){
+ $('location-status').textContent='Loading states and districts…';$('retry-locations').hidden=true;
+ try{
+  const response=await fetch('/static/data/india-locations.json');if(!response.ok)throw Error('location data');
+  const data=await response.json();if(!Array.isArray(data.states)||!data.states.length)throw Error('location data');locationData=data;
+  setLocationOptions($('person-state'),data.states,'Choose your state / union territory',draft.person.state);
+  const selected=IndianDetails.state(data,draft.person.state);if(selected)draft.person.state=selected.name;
+  $('person-state').disabled=busy;populateDistricts();
+  $('location-status').textContent='Choose a state to see its districts. These lists work offline.';
+ }catch(_){$('location-status').textContent='Could not load the location list. Please try again.';$('retry-locations').hidden=false;}
+}
 fields('incident-fields',incident,'field-',draft.fields);fields('person-fields',personal,'person-',draft.person);
+$('retry-locations').onclick=loadLocations;loadLocations();
+
 function hydrate(){for(const key of Object.keys(incident)){if(!draft.edited.includes(key)){draft.fields[key]=draft.docket[key]??'';$('field-'+key).value=draft.fields[key];}}if(draft.docket.complainant_age&&!draft.person.age){draft.person.age=draft.docket.complainant_age;$('person-age').value=draft.person.age;}}
 function renderConversation(){ $('conversation').replaceChildren();for(const item of draft.history){const b=document.createElement('div');b.className='bubble '+item.role;const label=document.createElement('strong');label.textContent=item.role==='user'?'You':'Complaint assistant';b.append(label,document.createTextNode(item.content));$('conversation').append(b);} $('answer-box').hidden=!!draft.docket.is_complete;renderReadings();}
 async function turn(message,reset=false){const history=reset?[]:draft.history;const docket=reset?{evidence_available:!!draft.evidence.length}:draft.docket;const result=await api('/api/guided/turn',{message,history:history.slice(-20),docket});draft.history=[...history,{role:'user',content:message,field:docket.pending_field||'story'},{role:'assistant',content:result.reply}];draft.docket=result.docket;draft.storyAnalyzed=draft.story;hydrate();invalidate();renderConversation();}
 function narrative(){const names={utr:'Transaction reference',suspect:'Suspect details',date:'Incident date',platform:'Platform',bank:'Bank or wallet',amount:'Money lost',age:'Age',evidence:'Evidence available'};const extras=draft.history.slice(2).filter(x=>x.role==='user').map(x=>(names[x.field]||'Additional information')+': '+x.content);return draft.story+(extras.length?'\n\nAdditional details:\n'+extras.join('\n'):'');}
 async function classify(){const result=await api('/api/guided/review',{narrative:narrative(),fields:draft.fields,age:draft.person.age?Number(draft.person.age):null,category:draft.category||null});draft.analysis=result;if(!draft.category)draft.category=result.category;$('category').value=draft.category;}
 async function navigate(step){if(busy||voiceCapturing)return;if(step===4){await task('Checking the updated complaint…',async()=>{if(!validatePersonal())return;if(!draft.analysis)await classify();show(4);});}else show(step);}
-function validatePersonal(){for(const key of ['name','phone','state','district'])if(!String(draft.person[key]||'').trim()){show(3);throw Error('Please enter your '+personal[key].toLowerCase()+'.');}if(draft.person.age&&(!Number.isInteger(Number(draft.person.age))||Number(draft.person.age)<1||Number(draft.person.age)>120)){show(3);throw Error('Please enter an age from 1 to 120.');}if(draft.person.email&&!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(draft.person.email)){show(3);throw Error('Please check your email address.');}if(!/^\+?[1-9][\d\s()-]{8,16}$/.test(draft.person.phone||'')||draft.person.phone.replace(/\D/g,'').length<10||/^0+$/.test(draft.person.phone.replace(/\D/g,''))){show(3);throw Error('Please enter a valid phone number.');}return true;}
+function validatePersonal(){
+ const message=IndianDetails.error(draft.person,locationData);
+ if(message){show(3);throw Error(message);}
+ draft.person.phone=IndianDetails.storedPhone(draft.person.phone);
+ return true;
+}
 $('next').onclick=()=>task(draft.step===0?'Checking your description…':draft.step===4?'Creating your complaint report…':'Checking your details…',async()=>{
  const step=draft.step;
  if(step===0){if(draft.story.trim().length<20)throw Error('Please describe what happened in a little more detail.');if(draft.story!==draft.storyAnalyzed){draft.categoryManual=false;draft.category='';await turn(draft.story,true);}show(1);}

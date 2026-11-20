@@ -29,7 +29,7 @@ function harness() {
     setTimeout:fn=>{stats.timers.set(++timerId,fn);return timerId;},
     clearInterval:id=>stats.timers.delete(id),clearTimeout:id=>stats.timers.delete(id),
     document:{body:{classList:{add(){},remove(){}}},querySelectorAll:()=>[...elements.values()]},
-    notice:message=>{stats.notice=message;},renderNavigation(){},save(){},
+    notice:message=>{stats.notice=message;},renderNavigation(){},save(){},populateDistricts(){},locationData:null,
     api:async()=>{stats.requests++;if(stats.fail)throw Error('Service unavailable');return {text:'Test complaint transcript'};}
   });
   function $(id){return element(id);}

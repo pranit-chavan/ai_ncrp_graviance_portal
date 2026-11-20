@@ -507,6 +507,12 @@ async def submit_case_endpoint(payload: Dict[str, Any]):
                                      "pdf_url": f"/api/pdf/{filename}.pdf"})
     try:
         comp = payload.get("complainant") or {}
+        if (payload.get("consent_details") or {}).get("version") == "guided-1":
+            from modules.personal_details import validate_personal_details
+            try:
+                comp = validate_personal_details(comp)
+            except ValueError as error:
+                raise HTTPException(status_code=422, detail=str(error))
         inc = payload.get("incident") or {}
         raw_text = str(payload.get("incident_text") or "").strip()
         narrative = str(payload.get("standardised_narrative") or "").strip()
