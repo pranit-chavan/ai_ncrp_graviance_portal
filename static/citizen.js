@@ -174,8 +174,24 @@ $('transcribe-recording').onclick=()=>{if(pendingRecording&&!busy&&!voiceCapturi
 updateVoiceControls();
 $('use-transcript').onclick=()=>{const text=$('transcript').value.trim();if(!text)return;$('story').value=[$('story').value,text].filter(Boolean).join('\n');$('story').dispatchEvent(new Event('input'));$('transcript-panel').hidden=true;};
 $('home').onclick=()=>{if(busy||voiceCapturing)return;save();$('workspace').hidden=true;$('landing').hidden=false;};
-$('start').onclick=()=>{if(draft.story||draft.evidence.length)show(draft.step);else show(0);};$('resume').onclick=()=>show(draft.step);
-$('restart').onclick=()=>{if(busy||voiceCapturing)return;if(confirm('Start a different complaint? The current browser draft will be replaced. Submitted reports and uploaded files will stay saved.')){localStorage.removeItem(KEY);location.reload();}};
+function startNewComplaint(){
+ if(busy||voiceCapturing)return;
+ releaseRecording();stopRecordingResources();recorder=null;
+ draft=fresh();
+ for(const id of ['story','answer','suspect','id-kind','category','transcript','audio','evidence','identity'])$(id).value='';
+ $('confirm').checked=false;$('transcript-panel').hidden=true;
+ for(const id of ['voice-status','recording-name','reference'])$(id).textContent='';
+ $('recording-time').textContent='00:00';$('download').removeAttribute('href');
+ for(const id of ['incident-fields','person-fields','conversation','evidence-readings','review'])$(id).replaceChildren();
+ // Rebuild field handlers so they write to the new draft's objects.
+ fields('incident-fields',incident,'field-',draft.fields);
+ fields('person-fields',personal,'person-',draft.person);
+ if(locationData){setLocationOptions($('person-state'),locationData.states,'Choose your state / union territory');$('person-state').disabled=false;populateDistricts();}
+ else loadLocations();
+ renderFiles();renderConversation();notice();updateVoiceControls();show(0);
+}
+$('start').onclick=startNewComplaint;$('resume').onclick=()=>show(draft.step);
+$('restart').onclick=startNewComplaint;
 renderFiles();$('resume').hidden=!(draft.story||draft.evidence.length);fetch('/api/guided/warmup',{method:'POST'}).catch(()=>{});
 fetch('/api/taxonomy').then(r=>r.json()).then(data=>{const cats=Array.isArray(data)?data:Object.values(data).flatMap(x=>Array.isArray(x)?x:typeof x==='object'?Object.values(x).flat():[]);const names=[...new Set(cats.filter(x=>typeof x==='string'))];for(const name of names){const option=document.createElement('option');option.value=name;option.textContent=name;$('category').append(option);}$('category').value=draft.category;}).catch(()=>{});
 window.addEventListener('beforeunload',e=>{if(busy||voiceCapturing||pendingRecording){e.preventDefault();e.returnValue='';}});
