@@ -156,9 +156,9 @@ def map_sections(sub_category, complainant_age=None):
         "conditional_applied": [],
         "notes": entry.get("notes", ""),
         "procedural_notes": {
-            "fir_registration": "BNSS 2023 Section 173 mandates registration of FIR upon electronic communication disclosures.",
-            "electronic_evidence_admissibility": "BSA 2023 Section 63 certificate is mandatory for admitting electronic evidence in court (superseding legacy IEA 65B).",
-            "proceeds_lien": "Section 106/107 BNSS 2023 & SOP 1930 / I4C protocols empower immediate inter-bank lien marking."
+            "fir_registration": "BNSS 2023 Section 173 covers information about cognizable offences. Information may be given orally or electronically; electronic information must be signed within three days to be taken on record.",
+            "electronic_evidence_admissibility": "For computer outputs tendered under BSA 2023 Section 63, the section sets admissibility conditions and a certificate requirement. Preserve original evidence and confirm case-specific requirements with the investigator.",
+            "proceeds_lien": "BNSS 2023 Section 106 permits police seizure of property suspected to be stolen or linked to an offence. Under Section 107, an investigating officer may apply to the Court or Magistrate for attachment of suspected proceeds of crime, with required approval. These provisions do not guarantee an immediate bank lien."
         },
         "audit_framework": {
             "jurisdiction": META.get("jurisdiction", "Republic of India"),
