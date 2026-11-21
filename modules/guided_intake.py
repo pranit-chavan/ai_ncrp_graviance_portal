@@ -21,7 +21,7 @@ class GuidedReview(BaseModel):
 
 def guided_turn(req: GuidedTurn):
     result = conduct_counselor_turn(req.message, req.history, req.docket, language="en")
-    return {"ok": True, "reply": result["spoken_response"].replace("You can upload its screenshot below and I’ll read it for you.", "You can add a screenshot in the Describe step, or choose I don’t know."), "docket": result}
+    return {"ok": True, "reply": result["spoken_response"].replace("You can upload its screenshot below and I’ll read it for you.", "If you have a screenshot, you can add it in the Describe step."), "docket": result}
 
 
 def guided_review(req: GuidedReview):

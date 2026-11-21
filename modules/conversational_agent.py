@@ -432,6 +432,42 @@ def _is_unknown_answer(message: str) -> bool:
     ))
 
 
+def _is_evidence_update(message: str) -> bool:
+    normalized = re.sub(r"[^a-z0-9]+", " ", message.lower()).strip()
+    return bool(re.search(
+        r"\b(?:evidence|screenshot|receipt|payment slip|chat screenshot)\b.*\b(?:added|attached|uploaded|sent|provided|shared)\b|"
+        r"\b(?:added|attached|uploaded|sent|provided|shared)\b.*\b(?:evidence|screenshot|receipt|payment slip|chat screenshot)\b",
+        normalized,
+    ))
+
+
+def _is_done_for_now(message: str) -> bool:
+    normalized = re.sub(r"[^a-z0-9']+", " ", message.lower().replace("’", "'")).strip()
+    return bool(re.search(
+        r"\b(?:that is|that's|this is|this was|that was) all (?:the )?(?:information|info|details|i know|i had|i have)\b|"
+        r"\b(?:all the information|all information|all the info|all info) i (?:have|had|know)\b|"
+        r"\b(?:nothing else|no more (?:information|info|details)|that's everything|that is everything|everything i know)\b|"
+        r"\b(?:done|bas itna hi|kuch nahi bacha|kuch nahi hai|aur kuch nahi|kahi nahi|purn zale|evdhech)\b",
+        normalized,
+    ))
+
+
+def _human_acknowledgement(message: str, pending_field: Optional[str], language: str,
+                           reference_confirmed: bool = False) -> str:
+    """Short, context-aware acknowledgements for the deterministic local flow."""
+    if language != "en":
+        return ""
+    if _is_done_for_now(message):
+        return "Understood. I’ve noted that this is all the information you have."
+    if _is_evidence_update(message):
+        if pending_field == "utr" and not reference_confirmed:
+            return "I’ve noted that you have supporting evidence. I haven’t confirmed a transaction reference, so I’ll leave that blank for now."
+        return "I’ve noted that supporting evidence is available."
+    if _is_unknown_answer(message) and pending_field:
+        return "That’s okay; I’ll leave that detail blank and continue."
+    return ""
+
+
 def _parse_pending_amount_answer(message: str) -> Optional[float]:
     """Parse a direct amount reply, where the preceding prompt supplies context."""
     normalized = message.lower().strip().translate(str.maketrans("०१२३४५६७८९", "0123456789"))
@@ -885,6 +921,8 @@ def conduct_counselor_turn(
     unknown_fields = set(docket.get("unknown_fields", []))
     pending_field = _previous_question_field(docket, conversation_history)
     unknown_reply = _is_unknown_answer(user_message)
+    evidence_update = _is_evidence_update(user_message)
+    user_ended = _is_done_for_now(user_message)
 
     # A short yes/no answer must fill the slot for the question that was just
     # asked. In particular, "yes" to the evidence question should open the
@@ -897,7 +935,15 @@ def conduct_counselor_turn(
         elif answer in {"no", "nope", "i do not", "i don t", "i have none", "no i don t", "no i do not", "nahi", "nahin", "नाही"}:
             docket["evidence_available"] = False
 
-    if unknown_reply and pending_field:
+    # Evidence is acknowledged once. If the person says evidence was added but
+    # no confirmed reference was passed from the reviewed OCR fields, leave the
+    # UTR blank and advance instead of asking for the same reference again.
+    if evidence_update:
+        docket["evidence_available"] = True
+        if pending_field == "utr" and not docket.get("utr_number"):
+            unknown_fields.add("utr")
+
+    if (unknown_reply or user_ended) and pending_field:
         field_values = {
             "amount": docket.get("financial_loss_amount"),
             "bank": docket.get("bank_name"),
@@ -961,13 +1007,6 @@ def conduct_counselor_turn(
 
     # 4. Check Termination Phrases ("nothing else", "that's all", "bas itna hi")
     docket["unknown_fields"] = sorted(unknown_fields)
-    user_lower = user_message.lower().strip()
-    termination_keywords = [
-        "nothing else", "that is all", "thats all", "no more", "done",
-        "bas itna hi", "kuch nahi bacha", "kuch nahi hai", "aur kuch nahi",
-        "kahi nahi", "purn zale", "evdhech"
-    ]
-    user_ended = any(k in user_lower for k in termination_keywords)
     max_turns_reached = turn_count >= 10
 
     # 5. Question Generation
@@ -1009,7 +1048,13 @@ def conduct_counselor_turn(
 
     final_spoken = prefix + spoken_q
     final_spoken_en = prefix_en + spoken_en
-    if unknown_reply and pending_field and pending_field in unknown_fields:
+    contextual_ack = _human_acknowledgement(
+        user_message, pending_field, lang, reference_confirmed=bool(docket.get("utr_number"))
+    )
+    if contextual_ack:
+        final_spoken = (prefix if is_urgent else "") + contextual_ack + (" " + spoken_q if spoken_q else "")
+        final_spoken_en = final_spoken
+    elif unknown_reply and pending_field and pending_field in unknown_fields:
         if lang == "mr":
             acknowledgement = "काही हरकत नाही. ही माहिती अज्ञात म्हणून नोंदवून पुढे जाऊ. "
         elif lang == "hi":
@@ -1024,7 +1069,7 @@ def conduct_counselor_turn(
         provider = "ollama"
     llm_used = False
     llm_error = None
-    if use_llm:
+    if use_llm and not contextual_ack:
         try:
             model_acknowledgement = _reply_with_model(
                 user_message=user_message,

@@ -490,7 +490,49 @@ class TestConversationalIntakeUnknownAnswers(unittest.TestCase):
 
         self.assertIn("bank", second_turn["unknown_fields"])
         self.assertEqual(second_turn["pending_field"], "utr")
-        self.assertIn("record that as unknown", second_turn["spoken_response"])
+        self.assertIn("leave that detail blank", second_turn["spoken_response"])
+
+    def test_evidence_update_does_not_repeat_unconfirmed_utr_question(self):
+        docket = {
+            "incident_described": True,
+            "has_financial": True,
+            "financial_loss_amount": 2499,
+            "bank_name": "PhonePe",
+            "pending_field": "utr",
+            "retry_counts": {"utr": 1},
+            "unknown_fields": [],
+        }
+        history = [{"role": "assistant", "content": "What UTR or RRN is shown on your receipt?"}]
+
+        result = conduct_counselor_turn(
+            "evidence added", history, current_docket=docket, language="en", use_llm=False
+        )
+
+        self.assertTrue(result["evidence_available"])
+        self.assertIn("utr", result["unknown_fields"])
+        self.assertNotEqual(result["pending_field"], "utr")
+        self.assertIn("haven’t confirmed a transaction reference", result["spoken_response"])
+        self.assertNotIn("What UTR", result["spoken_response"])
+
+    def test_all_information_statement_closes_followups(self):
+        docket = {
+            "incident_described": True,
+            "has_financial": False,
+            "incident_category": "Cyber Bullying / Stalking / Sexting",
+            "pending_field": "suspect",
+            "retry_counts": {"suspect": 1},
+            "unknown_fields": [],
+        }
+        result = conduct_counselor_turn(
+            "This was all the information I had.", [], current_docket=docket,
+            language="en", use_llm=False,
+        )
+
+        self.assertTrue(result["is_complete"])
+        self.assertIsNone(result["pending_field"])
+        self.assertIn("suspect", result["unknown_fields"])
+        self.assertIn("all the information you have", result["spoken_response"])
+        self.assertNotIn("?", result["spoken_response"])
 
     def test_follow_up_answers_update_slots_and_advance_in_client_docket(self):
         first = conduct_counselor_turn(
