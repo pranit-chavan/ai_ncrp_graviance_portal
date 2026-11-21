@@ -25,6 +25,14 @@ class LossAndReportTests(unittest.TestCase):
             self.assertEqual(extract_loss(text),amount,text)
         self.assertIsNone(extract_loss('I paid 2000. Total loss was 5000.'))
 
+    def test_plain_language_money_gone_claim_is_captured(self):
+        complaint = ('A person asked me to enter my PhonePe PIN, saying cashback was pending. '
+                     'My money gone 5000 I think. It happened yesterday evening.')
+        self.assertEqual(extract_loss(complaint), 5000)
+        result = conduct_counselor_turn(complaint, [], {}, language='en', use_llm=False)
+        self.assertEqual(result['financial_loss_amount'], 5000)
+        self.assertNotEqual(result['pending_field'], 'amount')
+
     def test_requested_and_received_money_not_loss(self):
         for text in ['They sent 150 rs.', 'They asked me to pay Rs 5000.', 'I did not pay Rs 5000.', 'I received 150 rupees.']:
             self.assertIsNone(extract_loss(text),text)

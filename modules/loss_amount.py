@@ -38,7 +38,12 @@ def extract_loss(text):
             if re.search(r'\b(?:total(?: loss)?|lost in total|overall loss)\s*(?:was|is|of|:)?\s*(?:rs\.?|inr|₹)?\s*$', before):
                 total = amount
                 continue
-            outgoing = re.search(r'\b(?:i|we)\s+(?:had\s+)?(?:paid|sent|transferred|lost)\b|\b(?:debited|deducted|stolen)\b', before)
+            money_reported_gone = re.search(
+                r'\b(?:(?:my|our|the)\s+)?(?:money|funds|cash|amount)\s+'
+                r'(?:(?:is|was|has)\s+)?(?:gone|lost|stolen|missing)\b',
+                before,
+            )
+            outgoing = re.search(r'\b(?:i|we)\s+(?:had\s+)?(?:paid|sent|transferred|lost)\b|\b(?:debited|deducted|stolen)\b', before) or money_reported_gone
             context = before[outgoing.start():] if outgoing else before
             if re.search(r"\b(?:didn'?t|did not|never|not)\s+(?:pay|send|transfer)|\b(?:asked|told|demanded|requested|earn|salary|reward|received)\b", context):
                 continue
